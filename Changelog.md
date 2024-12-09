@@ -20,6 +20,7 @@
 #### :wrench: Fix
 
 1. Fix: Adjust the formats of the `requirements` to make them compatible with `pyproject.toml`.
+2. Fix: A Git-sourced dependency is not approved by PyPI. Therefore, replace the Git source by a customized related package: [`Flask-SQLAlchemy-compat-backend-py37`](https://pypi.org/project/Flask-SQLAlchemy-compat-backend-py37).
 
 #### :floppy_disk: Change
 
