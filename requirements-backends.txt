@@ -1,3 +1,3 @@
 flask-sqlalchemy-lite; python_version>="3.9"
 flask-sqlalchemy>=3.1.0; python_version>="3.8"
-git+https://github.com/pamelafox/flask-sqlalchemy.git@fdeec1d0d98669cc612e1f69d6875f9c1e4c6c45; python_version<="3.7"
+flask-sqlalchemy@git+https://github.com/pamelafox/flask-sqlalchemy.git@fdeec1d0d98669cc612e1f69d6875f9c1e4c6c45;python_version<="3.7"

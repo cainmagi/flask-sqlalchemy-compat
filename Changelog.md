@@ -4,7 +4,7 @@
 
 ## CHANGELOG
 
-### 0.1.0 @ 10/09/2024
+### 0.1.0 @ 12/09/2024
 
 #### :mega: New
 
@@ -16,6 +16,10 @@
 6. Add the issue and pull request templates.
 7. Configure the github workflows for publishing the package.
 8. Add the banner and adjust the format in the readme.
+
+#### :wrench: Fix
+
+1. Fix: Adjust the formats of the `requirements` to make them compatible with `pyproject.toml`.
 
 #### :floppy_disk: Change
 
