@@ -16,3 +16,7 @@
 6. Add the issue and pull request templates.
 7. Configure the github workflows for publishing the package.
 8. Add the banner and adjust the format in the readme.
+
+#### :floppy_disk: Change
+
+1. Adjust the metadata according to the current project status.

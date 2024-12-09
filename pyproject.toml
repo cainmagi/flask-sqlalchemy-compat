@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "flask-sqlalchemy-compat"
+name = "Flask-SQLAlchemy-compat"
 authors = [{ name = "Yuchen Jin", email = "cainmagi@gmail.com" }]
 maintainers = [{ name = "Yuchen Jin", email = "cainmagi@gmail.com" }]
 dynamic = [
@@ -30,7 +30,7 @@ requires-python = ">=3.7"
 
 [project.urls]
 Homepage = "https://github.com/cainmagi/flask-sqlalchemy-compat"
-Documentation = "https://cainmagi.github.io/flask-sqlalchemy-compat/"
+# Documentation = "https://cainmagi.github.io/flask-sqlalchemy-compat/"
 Repository = "https://github.com/cainmagi/flask-sqlalchemy-compat.git"
 Issues = "https://github.com/cainmagi/flask-sqlalchemy-compat/issues"
 Changelog = "https://github.com/cainmagi/flask-sqlalchemy-compat/blob/main/Changelog.md"
