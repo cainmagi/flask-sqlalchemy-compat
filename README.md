@@ -1,5 +1,7 @@
 # Flask SQLAlchemy Compat
 
+<p><img alt="Banner" src="https://repository-images.githubusercontent.com/900959960/5fa49b35-0f23-4e6d-9c00-b57ff6e513fd"></p>
+
 <p align="center">
   <a href="https://github.com/cainmagi/flask-sqlalchemy-compat/releases/latest"><img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/cainmagi/flask-sqlalchemy-compat?logo=github&sort=semver&style=flat-square"></a>
   <a href="https://github.com/cainmagi/flask-sqlalchemy-compat/releases"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/cainmagi/flask-sqlalchemy-compat/total?logo=github&style=flat-square"></a>
@@ -37,7 +39,9 @@ python -m pip install "flask-sqlalchemy-compat[dev] @ git+https://github.com/cai
 
 > [!WARNING]
 > To make this package work with `python=3.7`, users should install an unofficial `flask-sqlalchemy` version. See
+>
 > https://github.com/pallets-eco/flask-sqlalchemy/issues/1140#issuecomment-1577921154
+>
 > This unofficial version can be installed by:
 > ```sh
 > python -m pip install flask-sqlalchemy-compat[backends]

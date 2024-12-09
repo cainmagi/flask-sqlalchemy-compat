@@ -15,3 +15,4 @@
 5. Add the community guideline files: `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, and `SECURITY.md`.
 6. Add the issue and pull request templates.
 7. Configure the github workflows for publishing the package.
+8. Add the banner and adjust the format in the readme.
