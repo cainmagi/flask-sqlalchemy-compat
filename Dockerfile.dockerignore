@@ -41,14 +41,8 @@
 
 # Marked by dev.
 /alpha*
-/data*
-/temp*
-!/data/*.py
 /logs
 /outputs
-/cache
-/instance
-/migrations
 
 # Ignore docs (maintained by another branch)
 /docs

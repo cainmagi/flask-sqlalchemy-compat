@@ -1,0 +1,34 @@
+# To run Flask
+flask
+sqlalchemy>=2
+werkzeug
+typing-extensions>=4.1.0
+
+# Flask-SQLAlchemy and Flask-SQLAlchemy-Lite
+flask-sqlalchemy-lite; python_version>="3.9"
+flask-sqlalchemy>=3.1.0; python_version>="3.8"
+git+https://github.com/pamelafox/flask-sqlalchemy.git@fdeec1d0d98669cc612e1f69d6875f9c1e4c6c45; python_version<="3.7"
+
+# Flask-SQLAlchemy related packages
+flask-migrate
+
+# Flask-SQLAlchemy-Lite related packages
+flask-alembic
+
+# Required by testing
+pytest
+pytest-base-url
+pytest-flask
+pytest-html
+pytest-metadata
+py
+pytest-variables
+pytest-xdist
+
+# Dev's
+black
+build
+flake8
+flake8-black
+importlib-metadata; python_version<"3.8"
+packaging
