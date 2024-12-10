@@ -66,6 +66,9 @@ extend-exclude = '''
 # in the root of the project.
 (
   ^/docs
+  |^/Flask_SQLAlchemy_compat\.egg-info
+  |^/instance
+  |^/migrations
 )
 '''
 

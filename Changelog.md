@@ -11,6 +11,10 @@
 1. Fix: Stabilize the backend import when using `Python=3.7`, where the compatible backend will provide an version that would not be overridden by other installations.
 2. Fix: Correct the package information. The package should be zip-safe and does not include extra data.
 
+#### :floppy_disk: Change
+
+1. Add more files to the exclude list of `black`.
+
 ### 0.1.0 @ 12/09/2024
 
 #### :mega: New
