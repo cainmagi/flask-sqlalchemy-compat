@@ -18,7 +18,7 @@ Support the compatibility between `flask_sqlalchemy` and `flask_sqlalchemy_lite`
 The main motivation of this package is because `flask_sqlalchemy_lite` does not support `python<=3.8`. This package is designed for providing the similar usages when users have to make the `flask_sqlalchemy_lite` working with `python<=3.8` by using `flask_sqlalchemy`. In this case, users can get rid of the difficulty of maintaining two sets of codes.
 
 > [!WARNING]
-> This package is designed for `sqlalchemy>=2`. If you are using an older version.
+> This package is designed for `sqlalchemy>=2.0.0` only. If you are using an older version. You cannot use this package.
 
 > [!WARNING]
 > To make this package work with `python=3.7`, users should install an unofficial `flask-sqlalchemy` version.
@@ -31,7 +31,7 @@ Intall the **latest released version** of this package by using the PyPI source:
 python -m pip install flask-sqlalchemy-compat
 ```
 
-Or use the following commands to install **the developing version** from the GitHub Source when you have already installed [Git :hammer:][tool-git]:
+or use the following commands to install **the developing version** from the GitHub Source when you have already installed [Git :hammer:][tool-git]:
 
 ```sh
 python -m pip install "flask-sqlalchemy-compat[dev] @ git+https://github.com/cainmagi/flask-sqlalchemy-compat.git"
@@ -46,7 +46,6 @@ python -m pip install "flask-sqlalchemy-compat[dev] @ git+https://github.com/cai
 > ```sh
 > python -m pip install flask-sqlalchemy-compat[backends]
 > ```
-> Note that specifying the option `backends` require `git` when you are using `python=3.7`. Certainly, you do not need `git` if you are using `python>=3.8`.
 
 ## 2. Usage
 

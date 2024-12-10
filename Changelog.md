@@ -10,6 +10,8 @@
 
 1. Fix: Stabilize the backend import when using `Python=3.7`, where the compatible backend will provide an version that would not be overridden by other installations.
 2. Fix: Correct the package information. The package should be zip-safe and does not include extra data.
+3. Fix: Correct some out-of-date information in the readme file.
+4. Fix: Make some type hint excluded from the run time to improve the stability.
 
 #### :floppy_disk: Change
 

@@ -34,9 +34,9 @@ except ImportError:
 
 from typing_extensions import Concatenate, ParamSpec, Self
 
-import sqlalchemy as sa
 import sqlalchemy.exc as sa_exc
 import sqlalchemy.orm as sa_orm
+import sqlalchemy.engine as sa_engine
 from flask import current_app
 from flask.globals import app_ctx
 
@@ -192,10 +192,10 @@ def hook_base_model(
 
 
 def apply_to_engines(
-    func: Callable[[sa.Engine], None],
+    func: Callable[[sa_engine.Engine], None],
     bind_key: Union[str, None, Sequence[Union[str, None]]],
-    engines: Mapping[str, sa.Engine],
-    default_engine: sa.Engine,
+    engines: Mapping[str, sa_engine.Engine],
+    default_engine: sa_engine.Engine,
 ) -> None:
     """Apply a function to one or multiple engines.
 
@@ -204,17 +204,17 @@ def apply_to_engines(
 
     Arguments
     ---------
-    func: `(sa.Engine) -> None`
+    func: `(sa.engine.Engine) -> None`
         The function to be applied to a single engine.
 
     bind_key: `str | None | Sequence[str | None]`
         The name(s) of the engines where the `func` will be applied to.
 
-    engines: `Mapping[str, sa.Engine]`
+    engines: `Mapping[str, sa.engine.Engine]`
         The collection of all registered engines. If `bind_key` is `__all__`, will
         apply `func` to all engines in this list.
 
-    default_engine: `sa.Engine`
+    default_engine: `sa.engine.Engine`
         The default engine. It should be the same as `engines["default"]`.
     """
     if bind_key is None:

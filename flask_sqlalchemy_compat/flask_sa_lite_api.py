@@ -31,8 +31,8 @@ except ImportError:
 from typing_extensions import Never, overload
 
 import flask
-import sqlalchemy as sa
 import sqlalchemy.orm as sa_orm
+import sqlalchemy.engine as sa_engine
 
 from flask import g
 
@@ -103,7 +103,7 @@ class SQLAlchemyLiteProxy(Generic[_SQLAlchemyDB_co]):
         """
         self.__db = db
 
-        self.__engines: Optional[BackDict[str, sa.Engine]] = None
+        self.__engines: Optional[BackDict[str, sa_engine.Engine]] = None
 
     @property
     def db(self) -> _SQLAlchemyDB_co:
@@ -111,7 +111,7 @@ class SQLAlchemyLiteProxy(Generic[_SQLAlchemyDB_co]):
         return self.__db
 
     @property
-    def engines(self) -> Dict[str, sa.Engine]:
+    def engines(self) -> Dict[str, sa_engine.Engine]:
         """Property: The same as `flask_sqlalchemy_lite.SQLAlchemy().engines`."""
         if self.__engines is None:
             raise RuntimeError(
@@ -119,14 +119,14 @@ class SQLAlchemyLiteProxy(Generic[_SQLAlchemyDB_co]):
                 "with this '{0}' instance. Did you forget to call "
                 "`self.init_app()?`".format(self.__class__.__name__)
             )
-        return cast(Dict[str, sa.Engine], self.__engines)
+        return cast(Dict[str, sa_engine.Engine], self.__engines)
 
     @property
-    def engine(self) -> sa.Engine:
+    def engine(self) -> sa_engine.Engine:
         """Property: The same as `flask_sqlalchemy_lite.SQLAlchemy().engine`."""
         return self.__db.engine
 
-    def get_engine(self, name: str = "default") -> sa.Engine:
+    def get_engine(self, name: str = "default") -> sa_engine.Engine:
         """Get a specific engine associated with the current application.
 
         The `engine` attribute is a shortcut for calling this without an
@@ -192,7 +192,7 @@ class SQLAlchemyLiteProxy(Generic[_SQLAlchemyDB_co]):
         )
 
     @property
-    def sessionmaker(self) -> sa_orm.sessionmaker[sa_orm.Session]:
+    def sessionmaker(self) -> "sa_orm.sessionmaker[sa_orm.Session]":
         """Property: The same as `flask_sqlalchemy_lite.SQLAlchemy().sessionmaker`.
 
         The session factory configured for the current application. This can

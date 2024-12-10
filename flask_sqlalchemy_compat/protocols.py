@@ -35,6 +35,7 @@ from typing_extensions import ClassVar, Protocol
 import sqlalchemy as sa
 import sqlalchemy.ext.asyncio as sa_async
 import sqlalchemy.orm as sa_orm
+import sqlalchemy.engine as sa_engine
 from flask import Flask
 
 if TYPE_CHECKING:
@@ -74,7 +75,8 @@ class ModelProtocol(Protocol):
 
     @property
     def metadata(self) -> sa.MetaData:
-        """Metadata property synthesized by the `flask_sqlalchemy.SQLAlchemy` instance."""
+        """Metadata property synthesized by the `flask_sqlalchemy.SQLAlchemy`
+        instance."""
         ...
 
 
@@ -88,7 +90,7 @@ class SQLAlchemySharedProtocol(Protocol):
     """
 
     @property
-    def engine(self) -> sa.Engine:
+    def engine(self) -> sa_engine.Engine:
         """The default engine associated with the current application."""
         ...
 
@@ -112,12 +114,12 @@ class SQLAlchemyLiteProtocol(SQLAlchemySharedProtocol, Protocol):
         ...
 
     @property
-    def engines(self) -> Dict[str, sa.Engine]:
+    def engines(self) -> Dict[str, sa_engine.Engine]:
         """The engines associated with the current application."""
         ...
 
     @property
-    def sessionmaker(self) -> sa_orm.sessionmaker[sa_orm.Session]:
+    def sessionmaker(self) -> "sa_orm.sessionmaker[sa_orm.Session]":
         """The session factory configured for the current application. This can
         be used to create sessions directly, but they will not be closed
         automatically at the end of the application context. Use `session`
@@ -142,7 +144,9 @@ class SQLAlchemyLiteProtocol(SQLAlchemySharedProtocol, Protocol):
         ...
 
     @property
-    def async_sessionmaker(self) -> sa_async.async_sessionmaker[sa_async.AsyncSession]:
+    def async_sessionmaker(
+        self,
+    ) -> "sa_async.async_sessionmaker[sa_async.AsyncSession]":
         """The async session factory configured for the current application."""
         ...
 
@@ -177,13 +181,13 @@ class SQLAlchemyProtocol(SQLAlchemySharedProtocol, Protocol):
         ...
 
     @property
-    def engines(self) -> Mapping[Optional[str], sa.Engine]:
+    def engines(self) -> Mapping[Optional[str], sa_engine.Engine]:
         """Map of bind keys to `sqlalchemy.engine.Engine` instances for current
         application. The `None` key refers to the default engine."""
         ...
 
     @property
-    def session(self) -> sa_orm.scoped_session[Any]:
+    def session(self) -> "sa_orm.scoped_session[Any]":
         """The default session for the current application context. It will be
         closed when the context ends.
         """

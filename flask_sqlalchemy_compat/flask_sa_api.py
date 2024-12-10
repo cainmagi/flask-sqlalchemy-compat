@@ -45,6 +45,7 @@ import flask
 import sqlalchemy as sa
 import sqlalchemy.exc as sa_exc
 import sqlalchemy.orm as sa_orm
+import sqlalchemy.engine as sa_engine
 import sqlalchemy.event as sa_event
 
 from sqlalchemy.orm.session import _EntityBindKey, _PKIdentityArgument
@@ -221,17 +222,17 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
         return self.__model_class.metadata
 
     @property
-    def engines(self) -> MutableMapping[Optional[str], sa.Engine]:
+    def engines(self) -> MutableMapping[Optional[str], sa_engine.Engine]:
         """The engines associated with the current application.
 
         To make this value compatible with `flask_sqlalchemy`. The returned value is
         added with an extra item: `self.engines[None] is self.engines["default"]`
         """
-        default_dict: Dict[Optional[str], sa.Engine] = {None: self.__db.engine}
+        default_dict: Dict[Optional[str], sa_engine.Engine] = {None: self.__db.engine}
         return collections.ChainMap(default_dict, cast(Any, self.__db.engines))
 
     @property
-    def engine(self) -> sa.Engine:
+    def engine(self) -> sa_engine.Engine:
         """The engines associated with the current application."""
         return self.__db.engine
 
@@ -286,7 +287,7 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
 
     def get_engine(
         self, bind_key: Optional[str] = None, **kwargs: Any
-    ) -> sa.engine.Engine:
+    ) -> sa_engine.Engine:
         """The same as `self.engines[bind_key]`
 
         Get the engine for the given bind key for the current application.
