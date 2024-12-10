@@ -4,6 +4,12 @@
 
 ## CHANGELOG
 
+### 0.1.2 @ 12/10/2024
+
+#### :wrench: Fix
+
+1. Fix: Adjust the dependency versions to make the requirements satisfy the usage in `Python=3.13`.
+
 ### 0.1.1 @ 12/10/2024
 
 #### :wrench: Fix
