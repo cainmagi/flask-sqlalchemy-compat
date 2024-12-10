@@ -1,6 +1,6 @@
 # To run Flask
-flask
-sqlalchemy>=2
+flask[async]
+sqlalchemy[asyncio]>=2
 werkzeug
 typing-extensions>=4.1.0
 

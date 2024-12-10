@@ -12,6 +12,7 @@
 2. Fix: Correct the package information. The package should be zip-safe and does not include extra data.
 3. Fix: Correct some out-of-date information in the readme file.
 4. Fix: Make some type hint excluded from the run time to improve the stability.
+5. Fix: Adjust the dependency versions to match the requirements specified in `flask-sqlalchemy-lite`.
 
 #### :floppy_disk: Change
 
