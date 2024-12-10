@@ -167,5 +167,11 @@ if TYPE_CHECKING:
     import flask_sqlalchemy_lite as fsa_lite
 else:
     # Create conditional-loaded modules.
-    fsa = conditional_import("flask_sqlalchemy")
+    if sys.version_info < (3, 8):
+        # Attempt to import the Python 3.7 version.
+        fsa = conditional_import("flask_sqlalchemy_py37")
+        if is_module_invalid(fsa):
+            fsa = conditional_import("flask_sqlalchemy")
+    else:
+        fsa = conditional_import("flask_sqlalchemy")
     fsa_lite = conditional_import("flask_sqlalchemy_lite")
