@@ -75,11 +75,10 @@ if __name__ == "__main__":
     import flask
 
     app = flask.Flask(__name__, instance_path=os.path.abspath("./instance"))
+    app.config.update({"SQLALCHEMY_ENGINES": {"default": "sqlite:///main.db"}})
+    db.init_app(app)
 
     with app.app_context():
-        app.config.update({"SQLALCHEMY_ENGINES": {"default": "sqlite:///main.db"}})
-        db.init_app(app)
-
         Base.metadata.create_all(db.engine)
 
         db.session.add(NewModel(name="new"))
@@ -115,10 +114,10 @@ if __name__ == "__main__":
     import flask
 
     app = flask.Flask(__name__, instance_path=os.path.abspath("./instance"))
+    app.config.update({"SQLALCHEMY_DATABASE_URI": "sqlite:///main.db"})
+    db.init_app(app)
 
     with app.app_context():
-        app.config.update({"SQLALCHEMY_DATABASE_URI": "sqlite:///main.db"})
-        db.init_app(app)
         db.create_all()
 
         # Indeed, flask_sqlalchemy has a type hint issue until `3.1.x`.

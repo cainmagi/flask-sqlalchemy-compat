@@ -10,6 +10,10 @@
 
 1. Fix: Previously, running `db.init_app(...)` outside the app context will fail if `db` is provided by the proxy class. Now, the `init_app` can be used without limitations.
 
+#### :floppy_disk: Change
+
+1. Adjust the readme file to make the examples consistent with the `db.init_app` behavior in the new version.
+
 ### 0.1.2 @ 12/10/2024
 
 #### :wrench: Fix
