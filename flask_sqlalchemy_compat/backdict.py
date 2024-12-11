@@ -138,7 +138,7 @@ class BackDict(UserDict[K, V]):
     def __init__(
         self,
         data: Mapping[K, V],
-        back_dict: Mapping[K2, V],
+        back_dict: Union[Mapping[K2, V], Callable[[], Mapping[K2, V]]],
         key_mapper: Callable[[K], K2],
         key_back_mapper: Callable[[K2], K],
     ) -> None:
@@ -149,8 +149,11 @@ class BackDict(UserDict[K, V]):
         data: `Mapping[K, T]`
             Mutable data internal storage of `BackDict`.
 
-        back_data: `Mapping[K2, T]`
+        back_data: `Mapping[K2, T] | () -> Mapping[K2, T]`
             Backup immutable data internal storage of `BackDict`.
+
+            This argument can be a deferred loader. A deferred loader is a function
+            that will be called only when the data in `back_dict` is actually accessed.
 
         key_mapper:
             Use this mapper to convert `K` to `K2` when the key is not found in `data`.
@@ -160,12 +163,52 @@ class BackDict(UserDict[K, V]):
             users.
         """
         super().__init__(data)
-        self.__back_dict = back_dict
         self.__key_mapper = key_mapper
         self.__key_back_mapper = key_back_mapper
-        self.__view = BackDictView(
-            data, back_dict, key_mapper=key_mapper, key_back_mapper=key_back_mapper
+
+        # Deferred loaded __back_dict
+        self.__back_dict_ = None
+        self.__back_dict_loader = back_dict
+        self.__view_ = (
+            BackDictView(
+                data, back_dict, key_mapper=key_mapper, key_back_mapper=key_back_mapper
+            )
+            if isinstance(back_dict, collections.abc.Mapping)
+            else None
         )
+
+    @property
+    def __view(self) -> BackDictView[K, V]:
+        """Private property: Deferred created `BackDictView` of this dict."""
+        if self.__view_ is not None:
+            return self.__view_
+        view = BackDictView(
+            self.data,
+            self.__back_dict,
+            key_mapper=self.__key_mapper,
+            key_back_mapper=self.__key_back_mapper,
+        )
+        self.__view_ = view
+        return view
+
+    @property
+    def __back_dict(self) -> Mapping[Any, Any]:
+        """Private property: Deferred created `__back_dict` of this dict."""
+        if self.__back_dict_ is not None:
+            return self.__back_dict_
+        if isinstance(self.__back_dict_loader, collections.abc.Mapping):
+            back_dict = self.__back_dict_loader
+        elif callable(self.__back_dict_loader):
+            back_dict = self.__back_dict_loader()
+        else:
+            back_dict = None
+        if not isinstance(back_dict, collections.abc.Mapping):
+            raise ValueError(
+                'flask_sqlalchemy_compat: The argument "back_dict" is not a mapping '
+                "or a deferred loaded mapping."
+            )
+        self.__back_dict_ = back_dict
+        return back_dict
 
     def __repr__(self) -> str:
         return "{{{0}}}".format(

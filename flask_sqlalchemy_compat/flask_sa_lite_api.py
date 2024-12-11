@@ -24,8 +24,10 @@ import collections.abc
 from typing import Union, Optional, Any, Generic, TypeVar, cast
 
 try:
+    from typing import Mapping
     from typing import Dict
 except ImportError:
+    from collections.abc import Mapping
     from builtins import dict as Dict
 
 from typing_extensions import Never, overload
@@ -186,10 +188,14 @@ class SQLAlchemyLiteProxy(Generic[_SQLAlchemyDB_co]):
         app.teardown_appcontext(_close_sessions)
         self.__engines = BackDict(
             {},
-            self.__db.engines,
+            self.__get_engines,
             key_mapper=_key_proxy_to_engine,
             key_back_mapper=_key_engine_to_proxy,
         )
+
+    def __get_engines(self) -> Mapping[Optional[str], sa_engine.Engine]:
+        """Deferred loader for loading the engines in the app context."""
+        return self.__db.engines
 
     @property
     def sessionmaker(self) -> "sa_orm.sessionmaker[sa_orm.Session]":

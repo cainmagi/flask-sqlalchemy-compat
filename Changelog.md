@@ -4,6 +4,12 @@
 
 ## CHANGELOG
 
+### 0.1.3 @ 12/11/2024
+
+#### :wrench: Fix
+
+1. Fix: Previously, running `db.init_app(...)` outside the app context will fail if `db` is provided by the proxy class. Now, the `init_app` can be used without limitations.
+
 ### 0.1.2 @ 12/10/2024
 
 #### :wrench: Fix

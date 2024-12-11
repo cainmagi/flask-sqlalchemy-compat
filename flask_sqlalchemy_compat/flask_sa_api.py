@@ -282,7 +282,9 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
         if "sqlalchemy" not in app.extensions:
             self.__add_configs(app)
             self.__db.init_app(app)
-        self.__session = sa_orm.scoped_session(self.__db.sessionmaker, get_app_ctx_id)
+        self.__session = sa_orm.scoped_session(
+            getattr(self.__db, "_app_state")[app].sessionmaker, get_app_ctx_id
+        )
         app.teardown_appcontext(self._teardown_session)
 
     def get_engine(
