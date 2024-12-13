@@ -22,6 +22,7 @@
 #### :floppy_disk: Change
 
 1. Update the metadata of the package. The chages are made for adjusting the new optional dependencies and tests.
+2. Update the project information for preparing to upload a new PyPI release.
 
 ### 0.1.3 @ 12/11/2024
 

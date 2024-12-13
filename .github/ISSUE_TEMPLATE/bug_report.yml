@@ -78,7 +78,7 @@ body:
     attributes:
       label: Flask SQLAlchemy Compat version
       description: >-
-        e.g. 0.1.x
+        e.g. 0.2.x
     validations:
       required: true
 
