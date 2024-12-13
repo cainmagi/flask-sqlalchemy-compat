@@ -46,8 +46,10 @@ from flask import Flask
 from .backends import proxy
 from .backends import is_module_invalid
 
-from .flask_sa_api import as_flask_sqlalchemy
-from .flask_sa_lite_api import as_flask_sqlalchemy_lite
+from .flask_sa_api import as_flask_sqlalchemy, SQLAlchemyProxy
+from .flask_sa_lite_api import as_flask_sqlalchemy_lite, SQLAlchemyLiteProxy
+
+from .utilities import clone_function
 
 
 if TYPE_CHECKING:
@@ -64,7 +66,12 @@ else:
 
 _ModelLite = TypeVar("_ModelLite", bound=sa_orm.DeclarativeBase, covariant=True)
 
-__all__ = ("get_flask_sqlalchemy_lite", "get_flask_sqlalchemy")
+__all__ = (
+    "get_flask_sqlalchemy_lite",
+    "get_flask_sqlalchemy",
+    "get_flask_sqlalchemy_lite_proxy_ver",
+    "get_flask_sqlalchemy_proxy_ver",
+)
 
 
 def get_flask_sqlalchemy_lite(
@@ -237,3 +244,43 @@ def get_flask_sqlalchemy(
         '"flask_sqlalchemy_lite" are not installed, cannot get the SQLAlchemy or its '
         "proxy db instance."
     )
+
+
+@clone_function(get_flask_sqlalchemy_lite)
+def get_flask_sqlalchemy_lite_proxy_ver(
+    model_class: Type[_ModelLite],
+    app: Optional[Flask] = None,
+    engine_options: Optional[Mapping[str, Any]] = None,
+    session_options: Optional[Mapping[str, Any]] = None,
+) -> Tuple[SQLAlchemyLiteProxy[SQLAlchemy], Type[_ModelLite]]:
+    """Proxy version of `get_flask_sqlalchemy_lite`.
+
+    The usage and the returned value of this function is totally the same as
+    `get_flask_sqlalchemy_lite`. However, the first returned value will be
+    deliberately notated by `SQLAlchemyLiteProxy`, which can be used by the coders
+    who want to use this type to remind remind them the compatibility supported
+    by the falling back version.
+    """
+    db, model = get_flask_sqlalchemy_lite(
+        model_class, app, engine_options, session_options
+    )
+    return cast(SQLAlchemyLiteProxy[SQLAlchemy], db), model
+
+
+@clone_function(get_flask_sqlalchemy)
+def get_flask_sqlalchemy_proxy_ver(
+    model_class: Type[_ModelLite],
+    app: Optional[Flask] = None,
+    engine_options: Optional[Mapping[str, Any]] = None,
+    session_options: Optional[Mapping[str, Any]] = None,
+) -> SQLAlchemyProxy[SQLAlchemyLite, _ModelLite]:
+    """Proxy version of `get_flask_sqlalchemy`.
+
+    The usage and the returned value of this function is totally the same as
+    `get_flask_sqlalchemy`. However, the first returned value will be
+    deliberately notated by `SQLAlchemyProxy`, which can be used by the coders
+    who want to use this type to remind remind them the compatibility supported
+    by the falling back version.
+    """
+    db = get_flask_sqlalchemy(model_class, app, engine_options, session_options)
+    return cast(SQLAlchemyProxy[SQLAlchemyLite, _ModelLite], db)

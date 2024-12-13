@@ -9,6 +9,7 @@
 #### :mega: New
 
 1. Make `backends.fsa` and `backends.fsa_lite` protected by `backends.proxy`. The other parts of this project will access backends module by this newly added `proxy`. This change allows users to deliberately change `proxy` for testing purposes. For example, the users can disable `flask-sqlalchemy` by setting `proxy.fsa = None` even if the package is already installed.
+2. Provide two new methods `get_flask_sqlalchemy_proxy_ver(...)` and `get_flask_sqlalchemy_lite_proxy_ver(...)`. In run time, they are totally the same as `get_flask_sqlalchemy(...)` and `get_flask_sqlalchemy_lite(...)`, respectively. The only difference is that the returned values of `_proxy_ver(...)` are notated by the the proxy classes like `SQLAlchemyProxy`. Users can use these methods to check the compatibility with the falling back version via the static type checker.
 
 ### 0.1.3 @ 12/11/2024
 

@@ -39,7 +39,12 @@ from .protocols import SQLAlchemyProtocol, SQLAlchemyLiteProtocol, ModelProtocol
 from .utilities import TableNameGetter, QueryGetter
 from .flask_sa_api import SQLAlchemyProxy, as_flask_sqlalchemy
 from .flask_sa_lite_api import SQLAlchemyLiteProxy, as_flask_sqlalchemy_lite
-from .auto import get_flask_sqlalchemy, get_flask_sqlalchemy_lite
+from .auto import (
+    get_flask_sqlalchemy,
+    get_flask_sqlalchemy_proxy_ver,
+    get_flask_sqlalchemy_lite,
+    get_flask_sqlalchemy_lite_proxy_ver,
+)
 
 
 __all__ = (
@@ -60,7 +65,9 @@ __all__ = (
     "as_flask_sqlalchemy",
     "as_flask_sqlalchemy_lite",
     "get_flask_sqlalchemy",
+    "get_flask_sqlalchemy_proxy_ver",
     "get_flask_sqlalchemy_lite",
+    "get_flask_sqlalchemy_lite_proxy_ver",
 )
 
 # Set this local module as the prefered one

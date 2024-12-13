@@ -21,6 +21,7 @@ provided.
 """
 
 import re
+import inspect
 import functools
 
 from typing import Union, Optional, Any, TypeVar, cast
@@ -45,6 +46,7 @@ from .protocols import SQLAlchemyProtocol, SQLAlchemyLiteProtocol
 
 P = ParamSpec("P")
 T = TypeVar("T")
+S = TypeVar("S")
 _Type = TypeVar("_Type", bound=Type)
 
 _Model_contra = TypeVar(
@@ -58,6 +60,7 @@ __all__ = (
     "hook_base_model",
     "apply_to_engines",
     "clone_method",
+    "clone_function",
     "get_app_ctx_id",
     "QueryGetter",
     "TableNameGetter",
@@ -134,7 +137,7 @@ def hook_classmethod(
     return cast(Callable[P, T], classmethod(hooked))
 
 
-def _hook_base_model_subclass(cls, *args: Any, **kwargs: Any) -> None:
+def _hook_base_model_subclass(cls: Type[Any], *args: Any, **kwargs: Any) -> None:
     """The hook used in `hook_base_model`."""
     try:
         _attr = getattr(cls, "__tablename__", None)
@@ -239,21 +242,24 @@ def apply_to_engines(
 
 def clone_method(
     method: Callable[Concatenate[P], Any],
-) -> Callable[[Callable[Concatenate[Any, P], T]], Callable[Concatenate[Any, P], T]]:
+) -> Callable[[Callable[Concatenate[S, P], T]], Callable[Concatenate[S, P], T]]:
     """A decorator for modifying the static type hint of a method by cloning the
     signature of another method.
 
-    This decorator should be only used for cloning the regular method. It is not
-    suitable for classmethod, staticmethod or regular functions.
+    This decorator should be only used for cloning the regular bounded method. It is
+    not suitable for classmethod, staticmethod or regular functions.
 
     Arguments
     ---------
     method: `(**P) -> Any`
-        The original method providing the signature to be cloned.
+        The original function providing the signature to be cloned. Its signature is
+        expected to be the same as the bounded method.
+
+        Note that the function itself is not a bounded method.
 
     Returns
     -------
-    #1: `((self, **P) -> T) -> ((self, **P) -> T)`
+    #1: `((self: S, **P) -> T) -> ((self: S, **P) -> T)`
         A wrapper that forward a function as it is directly but the signature of the
         function will be consistent with the argument `method`.
 
@@ -261,13 +267,44 @@ def clone_method(
         be determined by the wrapped method.
     """
 
-    def wrapper(
-        func: Callable[Concatenate[Any, P], T]
-    ) -> Callable[Concatenate[Any, P], T]:
-        _doc = func.__doc__
-        _func = functools.wraps(method)(func)
+    def wrapper(func: Callable[Concatenate[S, P], T]) -> Callable[Concatenate[S, P], T]:
+        _func = functools.update_wrapper(wrapper=func, wrapped=method)
         _func.__doc__ = "{0}\n\nOriginal Method\n---------------\n\n{1}".format(
-            _doc, func.__doc__
+            inspect.getdoc(func), inspect.getdoc(_func)
+        )
+        return _func
+
+    return wrapper
+
+
+def clone_function(
+    func_o: Callable[..., Any]
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """A decorator for modifying the static type hint of a function by cloning the
+    signature of another function.
+
+    This decorator should be only used for cloning the regular functions. It is not
+    suitable for methods.
+
+    Arguments
+    ---------
+    func_o: `(**P) -> Any`
+        The original function providing the signature to be cloned.
+
+    Returns
+    -------
+    #1: `((**P) -> T) -> ((**P) -> T)`
+        A wrapper that forward a function as it is directly but the signature of the
+        function will be consistent with the argument `method`.
+
+        The input signature will be copied from `method`. But the output value will
+        be determined by the wrapped method.
+    """
+
+    def wrapper(func: Callable[P, T]) -> Callable[P, T]:
+        _func = functools.update_wrapper(wrapper=func, wrapped=func_o)
+        _func.__doc__ = "{0}\n\nOriginal Function\n-----------------n\n{1}".format(
+            inspect.getdoc(func), inspect.getdoc(_func)
         )
         return _func
 
