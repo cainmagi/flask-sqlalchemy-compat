@@ -17,6 +17,7 @@
 #### :wrench: Fix
 
 1. Fix: When the module is reloaded, accessing the `SQLAlchemyProxy().Model.query` may cause `RuntimeError`. Now, this error has been catched.
+2. Fix: Prevent `flake8` from raising `F722` when working with older python versions (`Python<3.10`).
 
 #### :floppy_disk: Change
 
