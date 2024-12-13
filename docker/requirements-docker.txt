@@ -26,6 +26,7 @@ pytest-metadata
 py
 pytest-variables
 pytest-xdist
+flask-login
 
 # Dev's
 black

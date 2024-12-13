@@ -82,12 +82,14 @@ docker run -it --rm -p 8080:8080 flask-sqlalchemy-compat:latest --demo
 The following command is used for launching a different demo. The available demo names are the `.py` file names in `./examples`
 
 ``` sh
-docker run -it --rm -p 8080:8080 flask-sqlalchemy-compat:latest --demo demo=change_image
+docker run -it --rm -p 8080:8080 flask-sqlalchemy-compat:latest --demo demo=app_fsqla
 ```
 
-| Demo Name | Description               |
-| :-------: | ------------------------- |
-|           | Demos are to be done now. |
+|    Demo Name     | Description                                                          |
+| :--------------: | -------------------------------------------------------------------- |
+|    `default`     | Only run some Flask SQLAlchemy (Lite) commits and queries.           |
+|   `app_fsqla`    | A Flask application providing APIs powered by Flask SQLAlchemy.      |
+| `app_fsqla_lite` | A Flask application providing APIs powered by Flask SQLAlchemy Lite. |
 
 When the demo is running, you should be able to access the demo by
 
@@ -129,6 +131,12 @@ Now you will be able to start the development. You can do the following things t
   
     ``` sh
     black .
+    ```
+
+* Run an example
+  
+    ``` sh
+    python -m examples.app_fsqla
     ```
 
 * Build the python pacakge
@@ -219,6 +227,12 @@ You can do the following things to test the codes.
   
     ``` sh
     black .
+    ```
+
+* Run an example
+  
+    ``` sh
+    python -m examples.app_fsqla
     ```
 
 * Build the python pacakge

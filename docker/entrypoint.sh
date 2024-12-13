@@ -33,6 +33,7 @@ msg "Developer's environment for Flask SQLAlchemy Compat."
 BASH=false
 RUN_PYTHON=false
 RUN_DEMO=false
+DEMO_NAME=""
 
 # Pass options from command line
 for ARGUMENT in "$@"
@@ -46,6 +47,7 @@ do
         --bash)         BASH=true ;;
         --python)       RUN_PYTHON=true ;;
         --demo)         RUN_DEMO=true ;;
+        demo)           DEMO_NAME=${VALUE} ;;
         *)
     esac
 done
@@ -85,8 +87,13 @@ fi
 if $RUN_DEMO
 then
     # Run python demo.
-    msg "Run the default Flask demo app."
-    ${PYTHON} usage.py || fail
+    if [ "x${DEMO_NAME}" = "x" ] || [ "x${DEMO_NAME}" = "xdefault" ]; then
+        msg "Run the default Flask demo app."
+        ${PYTHON} usage.py || fail
+    else
+        msg "Run the Flask demo app: ${DEMO_NAME}"
+        ${PYTHON} -m examples.${DEMO_NAME} || fail
+    fi
     exit 0
 fi
 

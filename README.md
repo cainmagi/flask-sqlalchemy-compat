@@ -132,6 +132,8 @@ if __name__ == "__main__":
 
 The magic happens if you run the first example with only `flask-sqlalchemy` installed and the second example with only `flask-sqlalchemy-lite` installed.
 
+Compared to the above minimal examples, we also provided a `usage.py` file and example applications in the `examples/` folder. Check them to view more details.
+
 ## 3. Documentation
 
 > [!CAUTION]

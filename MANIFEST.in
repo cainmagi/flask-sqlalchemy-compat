@@ -5,3 +5,4 @@ include CODE_OF_CONDUCT.md
 include SECURITY.md
 include LICENSE
 include version/__init__.py
+include examples/*
