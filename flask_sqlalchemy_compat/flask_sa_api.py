@@ -53,8 +53,7 @@ from sqlalchemy.orm.session import _EntityBindKey, _PKIdentityArgument
 from .protocols import SQLAlchemyProtocol, SQLAlchemyLiteProtocol
 from .utilities import hook_base_model, get_app_ctx_id, apply_to_engines, clone_method
 
-from .backends import fsa as _fsa
-from .backends import fsa_lite as _fsa_lite
+from .backends import proxy
 from .backends import is_module_invalid
 
 
@@ -567,8 +566,8 @@ def as_flask_sqlalchemy(
         This wrapper has the same APIs of `flask_sqlalchemy.SQLAlchemy()` but
         the implementation is based on `flask_sqlalchemy_lite.SQLAlchemy()`.
     """
-    if not is_module_invalid(_fsa):
-        if isinstance(db, _fsa.SQLAlchemy):
+    if not is_module_invalid(proxy.fsa):
+        if isinstance(db, proxy.fsa.SQLAlchemy):
             return db
     if not isinstance(model_class, type):
         raise TypeError(
@@ -580,8 +579,8 @@ def as_flask_sqlalchemy(
             'flask_sqlalchemy_compat: The argument "model_class" needs to be a '
             'subclass of "sa.orm.DeclarativeBase".'
         )
-    if not is_module_invalid(_fsa_lite):
-        if isinstance(db, _fsa_lite.SQLAlchemy):
+    if not is_module_invalid(proxy.fsa_lite):
+        if isinstance(db, proxy.fsa_lite.SQLAlchemy):
             return SQLAlchemyProxy(db, model_class=model_class)
     raise TypeError(
         'flask_sqlalchemy_compat: Fail to convert "db" because of either of the '

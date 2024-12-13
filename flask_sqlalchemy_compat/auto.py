@@ -43,8 +43,7 @@ import sqlalchemy.orm as sa_orm
 
 from flask import Flask
 
-from .backends import fsa as _fsa
-from .backends import fsa_lite as _fsa_lite
+from .backends import proxy
 from .backends import is_module_invalid
 
 from .flask_sa_api import as_flask_sqlalchemy
@@ -135,15 +134,15 @@ def get_flask_sqlalchemy_lite(
         if isinstance(session_options, collections.abc.Mapping)
         else None
     )
-    if not is_module_invalid(_fsa_lite):
+    if not is_module_invalid(proxy.fsa_lite):
         return (
-            _fsa_lite.SQLAlchemy(
+            proxy.fsa_lite.SQLAlchemy(
                 app, engine_options=engine_options, session_options=session_options
             ),
             model_class,
         )
-    if not is_module_invalid(_fsa):
-        _db = _fsa.SQLAlchemy(
+    if not is_module_invalid(proxy.fsa):
+        _db = proxy.fsa.SQLAlchemy(
             model_class=model_class,
             session_options=session_options,
             engine_options=engine_options,
@@ -219,14 +218,14 @@ def get_flask_sqlalchemy(
         if isinstance(session_options, collections.abc.Mapping)
         else None
     )
-    if not is_module_invalid(_fsa):
-        return _fsa.SQLAlchemy(
+    if not is_module_invalid(proxy.fsa):
+        return proxy.fsa.SQLAlchemy(
             model_class=model_class,
             session_options=session_options,
             engine_options=engine_options,
         )
-    if not is_module_invalid(_fsa_lite):
-        _db = _fsa_lite.SQLAlchemy(
+    if not is_module_invalid(proxy.fsa_lite):
+        _db = proxy.fsa_lite.SQLAlchemy(
             app, engine_options=engine_options, session_options=session_options
         )
         _wrap = as_flask_sqlalchemy(_db, model_class=model_class)

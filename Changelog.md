@@ -4,6 +4,12 @@
 
 ## CHANGELOG
 
+### 0.2.0 @ 12/13/2024
+
+#### :mega: New
+
+1. Make `backends.fsa` and `backends.fsa_lite` protected by `backends.proxy`. The other parts of this project will access backends module by this newly added `proxy`. This change allows users to deliberately change `proxy` for testing purposes. For example, the users can disable `flask-sqlalchemy` by setting `proxy.fsa = None` even if the package is already installed.
+
 ### 0.1.3 @ 12/11/2024
 
 #### :wrench: Fix

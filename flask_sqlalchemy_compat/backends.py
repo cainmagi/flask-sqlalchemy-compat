@@ -26,21 +26,24 @@ The backends include:
     (licensed by MIT License, Copyright 2024 Pallets)
 """
 
+import sys
 import importlib
 import importlib.util
 from types import ModuleType
-import sys
 
-from typing import TYPE_CHECKING
-from typing import Optional
+from typing import TYPE_CHECKING, cast
+from typing import Union, Optional, Generic, TypeVar
 
 try:
     from typing import Sequence
 except ImportError:
     from collections.abc import Sequence
 
-from typing_extensions import TypeGuard
+from typing_extensions import Literal, TypeGuard
 
+
+M1 = TypeVar("M1", bound=ModuleType)
+M2 = TypeVar("M2", bound=ModuleType)
 
 __all__ = (
     "fsa",
@@ -48,6 +51,8 @@ __all__ = (
     "ModulePlaceholder",
     "conditional_import",
     "is_module_invalid",
+    "BackendProxy",
+    "proxy",
 )
 
 
@@ -175,3 +180,79 @@ else:
     else:
         fsa = conditional_import("flask_sqlalchemy")
     fsa_lite = conditional_import("flask_sqlalchemy_lite")
+
+
+class BackendProxy(Generic[M1, M2]):
+    """A proxy class that is used for maintaining the dynamically loaded modules.
+
+    The properties of this module are editable, thus allowing the modules to be
+    dynamically changed if necessary.
+    """
+
+    def __init__(self, fsa: M1, fsa_lite: M2) -> None:
+        """Initialization."""
+        self.__fsa: M1 = fsa
+        self.__fsa_prototype: M1 = self.__fsa
+        self.__fsa_lite: M2 = fsa_lite
+        self.__fsa_lite_prototype: M2 = self.__fsa_lite
+
+    @property
+    def fsa(self) -> M1:
+        """A reference to `flask_sqlalchemy`.
+
+        This value can be set by `True`, `False`, or `None`.
+        If using `True`, will attempt to retrieve the module.
+        If using `False` or `None`, will make the module replaced by the placeholder.
+        """
+        return self.__fsa
+
+    @fsa.setter
+    def fsa(self, value: Union[M1, Literal[True, False], None]) -> None:
+        """A reference to `flask_sqlalchemy`. (Setter)"""
+        if value is False or value is None:
+            if is_module_invalid(self.__fsa_lite):
+                # This is the only installed module. Should not disable it.
+                return
+            self.__fsa = cast(M1, ModulePlaceholder(fsa.__name__))
+        elif value is True:
+            self.__fsa = self.__fsa_prototype
+        else:
+            if is_module_invalid(self.__fsa_lite):
+                # This is the only installed module. Should not disable it.
+                return
+            self.__fsa = value
+
+    @property
+    def fsa_lite(self) -> M2:
+        """A reference to `flask_sqlalchemy_lite`.
+
+        This value can be set by `True`, `False`, or `None`.
+        If using `True`, will attempt to retrieve the module.
+        If using `False` or `None`, will make the module replaced by the placeholder.
+        """
+        return self.__fsa_lite
+
+    @fsa_lite.setter
+    def fsa_lite(self, value: Union[M2, Literal[True, False], None]) -> None:
+        """A reference to `flask_sqlalchemy_lite`. (Setter)"""
+        if value is False or value is None:
+            if is_module_invalid(self.__fsa):
+                # This is the only installed module. Should not disable it.
+                return
+            self.__fsa_lite = cast(M2, ModulePlaceholder(fsa_lite.__name__))
+        elif value is True:
+            self.__fsa_lite = self.__fsa_lite_prototype
+        else:
+            if is_module_invalid(self.__fsa):
+                # This is the only installed module. Should not disable it.
+                return
+            self.__fsa_lite = value
+
+
+proxy = BackendProxy(fsa, fsa_lite)
+"""The proxy of internally used modules. For the testing purposes, its properties
+can by dynamically changed by `None`, `True`, or `False` to turn on or turn off the
+modules. Changing the properties of this instance will take a global effect to all
+functionalities actually loading the extensions. For example,
+`flask_sa_api.as_flask_sqlalchemy(...)` will not be able to use Flask SQLAlchemy if
+the property `fsa` is deliberately configured by `False` or `None`."""

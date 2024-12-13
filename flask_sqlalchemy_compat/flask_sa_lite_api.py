@@ -41,8 +41,7 @@ from flask import g
 from .backdict import BackDict
 from .protocols import SQLAlchemyProtocol, SQLAlchemyLiteProtocol
 
-from .backends import fsa as _fsa
-from .backends import fsa_lite as _fsa_lite
+from .backends import proxy
 from .backends import is_module_invalid
 
 
@@ -322,11 +321,11 @@ def as_flask_sqlalchemy_lite(
         This wrapper has the same APIs of `flask_sqlalchemy_lite.SQLAlchemy()` but
         the implementation is based on `flask_sqlalchemy.SQLAlchemy()`.
     """
-    if not is_module_invalid(_fsa_lite):
-        if isinstance(db, _fsa_lite.SQLAlchemy):
+    if not is_module_invalid(proxy.fsa_lite):
+        if isinstance(db, proxy.fsa_lite.SQLAlchemy):
             return db
-    if not is_module_invalid(_fsa):
-        if isinstance(db, _fsa.SQLAlchemy):
+    if not is_module_invalid(proxy.fsa):
+        if isinstance(db, proxy.fsa.SQLAlchemy):
             return SQLAlchemyLiteProxy(db)
     raise TypeError(
         'flask_sqlalchemy_compat: Fail to convert "db" because of either of the '
