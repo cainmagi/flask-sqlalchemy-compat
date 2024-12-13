@@ -352,11 +352,17 @@ class QueryGetter:
                 "model has not been passed to a `flask_sqlalchemy.SQLAlchemy` object "
                 "or its proxy."
             )
-        if __db is not current_app.extensions.get("sqlalchemy"):
+        try:
+            if __db is not current_app.extensions.get("sqlalchemy"):
+                raise DBNotReadyError(
+                    "flask_sqlalchemy_compat: Cannot use `query` before registering "
+                    "the app by `init_app(...)`."
+                )
+        except RuntimeError as exc:
             raise DBNotReadyError(
-                "flask_sqlalchemy_compat: Cannot use `query` before registering the "
-                "app by `init_app(...)`."
-            )
+                "flask_sqlalchemy_compat: Attempt to access the database outside "
+                "the app context `app.app_context()`."
+            ) from exc
         self.__db = __db
         return __db.session
 
