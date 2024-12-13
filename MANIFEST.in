@@ -6,3 +6,4 @@ include SECURITY.md
 include LICENSE
 include version/__init__.py
 include examples/*
+include tests/*

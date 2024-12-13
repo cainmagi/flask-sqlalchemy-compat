@@ -25,9 +25,10 @@ RUN bash /app/install.sh $INSTALL_MODE
 # Copy codes
 COPY ./flask_sqlalchemy_compat /app/flask_sqlalchemy_compat
 COPY ./examples /app/examples
-# COPY ./tests /app/tests
+COPY ./tests /app/tests
 COPY ./version /app/version
 COPY ./*.* /app/
+COPY ./LICENSE /app/
 
 # Finalize
 COPY ./docker/entrypoint.sh /app/

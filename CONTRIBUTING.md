@@ -60,13 +60,15 @@ Run the following command to start the tests.
 docker run -it --rm flask-sqlalchemy-compat:latest
 ```
 
-<!--
 If the codes have not been modified, you suppose to see the the messages like this:
 
 ![docker-hello-world](./display/docker-pytest.png)
 
 It shows that all unit tests get passed.
--->
+
+> [!NOTE]
+> Note that in Python 3.7, the tests will be fewer because `flask-sqlalchemy` is the
+> only available backend and some tests are meaningless.
 
 #### 2.3. Run the demo
 
