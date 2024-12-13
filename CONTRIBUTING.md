@@ -163,14 +163,6 @@ Before start the installation, you need to ensure the following things are insta
     * Get MiniConda: https://docs.anaconda.com/miniconda/miniconda-install/
     * Get MicroMamba: https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html
 
-* A browser
-
-    You need to ensure that either one of the Chromium-based browser is installed.
-
-    * Get Edge: https://www.microsoft.com/en-us/edge/download
-    * Get Chrome: https://www.google.com/chrome/dr/download
-    * Get Chromium: https://www.chromium.org/getting-involved/download-chromium/
-
 * Git
 
     You need to ensure that Git command is available:

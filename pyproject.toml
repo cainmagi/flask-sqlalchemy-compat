@@ -49,12 +49,21 @@ dependencies = { file = ["requirements.txt"] }
 [tool.setuptools.dynamic.optional-dependencies]
 dev = { file = ["requirements-dev.txt"] }
 backends = { file = ["requirements-backends.txt"] }
-# test = { file = ["tests/requirements.txt"] }
+test = { file = ["tests/requirements.txt"] }
+example = { file = ["examples/requirements.txt"] }
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["flask_sqlalchemy_compat"]
-exclude = ["version", "docker", "tests*", "examples*", "docs*"]
+exclude = [
+  "version",
+  "docker",
+  "tests*",
+  "examples*",
+  "docs*",
+  "instance",
+  "migrations",
+]
 namespaces = false
 
 [tool.black]
@@ -81,8 +90,7 @@ log_format = "%(name)s | %(filename)s - %(funcName)s @ %(asctime)s: %(levelname)
 log_date_format = "%Y-%m-%d %H:%M:%S"
 log_cli = true
 log_cli_level = "INFO"
-selenium_exclude_debug = "html:logs:screenshot"
-filterwarnings = ["ignore::DeprecationWarning:selenium"]
+filterwarnings = []
 
 [tool.pyright]
 include = ["./usage.py", "flask_sqlalchemy_compat", "tests"]
@@ -93,6 +101,8 @@ exclude = [
   "logs",
   "outputs",
   "docs",
+  "instance",
+  "migrations",
   ".VSCodeCounter",
   ".github",
   ".git",
@@ -108,6 +118,7 @@ exclude = [
   "typestubs",
   "setup.py",
   "version",
+
 ]
 ignore = ["version", "setup.py"]
 defineConstant = { DEBUG = true }

@@ -18,6 +18,10 @@
 
 1. Fix: When the module is reloaded, accessing the `SQLAlchemyProxy().Model.query` may cause `RuntimeError`. Now, this error has been catched.
 
+#### :floppy_disk: Change
+
+1. Update the metadata of the package. The chages are made for adjusting the new optional dependencies and tests.
+
 ### 0.1.3 @ 12/11/2024
 
 #### :wrench: Fix

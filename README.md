@@ -134,6 +134,12 @@ The magic happens if you run the first example with only `flask-sqlalchemy` inst
 
 Compared to the above minimal examples, we also provided a `usage.py` file and example applications in the `examples/` folder. Check them to view more details.
 
+> [!TIP]
+> To run the demos in `examples`, you need to install the optional dependencies by
+> ```sh
+> python -m pip install flask-sqlalchemy-compat[example,backends]
+> ```
+
 ## 3. Documentation
 
 > [!CAUTION]
