@@ -355,9 +355,9 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
     ) -> T: ...
 
     @overload  # noqa: F722
-    def first_or_404(
+    def first_or_404(  # noqa: F722
         self,
-        statement: "sa.sql.Select[Tuple[T, T2, *Ts]]",
+        statement: "sa.sql.Select[Tuple[T, T2, *Ts]]",  # noqa: F722
         *,
         description: Optional[str] = None,
     ) -> "Tuple[T, T2, *Ts]": ...
@@ -394,9 +394,9 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
     ) -> T: ...
 
     @overload  # noqa: F722
-    def one_or_404(
+    def one_or_404(  # noqa: F722
         self,
-        statement: "sa.sql.Select[Tuple[T, T2, *Ts]]",
+        statement: "sa.sql.Select[Tuple[T, T2, *Ts]]",  # noqa: F722
         *,
         description: Optional[str] = None,
     ) -> "Tuple[T, T2, *Ts]": ...
