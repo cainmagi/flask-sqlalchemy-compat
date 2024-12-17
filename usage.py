@@ -33,7 +33,7 @@ class _Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase): ...
 
 engine_options = {
     "connect_args": {"check_same_thread": False},
-    "poolclass": 1,
+    "poolclass": sa.pool.StaticPool,
 }
 
 
@@ -97,7 +97,10 @@ if __name__ == "__main__":
     logger.setLevel(logging.INFO)
 
     app = flask.Flask(
-        __name__, instance_path=os.path.abspath(os.path.dirname(__file__))
+        __name__,
+        instance_path=os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "instance")
+        ),
     )
     app.config.update(
         {
