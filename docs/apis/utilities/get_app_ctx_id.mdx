@@ -1,0 +1,28 @@
+---
+id: get_app_ctx_id
+title: get_app_ctx_id
+sidebar_label: get_app_ctx_id
+slug: /apis/utilities/get_app_ctx_id
+description: Get the ID of the current Flask app context object.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.get_app_ctx_id" />
+
+```python
+ctx_id: int = get_app_ctx_id()
+```
+
+Get the ID of the current Flask app context object.
+
+## Arguments
+
+### Returns
+
+| Argument | Type  | <center>Description</center>             |
+| :------: | :---: | :--------------------------------------- |
+| `ctx_id` | `int` | The ID of the current Flask App context. |

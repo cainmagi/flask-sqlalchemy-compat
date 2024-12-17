@@ -1,0 +1,31 @@
+---
+id: index
+title: auto
+sidebar_label: auto
+slug: /apis/auto
+description: Methods used for creating the SQLAlchemy extension in the compatible mode.
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="auto" />
+
+Methods used for creating the `SQLAlchemy` extension in the compatible mode.
+The compatiblity is supported by the automatic falling-back strategy. For example,
+
+1. `get_flask_sqlalchemy_lite(...)` is a method returning the db extesnion of
+   `flask_sqlalchemy_lite.SQLAlchemy()`.
+2. If `flask_sqlalchemy_lite` is not installed but `flask_sqlalchemy` is installed,
+   will return a db extension with a backend of `flask_sqlalchemy.SQLAlchemy()`. This
+   wrapped extension will mimic the behaviors of `flask_sqlalchemy_lite.SQLAlchemy()`.
+3. If both `flask_sqlalchemy` and `flask_sqlalchemy_lite` are not installed, raise
+   a `ModuleNotFoundError`.
+
+## Functions
+
+|                                                              Member                                                               | <center>Description</center>                                      |
+| :-------------------------------------------------------------------------------------------------------------------------------: | ----------------------------------------------------------------- |
+|           [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite"/>](./get_flask_sqlalchemy_lite.mdx)           | Get the Flask SQLAlchemy Lite DB instance in the compatible mode. |
+| [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite_proxy_ver"/>](./get_flask_sqlalchemy_lite_proxy_ver.mdx) | Proxy version of `get_flask_sqlalchemy_lite`.                     |
+|                [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy"/>](./get_flask_sqlalchemy.mdx)                | Get the Flask SQLAlchemy DB instance in the compatible mode.      |
+|      [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_proxy_ver"/>](./get_flask_sqlalchemy_proxy_ver.mdx)      | Proxy version of `get_flask_sqlalchemy`.                          |

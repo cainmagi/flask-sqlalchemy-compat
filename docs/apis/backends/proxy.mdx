@@ -1,0 +1,64 @@
+---
+id: proxy
+title: proxy
+sidebar_label: proxy
+slug: /apis/backends/proxy
+description: A proxy class that is used for maintaining the dynamically loaded modules.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="obj" source="backends.proxy" />
+
+```python
+proxy: BackendProxy[module("flask_sqlalchemy"), module("flask_sqlalchemy_lite")]
+```
+
+The proxy of internally used modules. For the testing purposes, its properties
+can by dynamically changed by `None`, `True`, or `False` to turn on or turn off the
+modules. Changing the properties of this instance will take a global effect to all
+functionalities actually loading the extensions. For example,
+[`flask_sa_api.as_flask_sqlalchemy(...)`](../flask_sa_api/as_flask_sqlalchemy.mdx)
+will not be able to use Flask SQLAlchemy if the property `fsa` is deliberately
+configured by `False` or `None`.
+
+## Properties
+
+### <IconObjType type="param"/> `fsa`
+
+```python
+import flask_sqlalchemy
+
+fsa: module("flask_sqlalchemy") | ModulePlaceholder = proxy.fsa
+
+new_fsa: module("flask_sqlalchemy") | True | False | None
+proxy.fsa = new_fsa
+```
+
+A reference to `flask_sqlalchemy`.
+
+This value can be set by `True`, `False`, or `None`.
+If using `True`, will attempt to retrieve the module.
+If using `False` or `None`, will make the module replaced by the placeholder.
+
+---
+
+### <IconObjType type="param"/> `fsa_lite`
+
+```python
+import flask_sqlalchemy_lite
+
+fsa_lite: module("flask_sqlalchemy_lite") | ModulePlaceholder = proxy.fsa_lite
+
+new_fsa_lite: module("flask_sqlalchemy_lite") | True | False | None
+proxy.fsa_lite = new_fsa_lite
+```
+
+A reference to `flask_sqlalchemy_lite`.
+
+This value can be set by `True`, `False`, or `None`.
+If using `True`, will attempt to retrieve the module.
+If using `False` or `None`, will make the module replaced by the placeholder.

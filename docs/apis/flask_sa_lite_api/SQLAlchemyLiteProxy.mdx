@@ -1,0 +1,282 @@
+---
+id: SQLAlchemyLiteProxy
+title: SQLAlchemyLiteProxy
+sidebar_label: SQLAlchemyLiteProxy
+slug: /apis/flask_sa_lite_api/SQLAlchemyLiteProxy
+description: Proxy class of flask_sqlalchemy_lite.SQLAlchemy.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" source="flask_sa_lite_api.SQLAlchemyLiteProxy" />
+
+```python
+db_proxy = SQLAlchemyLiteProxy[_SQLAlchemyDB_co](
+    db: _SQLAlchemyLiteDB_co,
+)
+```
+
+Proxy class of `flask_sqlalchemy_lite.SQLAlchemy`.
+
+This class is a wrapper of the regular SQLAlchemy. By adjusting the behavior of
+the `flask_sqlalchemy.SQLAlchemy`, it can mimic the usage of
+`flask_sqlalchemy_lite.SQLAlchemy`.
+
+Note that not all the functionalities of `flask_sqlalchemy.SQLAlchemy` can be
+exactly the same as the those of `flask_sqlalchemy_lite.SQLAlchemy`. In specific,
+this proxy will do the following things:
+
+- Provide a regular session like that of `flask_sqlalchemy_lite.SQLAlchemy`. This
+  regular session is managed by this proxy class.
+- Provide other basic methods in `flask_sqlalchemy_lite.SQLAlchemy`. The usages
+  would be equivalent but the implmentation is based on `flask_sqlalchemy`.
+- Any functionality that cannot be used will raise a `NotImplementedError`.
+
+## Aliases
+
+This class can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyLiteProxy
+fsc.flask_sa_lite_api.SQLAlchemyLiteProxy
+```
+
+## Arguments
+
+| Argument |        Type        |             Required              | <center>Description</center>                                                                                                                                                                                                                                            |
+| :------: | :----------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `db`   | `_SQLAlchemyDB_co` | <InlineIcon icon={vsiCheckIcon}/> | <p>The database instance exporting the session and engine instances.</p><p>It is provided by the Flask extensions like `flask_sqlachemy`. This wrapper will mimic the behaviors of `flask_sqlalchemy_lite` even if the given instance is from the not-lite version.</p> |
+
+- where `_SQLAlchemyDB_co` is a `TypeVar` of [`fsc.protocols.SQLAlchemyProtocol`](../protocols/SQLAlchemyProtocol.mdx).
+
+## Methods
+
+### <IconObjType type="method"/> `init_app`
+
+```python
+db_proxy.init_app(
+    app: Flask,
+)
+```
+
+Register the extension on an application, creating engines from its
+`Flask.config`.
+
+#### Requires
+
+| Argument |  Type   |             Required              | <center>Description</center> |
+| :------: | :-----: | :-------------------------------: | ---------------------------- |
+|  `app`   | `Flask` | <InlineIcon icon={vsiCheckIcon}/> | The application to register. |
+
+---
+
+### <IconObjType type="method"/> `get_engine`
+
+```python
+db_proxy.get_engine(
+    name: str = "default"
+)
+```
+
+Get a specific engine associated with the current application.
+
+The `engine` attribute is a shortcut for calling this without an
+argument to get the default engine.
+
+#### Requires
+
+| Argument | Type  | Required | <center>Description</center>         |
+| :------: | :---: | :------: | ------------------------------------ |
+|  `name`  | `str` |          | The name associated with the engine. |
+
+#### Returns
+
+| Argument |        Type        | <center>Description</center>   |
+| :------: | :----------------: | :----------------------------- |
+| `engine` | `sa.engine.Engine` | The engine gotten by the name. |
+
+---
+
+### <IconObjType type="method"/> `get_session`
+
+```python
+sess: sa.orm.Session = db_proxy.get_session(
+    name: str = "default"
+)
+```
+
+Create a `sa.orm.Session` that will be closed at the end of the application
+context. Repeated calls with the same name within the same application context
+will return the same session.
+
+The `session` attribute is a shortcut for calling this without an argument to
+get the default session.
+
+#### Requires
+
+| Argument | Type  | Required | <center>Description</center>           |
+| :------: | :---: | :------: | -------------------------------------- |
+|  `name`  | `str` |          | A unique name for caching the session. |
+
+#### Returns
+
+| Argument |       Type       | <center>Description</center>    |
+| :------: | :--------------: | :------------------------------ |
+|  `sess`  | `sa.orm.Session` | The session gotten by the name. |
+
+---
+
+### <IconObjType type="method"/> `get_async_engines`
+
+```python
+db_proxy.get_async_engines(*args: Any, **kwargs: Any)
+```
+
+:::danger
+
+This method is not implemented by the proxy.
+
+:::
+
+---
+
+### <IconObjType type="method"/> `get_async_session`
+
+```python
+db_proxy.get_async_session(*args: Any, **kwargs: Any)
+```
+
+:::danger
+
+This method is not implemented by the proxy.
+
+:::
+
+## Properties
+
+### <IconObjType type="param"/> `db`
+
+```python
+db: _SQLAlchemyDB_co = db_proxy.db
+```
+
+The `db` instance provided by the Flask SQLAlchemy extension.
+
+---
+
+### <IconObjType type="param"/> `sessionmaker`
+
+```python
+sessionmaker: sa.orm.sessionmaker[sa.orm.Session] = db_proxy.sessionmaker
+```
+
+The same as `flask_sqlalchemy_lite.SQLAlchemy().sessionmaker`.
+
+The session factory configured for the current application. This can
+be used to create sessions directly, but they will not be closed
+automatically at the end of the application context. Use `session`
+and `get_session` for that.
+
+This can also be used to update the session options after
+`self.init_app`, by calling its `sa.orm.sessionmaker.configure` method.
+
+---
+
+### <IconObjType type="param"/> `session`
+
+```python
+sess: sa.orm.Session = db_proxy.session
+```
+
+The same as `flask_sqlalchemy_lite.SQLAlchemy().session`.
+
+The default session for the current application context. It will be
+closed when the context ends.
+
+---
+
+### <IconObjType type="param"/> `engines`
+
+```python
+engines: dict[str, sa.engine.Engine] = db_proxy.engines
+```
+
+The same as `flask_sqlalchemy_lite.SQLAlchemy().engines`.
+
+The dictionary of named engines registered to this extension.
+
+---
+
+### <IconObjType type="param"/> `engine`
+
+```python
+engine: sa.engine.Engine = db_proxy.engine
+```
+
+The same as `flask_sqlalchemy_lite.SQLAlchemy().engine`.
+
+The default engine associated with the current application.
+
+---
+
+### <IconObjType type="param"/> `async_engines`
+
+```python
+db_proxy.async_engines
+```
+
+:::danger
+
+This property is not implemented by the proxy.
+
+:::
+
+---
+
+### <IconObjType type="param"/> `async_engine`
+
+```python
+db_proxy.async_engine
+```
+
+:::danger
+
+This property is not implemented by the proxy.
+
+:::
+
+---
+
+### <IconObjType type="param"/> `async_sessionmaker`
+
+```python
+db_proxy.async_sessionmaker
+```
+
+:::danger
+
+This property is not implemented by the proxy.
+
+:::
+
+---
+
+### <IconObjType type="param"/> `async_session`
+
+```python
+db_proxy.async_session
+```
+
+:::danger
+
+This property is not implemented by the proxy.
+
+:::

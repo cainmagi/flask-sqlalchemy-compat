@@ -1,0 +1,116 @@
+---
+id: install
+sidebar_label: Install
+title: Install the Python package
+description: Install the Python package by PyPI or the dev build.
+slug: /install
+---
+
+import DarkButton from "@site/src/components/DarkButton";
+import InlineIcon from "@site/src/components/InlineIcon";
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+import octInfo16 from "@iconify-icons/octicon/info-16";
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import {repoURL} from "@site/src/envs/variables";
+
+# Install the Python package
+
+Run the following command to install the package:
+
+```shell
+pip install flask-sqlalchemy-compat
+```
+
+## Extra features
+
+Specify the optional dependencies to enable more features:
+
+```shell
+pip install flask-sqlalchemy-compat[option1,option2...]
+```
+
+|   Option   | <center>Supports</center>                                                                                                                                                    |
+| :--------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `test`   | Install the dependencies related to [`pytest`][link-pytest]. These dependencies are not used by the package but used by the unittests. This tier already includes `example`. |
+|   `dev`    | Install the developer's dependencies. These dependencies may be used for building the package. This tier already includes `backends`.                                        |
+| `backends` | Install `flask-sqlalchemy` and `flask-sqlalchemy-lite` if they are available for the current Python version.                                                                 |
+| `example`  | Install the requirements for running the example scripts.                                                                                                                    |
+
+## Backends
+
+By default, installing this pacakge will not install `flask-sqlalchemy` or
+`flask-sqlalchemy-lite`. That's because this package assumes that the `flask-sqlalchemy`
+or `flask-sqlalchemy-lite` is installed by users.
+
+Installing the package with the option `backends` will let the following packages
+installed according to the current python version.
+
+| Python version | <center>`flask-sqlalchemy-lite`</center> | <center>`flask-sqlalchemy`</center> | <center>`flask-sqlalchemy-compat-backend-py37`</center> |
+| :------------: | :--------------------------------------: | :---------------------------------: | :-----------------------------------------------------: |
+|    `~=3.7`     |                                          |                                     |            <InlineIcon icon={vsiCheckIcon}/>            |
+|    `~=3.8`     |                                          |  <InlineIcon icon={vsiCheckIcon}/>  |                                                         |
+|    `>=3.9`     |    <InlineIcon icon={vsiCheckIcon}/>     |  <InlineIcon icon={vsiCheckIcon}/>  |                                                         |
+
+:::warning
+
+To make this package work with `Python=3.7`, users should install an unofficial `flask-sqlalchemy` version. See
+
+https://github.com/pallets-eco/flask-sqlalchemy/issues/1140#issuecomment-1577921154
+
+This unofficial version can be installed by:
+
+```bash
+python -m pip install flask-sqlalchemy-compat[backends]
+```
+
+:::
+
+## Install the GitHub version
+
+The GitHub version may be newer than the PyPI version during the development.
+If users want to install the GitHub version, please ensure that
+[Git<IconExternalLink/>][link-git] has been installed.
+
+After that, run the following command to install the developer's version.
+
+```shell
+git clone https://github.com/cainmagi/flask-sqlalchemy-compat
+cd flask-sqlalchemy-compat
+python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pip install .[dev]
+```
+
+:::tip
+
+If you would like, you can add `-e` option after `pip install` to make the installed
+package editable. Any modification in the cloned project folder will take effects
+when `flask_sqlalchemy_compat` is imported anywhere.
+
+:::
+
+## Run the tests
+
+To verify whether the package is compatible with your device, please ensure that
+[Git<IconExternalLink/>][link-git] is available.
+
+After that, clone the project and run the tests:
+
+```shell
+git clone https://github.com/cainmagi/flask-sqlalchemy-compat
+cd flask-sqlalchemy-compat
+python -m pip install -r requirements.txt -r requirements-backends.txt -r tests/requirements.txt
+python -m pytest
+```
+
+The package is only compatible with `python>=3.7`. If you find the package fails to
+pass the tests, please
+
+<p>
+  <DarkButton href={repoURL("issues/new/choose")} icon={octInfo16}>
+    {"File an issue"}
+  </DarkButton>
+</p>
+
+[link-git]: https://git-scm.com/downloads
+[link-pytest]: https://docs.pytest.org/

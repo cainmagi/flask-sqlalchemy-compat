@@ -1,0 +1,274 @@
+---
+id: BackDict
+title: BackDict
+sidebar_label: BackDict
+slug: /apis/backdict/BackDict
+description: Dictionary with a falling-back level.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backdict.BackDict" />
+
+```python
+bdict = BackDict[K, V](
+    data: Mapping[K, V],
+    back_dict: Mapping[K2, V] | Callable[[], Mapping[K2, V]],
+    key_mapper: Callable[[K], K2],
+    key_back_mapper: Callable[[K2], K],
+)
+```
+
+Dictionary with a falling-back level.
+
+A two-level chain map supporting the following feature:
+
+1. The first level `data` is a readable and writable domain. Any modification of
+   this dictionary will take effects on the `data` domain.
+2. The second level `back_dict` is a read-only domain. When iterating or locating
+   values of this dictionary, the value will be searched in the `data` domain
+   first. If it is not found, will return the value in `back_dict` domain. Since
+   the modifications of the dictionary will only take effects on the `data` domain,
+   this second-level domain will not change.
+3. The second-level dictionary can have different keyword types. compared to the
+   `data` domain. Users need to provide a `key_mapper` and its inverse operator
+   `key_back_mapper` to support this feature.
+
+:::note
+
+Note that this type is a subtype of `dict`, which means that for any method or operator
+that is not mentioned in the following part, the method or operator will follow the
+same usage of `dict`.
+
+:::
+
+## Arguments
+
+|   Argument   |                   Type                   |             Required              | <center>Description</center>                                                                                                                                                                                           |
+| :----------: | :--------------------------------------: | :-------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    `data`    |             `Mapping[K, T]`              | <InlineIcon icon={vsiCheckIcon}/> | Mutable data internal storage of `BackDict`.                                                                                                                                                                           |
+| `back_data`  | `Mapping[K2, T] \| () -> Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | <p>Backup immutable data internal storage of `BackDict`.</p><p>This argument can be a deferred loader. A deferred loader is a function that will be called only when the data in `back_dict` is actually accessed.</p> |
+| `key_mapper` |               `(K) -> K2`                | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K` to `K2` when the key is not found in `data`.                                                                                                                                            |
+| `key_mapper` |               `(K2) -> K`                | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K2` to `K` when the key needs to be listed to users.                                                                                                                                       |
+
+## Methods
+
+### <IconObjType type="method"/> `copy`
+
+```python
+bdict_copy: BackDict[K, V] = bdict.copy()
+```
+
+Make a shallow copy of this `BackDict`.
+
+#### Returns
+
+|   Argument   |       Type       | <center>Description</center>                    |
+| :----------: | :--------------: | :---------------------------------------------- |
+| `bdict_copy` | `BackDict[K, V]` | A copy of this customized two-level dictionary. |
+
+---
+
+### <IconObjType type="method"/> `get`
+
+```python
+val: V | S = bdict.get(key: K, default: S = None)
+```
+
+Get a value from the dictionary with a default value provided.
+
+#### Requires
+
+| Argument  | Type |             Required              | <center>Description</center>                                                                                   |
+| :-------: | :--: | :-------------------------------: | -------------------------------------------------------------------------------------------------------------- |
+|   `key`   | `K`  | <InlineIcon icon={vsiCheckIcon}/> | The keyword used for locating the value. If the value does not exist in both levels, return the default value. |
+| `default` | `S`  |                                   | The user specified default value. If the `key` is not found in the dictionary, return this value.              |
+
+#### Returns
+
+| Argument |   Type   | <center>Description</center>                                                            |
+| :------: | :------: | :-------------------------------------------------------------------------------------- |
+|  `val`   | `V \| S` | If the keyword is found, return the located value. Otherwise, return the default value. |
+
+---
+
+### <IconObjType type="method"/> `keys`
+
+```python
+key_iter: KeysView[BackDictView[K, V]] = bdict.keys()
+```
+
+`BackDict(...).keys()` -> a set-like object providing a view on
+`BackDict`'s keys.
+
+#### Returns
+
+|  Argument  |              Type              | <center>Description</center>                                                                                                                               |
+| :--------: | :----------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `key_iter` | `KeysView[BackDictView[K, V]]` | An iterator on all keys of this dictionary. The iteration converage includes the keys of the `back_data`. For each iteration, it will returns a `K` value. |
+
+---
+
+### <IconObjType type="method"/> `values`
+
+```python
+val_iter: ValuesView[BackDictView[K, V]] = bdict.values()
+```
+
+`BackDict(...).values()` -> an object providing a view on `BackDict`'s
+values.
+
+#### Returns
+
+|  Argument  |               Type               | <center>Description</center>                                                                                                                                   |
+| :--------: | :------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `val_iter` | `ValuesView[BackDictView[K, V]]` | An iterator on all values of this dictionary. The iteration converage includes the values of the `back_data`. For each iteration, it will returns a `V` value. |
+
+---
+
+### <IconObjType type="method"/> `items`
+
+```python
+item_iter: ItemsView[BackDictView[K, V]] = bdict.items()
+```
+
+`BackDict(...).items()` -> a set-like object providing a view on
+`BackDict`'s items.
+
+#### Returns
+
+|  Argument   |              Type               | <center>Description</center>                                                                                                                                                                      |
+| :---------: | :-----------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `item_iter` | `ItemsView[BackDictView[K, V]]` | An iterator on all (key, value) item pairs of this dictionary. The iteration converage includes the items of the `back_data`. For each iteration, it will returns a tuple typed by `Tuple[K, V]`. |
+
+## Operators
+
+### <IconObjType type="op"/> `__len__`
+
+```python
+vlen: int = len(bdict)
+```
+
+Get the length of the dictionary.
+
+#### Returns
+
+| Argument | Type  | <center>Description</center>                                                                               |
+| :------: | :---: | :--------------------------------------------------------------------------------------------------------- |
+|  `vlen`  | `int` | The number of the keys in the union of the first level dictionary keys and the back-level dictionary keys. |
+
+---
+
+### <IconObjType type="op"/> `__contains__`
+
+```python
+flag: bool = key in bdict
+```
+
+Check whether `key` is in the dictionary.
+
+#### Requires
+
+| Argument | Type |             Required              | <center>Description</center> |
+| :------: | :--: | :-------------------------------: | ---------------------------- |
+|  `key`   | `K`  | <InlineIcon icon={vsiCheckIcon}/> | The keyword to be checked.   |
+
+#### Returns
+
+| Argument |  Type  | <center>Description</center>                                                                                                                                    |
+| :------: | :----: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  `flag`  | `bool` | If `True`, the given `key` value exists in the dictionary. If the `key` is not found in the first level but found in the back level, this value is also `True`. |
+
+---
+
+### <IconObjType type="op"/> `__iter__`
+
+```python
+keys: Iterator[K] = iter(bdict)
+```
+
+Iterate each key in the dictionary.
+
+#### Returns
+
+| Argument |     Type      | <center>Description</center>                                                                                                                                                 |
+| :------: | :-----------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  `keys`  | `Iterator[K]` | An iterator. For each iteration, it will return a key in the dicionary. For any key in the back-level, the iterator will return the key post-processed by `key_back_mapper`. |
+
+---
+
+### <IconObjType type="op"/> `__getitem__`
+
+```python
+val: V = bdict[key]
+```
+
+Locate one value in the dictionary. Raise `KeyError` if the keyword is not found.
+
+#### Requires
+
+| Argument | Type |             Required              | <center>Description</center>                                                                                                |
+| :------: | :--: | :-------------------------------: | --------------------------------------------------------------------------------------------------------------------------- |
+|  `key`   | `K`  | <InlineIcon icon={vsiCheckIcon}/> | The keyword used for locating the value. If the value is in the back level. Will use `key_mapper(key)` to locate the value. |
+
+#### Returns
+
+| Argument | Type | <center>Description</center> |
+| :------: | :--: | :--------------------------- |
+|  `val`   | `V`  | The value located by `key`.  |
+
+---
+
+### <IconObjType type="op"/> `__or__`
+
+```python
+any_dict: Mapping[K, V]
+new_bdict: BackDict[K, V] = bdict | any_dict
+```
+
+Merge this `BackDict` with another dictionary.
+
+#### Requires
+
+|  Argument  |      Type       |             Required              | <center>Description</center>                                                                                      |
+| :--------: | :-------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------- |
+| `any_dict` | `Mapping[K, V]` | <InlineIcon icon={vsiCheckIcon}/> | The mapping that will be merged with this `BackDict`. The mapping needs to have the same keyword and value types. |
+
+#### Returns
+
+|  Argument   |       Type       | <center>Description</center>                                                                                                             |
+| :---------: | :--------------: | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `new_bdict` | `BackDict[K, V]` | A new dictionary merged from the current `bdict` and the other `any_dict`. The values `any_dict` take priority when the keys are shared. |
+
+---
+
+### <IconObjType type="op"/> `__ror__`
+
+```python
+any_dict: Mapping[K, V]
+new_bdict: BackDict[K, V] = any_dict | bdict
+```
+
+Merge this `BackDict` with another dictionary.
+
+:::note
+
+Note that this method is used only when `any_dict` does not implement the `__or__`
+operator. Otherwise, the merged value is given by `any_dict.__or__(bdict)`.
+
+:::
+
+#### Requires
+
+|  Argument  |      Type       |             Required              | <center>Description</center>                                                                                      |
+| :--------: | :-------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------- |
+| `any_dict` | `Mapping[K, V]` | <InlineIcon icon={vsiCheckIcon}/> | The mapping that will be merged with this `BackDict`. The mapping needs to have the same keyword and value types. |
+
+#### Returns
+
+|  Argument   |       Type       | <center>Description</center>                                                                                                                     |
+| :---------: | :--------------: | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `new_bdict` | `BackDict[K, V]` | A new dictionary merged from the current `bdict` and the other `any_dict`. The values of this `BackDict` take priority when the keys are shared. |

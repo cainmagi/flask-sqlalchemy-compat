@@ -1,0 +1,47 @@
+---
+id: index
+title: backends
+sidebar_label: backends
+slug: /apis/backends
+description: The backends of the flask_sqlalchemy_compat package.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="backends" />
+
+The backends of the `flask_sqlalchemy_compat` package. These backends are modules
+conditionally loaded. In other words, if the model is intalled, will load the module.
+Otherwise, load a placeholder of the corresponding module.
+
+The backends include:
+
+1. `fsa`: [`flask_sqlalchemy`<IconExternalLink/>][link-fsa]
+   (licensed by BSD 3-Clause License, Copyright 2010 Pallets)
+2. `fsa_lite`: [`flask_sqlalchemy_lite`<IconExternalLink/>][link-fsa-lite]
+   (licensed by MIT License, Copyright 2024 Pallets)
+
+## Classes
+
+|                                             Member                                             | <center>Description</center>                                               |
+| :--------------------------------------------------------------------------------------------: | -------------------------------------------------------------------------- |
+| [<IconObjType type="class" hasText={true} text="ModulePlaceholder"/>](./ModulePlaceholder.mdx) | The placeholder module.                                                    |
+|      [<IconObjType type="class" hasText={true} text="BackendProxy"/>](./BackendProxy.mdx)      | A proxy class that is used for maintaining the dynamically loaded modules. |
+
+## Instances
+
+|                                Member                                | <center>Description</center>          |
+| :------------------------------------------------------------------: | ------------------------------------- |
+| [<IconObjType type="obj" hasText={true} text="proxy"/>](./proxy.mdx) | The proxy of internally used modules. |
+
+## Functions
+
+|                                             Member                                              | <center>Description</center>                                             |
+| :---------------------------------------------------------------------------------------------: | ------------------------------------------------------------------------ |
+| [<IconObjType type="func" hasText={true} text="conditional_import"/>](./conditional_import.mdx) | Import the module if it exists. Otherwise, return a `ModulePlaceholder`. |
+|  [<IconObjType type="func" hasText={true} text="is_module_invalid"/>](./is_module_invalid.mdx)  | Check whether the given module is invalid or not.                        |
+
+[link-fsa]: https://flask-sqlalchemy.palletsprojects.com
+[link-fsa-lite]: https://flask-sqlalchemy-lite.readthedocs.io

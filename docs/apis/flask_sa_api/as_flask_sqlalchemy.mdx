@@ -1,0 +1,58 @@
+---
+id: as_flask_sqlalchemy
+title: as_flask_sqlalchemy
+sidebar_label: as_flask_sqlalchemy
+slug: /apis/flask_sa_api/as_flask_sqlalchemy
+description: Make db works as flask_sqlalchemy.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" source="flask_sa_api.as_flask_sqlalchemy" />
+
+```python
+db: _SQLAlchemyDB = as_flask_sqlalchemy(db: _SQLAlchemyDB)
+db: SQLAlchemyProxy[_SQLAlchemyLiteDB_co, _ModelLite_co] = as_flask_sqlalchemy(
+     db: _SQLAlchemyLiteDB_co,
+     model_class: Type[_ModelLite_co],
+)
+```
+
+Make `db` works as `flask_sqlalchemy`.
+
+## Aliases
+
+This function can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.as_flask_sqlalchemy
+fsc.flask_sa_api.as_flask_sqlalchemy
+```
+
+## Arguments
+
+### Requires
+
+|   Argument    |                  Type                   |             Required              | <center>Description</center>                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :-----------: | :-------------------------------------: | :-------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     `db`      | `_SQLAlchemyDB \| _SQLAlchemyLiteDB_co` | <InlineIcon icon={vsiCheckIcon}/> | The db extension to be wrapped.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `model_class` |          `Type[_ModelLite_co]`          |                                   | <p>The base model class used for mimicking the behavior of `db.Model` when `db` is not from `flask_sqlalchemy`. Note that this value will be modified inplace because some compatibility-related functionalities like auto table name and the query method need to be provided to make its usage aligned with `flask_sqlalchemy.SQLAlchemy().Model`.</p><p>This value should not be used if `db` is provided by `flask_sqlalchemy`.</p> |
+
+- where `_SQLAlchemyDB` is a `TypeVar` of [`fsc.protocols.SQLAlchemyProtocol`](../protocols/SQLAlchemyProtocol.mdx).
+- where `_SQLAlchemyLiteDB_co` is a `TypeVar` of [`fsc.protocols.SQLAlchemyLiteProtocol`](../protocols/SQLAlchemyLiteProtocol.mdx).
+- where `_ModelLite_co` is a `TypeVar` of `sa.orm.DeclarativeBase`.
+
+### Returns
+
+| Argument |                                                     Type                                                      | <center>Description</center>                                                                                                                                                                                                                                                                              |
+| :------: | :-----------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `db`   | <code>{`flask_sqlalchemy.SQLAlchemy \| `}[SQLAlchemyProxy](./SQLAlchemyProxy.mdx){"(db, model_class)"}</code> | <p>If `db` is already provided by `flask_sqlalchemy`, return as it is.</p><p>If `db` is provided by `flask_sqlalchemy_lite`, return a proxy wrapper of it. This wrapper has the same APIs of `flask_sqlalchemy.SQLAlchemy()` but the implementation is based on `flask_sqlalchemy_lite.SQLAlchemy()`.</p> |

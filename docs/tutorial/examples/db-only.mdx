@@ -1,0 +1,58 @@
+---
+id: db-only
+sidebar_label: DB only
+title: "Demo: database extension only"
+description: The demo of only using the database extension.
+slug: /examples/db-only
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import ThemedImage from "@theme/ThemedImage";
+
+import mdiLanguagePython from "@iconify-icons/mdi/language-python";
+
+import {demoURL} from "@site/src/envs/variables";
+import DarkButton from "@site/src/components/DarkButton";
+
+Check the following link to review this basic demo.
+
+<p>
+  <DarkButton to={demoURL()} icon={mdiLanguagePython}>
+    {"usage.py"}
+  </DarkButton>
+</p>
+
+This demo provides the following features:
+
+1. A very simple database composed of two tables: `new_model` and `numerical_model`.
+2. The relationship between `new_model` and `numerical_model` is one-to-many.
+3. Each `numerical_model` contains a float-point value.
+4. The demo will query the `new_model` with different conditions applied to the `numerical_model` of each `new_model` item.
+
+The entity-relationship diagram (ERD) of the database is:
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="ERD of the DB-only demo"
+    sources={{
+      light: useBaseUrl("/img/examples/erd-usage-light.svg"),
+      dark: useBaseUrl("/img/examples/erd-usage-dark.svg"),
+    }}
+  />
+</div>
+
+The query results should be like this:
+
+```log showLineNumbers
+16:41:05,028 flask-sqlalchemy-compat.example INFO Start to add testing data.
+16:41:05,036 flask-sqlalchemy-compat.example INFO Start to query data.
+16:41:05,036 flask-sqlalchemy-compat.example INFO Query by name.
+16:41:05,041 flask-sqlalchemy-compat.example INFO Queried: NewModel(id=3, name=mixed, n_vals=3)
+16:41:05,041 flask-sqlalchemy-compat.example INFO Query all models having positive values.
+16:41:05,043 flask-sqlalchemy-compat.example INFO Queried: [NewModel(id=1, name=only-pos, n_vals=3), NewModel(id=3, name=mixed, n_vals=3)]
+16:41:05,043 flask-sqlalchemy-compat.example INFO Query all models having negative values.
+16:41:05,045 flask-sqlalchemy-compat.example INFO Queried: [NewModel(id=2, name=only-neg, n_vals=3), NewModel(id=3, name=mixed, n_vals=3)]
+16:41:05,045 flask-sqlalchemy-compat.example INFO Query all models having both positive and negative values.
+16:41:05,047 flask-sqlalchemy-compat.example INFO Queried: [NewModel(id=3, name=mixed, n_vals=3)]
+```

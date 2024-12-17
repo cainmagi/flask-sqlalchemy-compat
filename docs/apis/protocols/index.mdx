@@ -1,0 +1,24 @@
+---
+id: index
+title: protocols
+sidebar_label: protocols
+slug: /apis/protocols
+description: The customized protocol type hints used by this package.
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="protocols" />
+
+The customized protocol type hints used by this package. These protocols can be used
+to notate the extension like `flask_sqlalchemy.SQLAlchemy` or the customized class
+`flask_sqlalchemy.model.Model` without actually importing the package.
+
+## Typehints
+
+|                                                   Member                                                    |    Type    | <center>Description</center>                                              |
+| :---------------------------------------------------------------------------------------------------------: | :--------: | :------------------------------------------------------------------------ |
+|            [<IconObjType type="type" hasText={true} text="ModelProtocol"/>](./ModelProtocol.mdx)            | `Protocol` | Protocol compatible with `flask_sqlalchemy.extensions._FSAModel`.         |
+| [<IconObjType type="type" hasText={true} text="SQLAlchemySharedProtocol"/>](./SQLAlchemySharedProtocol.mdx) | `Protocol` | Protocol compatible with both Flask SQLAlchemy and Flask SQLAlchemy Lite. |
+|   [<IconObjType type="type" hasText={true} text="SQLAlchemyLiteProtocol"/>](./SQLAlchemyLiteProtocol.mdx)   | `Protocol` | Protocol compatible with Flask SQLAlchemy Lite.                           |
+|       [<IconObjType type="type" hasText={true} text="SQLAlchemyProtocol"/>](./SQLAlchemyProtocol.mdx)       | `Protocol` | Protocol compatible with Flask SQLAlchemy.                                |

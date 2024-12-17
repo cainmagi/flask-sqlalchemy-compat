@@ -1,0 +1,39 @@
+---
+id: is_module_invalid
+title: is_module_invalid
+sidebar_label: is_module_invalid
+slug: /apis/backends/is_module_invalid
+description: Check whether the given module is invalid or not.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="backends.is_module_invalid" />
+
+```python
+flag: bool = is_module_invalid(
+    module: ModuleType
+)
+```
+
+Check whether the given module is invalid or not.
+
+An invalid module does not provide any functionalities but only serves as a
+placeholder.
+
+## Arguments
+
+### Requires
+
+| Argument |     Type     |             Required              | <center>Description</center> |
+| :------: | :----------: | :-------------------------------: | ---------------------------- |
+| `module` | `ModuleType` | <InlineIcon icon={vsiCheckIcon}/> | The module to be checked.    |
+
+### Returns
+
+| Argument |  Type  | <center>Description</center>                                                                                                                                                             |
+| :------: | :----: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  `flag`  | `bool` | If this flag is `True`, the module will be notated as [`ModulePlaceholder`](./ModulePlaceholder.mdx), i.e. the module will be marked as invalid. Otherwise, the module should be usable. |

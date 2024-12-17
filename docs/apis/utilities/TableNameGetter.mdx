@@ -1,0 +1,72 @@
+---
+id: TableNameGetter
+title: TableNameGetter
+sidebar_label: TableNameGetter
+slug: /apis/utilities/TableNameGetter
+description: The getter of the __tablename__ property.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isDescriptor={true} source="utilities.TableNameGetter" />
+
+```python
+class AnyClass(sa.orm.DeclarativeBase):
+    __tablename__ = TableNameGetter()
+
+val: sa.orm.Query[AnyClass] = AnyClass.query
+```
+
+The getter of the `__tablename__` property.
+
+Use this descriptor like this:
+
+```python
+class Base(sa.orm.DeclarativeBase):
+    __tablename__ = TableNameGetter()
+
+class NewModel(Base): ...
+```
+
+or like this:
+
+```python
+class NewModel(Base):
+    __tablename__ = TableNameGetter()
+```
+
+It will
+
+1. Prevent users to modify `__tablename__` of an instance of the model class.
+2. Return an automatically synthesized table name if it is not defined.
+
+:::tip
+
+You may not need to use this descriptor, because the following codes will have the
+equivalent effect. The following usage is also recommended by
+[`sqlalchemy`<IconExternalLink/>][link-sqla]:
+
+```python
+class AnyClass(sa.orm.DeclarativeBase):
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return fsc.utilities.TableNameGetter.calc_auto_table_name(cls.__name__)
+```
+
+:::
+
+[link-sqla]: https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.declared_attr.directive
+
+## Aliases
+
+This type can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.TableNameGetter
+fsc.utilities.TableNameGetter
+```

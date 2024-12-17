@@ -1,0 +1,26 @@
+---
+id: DBNotReadyError
+title: DBNotReadyError
+sidebar_label: DBNotReadyError
+slug: /apis/utilities/DBNotReadyError
+description: Exception raised by QueryGetter.
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar
+  type="class"
+  isException={true}
+  isPrivate={true}
+  source="utilities.DBNotReadyError"
+/>
+
+```python
+class DBNotReadyError(RuntimeError):
+    pass
+```
+
+Exception raised by [`QueryGetter`](./QueryGetter.mdx).
+
+Will raise this exception if the `QueryGetter` is accessed before passed to the
+SQLAlchemy extension or using `init_app()`.

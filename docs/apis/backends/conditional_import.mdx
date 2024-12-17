@@ -1,0 +1,36 @@
+---
+id: conditional_import
+title: conditional_import
+sidebar_label: conditional_import
+slug: /apis/backends/conditional_import
+description: Import the module if it exists. Otherwise, return a ModulePlaceholder.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="backends.conditional_import" />
+
+```python
+module: ModuleType = conditional_import(
+    name: str
+)
+```
+
+{<p>Import the module if it exists. Otherwise, return a [`ModulePlaceholder`](./ModulePlaceholder.mdx).</p>}
+
+## Arguments
+
+### Requires
+
+| Argument | Type  |             Required              | <center>Description</center>           |
+| :------: | :---: | :-------------------------------: | -------------------------------------- |
+|  `name`  | `str` | <InlineIcon icon={vsiCheckIcon}/> | The name of the module to be imported. |
+
+### Returns
+
+| Argument |     Type     | <center>Description</center>                                                                                                |
+| :------: | :----------: | :-------------------------------------------------------------------------------------------------------------------------- |
+| `module` | `ModuleType` | If the module exists, this value is the imported module. Otherwise, it is a [`ModulePlaceholder`](./ModulePlaceholder.mdx). |

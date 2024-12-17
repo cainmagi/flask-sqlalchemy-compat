@@ -1,0 +1,141 @@
+---
+id: SQLAlchemyProtocol
+title: SQLAlchemyProtocol
+sidebar_label: SQLAlchemyProtocol
+slug: /apis/protocols/SQLAlchemyProtocol
+description: Protocol compatible with Flask SQLAlchemy.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="type" source="protocols.SQLAlchemyProtocol" />
+
+```python
+db: SQLAlchemyProtocol
+```
+
+Protocol compatible with Flask SQLAlchemy.
+
+Flask SQLAlchemy has been maintained for many years. It has a big community and
+many users, granting many available plugins that have served various applications
+for long. However, it works better with `SQLAlchemy<2`. For the new SQLAlchemy
+package heavily dependent on the modern typing system, this old extension pacakge
+may have several unsolved compatibility issues.
+
+Note that users still have to use it if they are working with `Python<3.9` because
+Flask SQLAlchemy Lite is not available for the legacy Python versions.
+
+This protocol covers most but does not include all functionalities of
+`flask_sqlalchemy.SQLAlchemy`.
+
+## Aliases
+
+This type can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyProtocol
+fsc.protocols.SQLAlchemyProtocol
+```
+
+## Protocol methods
+
+### <IconObjType type="method"/> `init_app`
+
+```python
+db.init_app(app: Flask)
+```
+
+Initialize a Flask application for use with this extension instance. This
+must be called before accessing the database engine or session with the app.
+
+## Protocol properties
+
+### <IconObjType type="param"/> `engine`
+
+```python
+db.engine: sa.engine.Engine
+```
+
+The default engine associated with the current application.
+
+---
+
+### <IconObjType type="param"/> `engines`
+
+```python
+db.engines: Mapping[str | None, sa.engine.Engine]
+```
+
+Map of bind keys to `sqlalchemy.engine.Engine` instances for current
+application. The `None` key refers to the default engine.
+
+---
+
+### <IconObjType type="param"/> `session`
+
+```python
+db.session: sa_orm.scoped_session[Any]
+```
+
+The default session for the current application context. It will be
+closed when the context ends.
+
+---
+
+### <IconObjType type="param"/> `metadatas`
+
+```python
+db.metadatas: Mapping[str | None, sa.MetaData]
+```
+
+Map of bind keys to `sqlalchemy.schema.MetaData` instances. The `None` key
+refers to the default metadata.
+
+---
+
+### <IconObjType type="param"/> `metadata`
+
+```python
+db.metadata: sa.MetaData
+```
+
+The default metadata used by `Model` and `Table` if no bind key is set.
+
+---
+
+### <IconObjType type="param"/> `Query`
+
+```python
+db.Query: Callable[..., sa.orm.Query]
+```
+
+The default query class used by `Model.query` and `lazy="dynamic"` relationships.
+
+---
+
+### <IconObjType type="param"/> `Table`
+
+```python
+db.Table: Callable[..., sa.Table]
+```
+
+The default query class used by `Model.query` and `lazy="dynamic"` relationships.
+
+---
+
+### <IconObjType type="param"/> `Model`
+
+```python
+db.Model: Callable[..., ModelProtocol]
+```
+
+The default query class used by `Model.query` and `lazy="dynamic"` relationships.
+
+- where [`ModelProtocol`](./ModelProtocol.mdx) is the protocol of Flask SQLAlchemy
+  customized model.

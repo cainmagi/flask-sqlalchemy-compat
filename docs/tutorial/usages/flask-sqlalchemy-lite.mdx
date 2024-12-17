@@ -1,0 +1,501 @@
+---
+id: flask-sqlalchemy-lite
+sidebar_label: Use Lite version
+title: Using Flask SQLAlchemy Lite
+description: A guide showing how to migrate from flask-sqlalchemy-lite to this package.
+slug: /usages/flask-sqlalchemy-lite
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import {IconLinkInline} from "@site/src/components/IconLink";
+import {repoURL} from "@site/src/envs/variables";
+
+This guide will show the steps of migrating from `flask-sqlalchemy-lite` to this
+package.
+
+## Background
+
+Suppose that you are working with the codes written by Flask SQLAlchemy Lite. However,
+now you need to support `Python 3.7` or `Python 3.8` on some legacy devices. The
+following codes compose a complete Flask project:
+
+<Tabs
+  defaultValue="app"
+  values={[
+    { label: 'app.py', value: 'app', },
+    { label: 'models.py', value: 'models', },
+    { label: 'base.py', value: 'base', },
+  ]
+}>
+
+<TabItem value="app">
+
+```python showLineNumbers title="app.py"
+import sqlalchemy as sa
+import flask
+from flask import request
+from werkzeug.exceptions import HTTPException
+
+from models import db, Base, Folder, Text
+
+
+def create_app() -> flask.Flask:
+    app = flask.Flask(__name__)
+
+    @app.route("/")
+    def index():
+        """Index, quering all folder db items."""
+        return {
+            "message": "All folders found",
+            "folders": [
+                {"id": folder.id, "title": folder.title}
+                for folder in db.session.scalars(sa.select(Folder).order_by(Folder.id))
+            ],
+        }
+
+    @app.route("/folder")
+    def folder():
+        """Query a folder db item with all its texts."""
+        folder_id = request.args.get("id", None, int)
+        if folder_id is None:
+            return flask.abort(404, "Folder ID is not specified.")
+        folder = db.session.get(Folder, folder_id)
+        if folder is None:
+            return flask.abort(404, "Folder is not found.")
+        return {
+            "message": "Texts of the folder is found.",
+            "folder": folder.id,
+            "texts": [{"id": text.id, "title": text.title} for text in folder.texts],
+        }
+
+    @app.route("/text")
+    def text():
+        """Query a text db item."""
+        text_id = request.args.get("id", None, int)
+        if text_id is None:
+            return flask.abort(404, "Text ID is not specified.")
+        text = db.session.get(Text, text_id)
+        if text is None:
+            return flask.abort(404, "Text is not found.")
+        return {
+            "message": "Text is found.",
+            "id": text.id,
+            "title": text.title,
+            "text": text.text,
+        }
+
+    @app.errorhandler(HTTPException)
+    def handle_exception(exc: HTTPException):
+        """Return JSON instead of HTML for HTTP errors."""
+        response = flask.make_response(
+            {
+                "code": exc.code,
+                "name": exc.name,
+                "description": exc.description,
+            },
+            exc.code,
+            exc.get_headers(),
+        )
+        response.content_type = "application/json"
+        return response
+
+    return app
+
+
+def init_db_data() -> None:
+    Base.metadata.drop_all(db.engine)
+    Base.metadata.create_all(db.engine)
+
+    folder_1 = Folder(title="Folder 1")
+    folder_1.texts.append(Text(title="F1 Text 1", text="Lorem ipsum, ..."))
+    folder_1.texts.append(Text(title="F1 Text 2", text="dolor sit amet, ..."))
+    folder_1.texts.append(Text(title="F1 Text 3", text="consectetur adipiscing, ..."))
+    folder_1.texts.append(Text(title="F1 Text 4", text="elit, sed do eiusmod, ..."))
+    db.session.add(folder_1)
+
+    folder_2 = Folder(title="Folder 2")
+    folder_2.texts.append(Text(title="F2 Code", text="Code is 0887967868"))
+    folder_2.texts.append(Text(title="F2 Report", text="The report of the ..."))
+    db.session.add(folder_2)
+
+    db.session.commit()
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.config.update({"SQLALCHEMY_ENGINES": {"default": "sqlite://"}})
+    db.init_app(app)
+
+    with app.app_context():
+        init_db_data()
+    app.run(host="127.0.0.1", port=8080)
+```
+
+</TabItem>
+
+<TabItem value="models">
+
+```python showLineNumbers title="models.py"
+from typing import Optional
+
+try:
+    from typing import List
+except ImportError:
+    from builtins import list as List
+
+import sqlalchemy as sa
+import sqlalchemy.orm as sa_orm
+
+from base import Base, db
+
+
+__all__ = ("db", "Base", "Text", "Folder")
+
+
+class Text(Base):
+    __tablename__ = "text"
+    id: sa_orm.Mapped[int] = sa_orm.mapped_column(init=False, primary_key=True)
+    title: sa_orm.Mapped[str] = sa_orm.mapped_column()
+    text: sa_orm.Mapped[str] = sa_orm.mapped_column(sa.Text, deferred=True)
+
+    folder_id: sa_orm.Mapped[Optional[int]] = sa_orm.mapped_column(
+        sa.ForeignKey("folder.id"), default=None, nullable=True
+    )
+    folder: sa_orm.Mapped[Optional["Folder"]] = sa_orm.relationship(default=None)
+
+
+class Folder(Base):
+    __tablename__ = "folder"
+    id: sa_orm.Mapped[int] = sa_orm.mapped_column(init=False, primary_key=True)
+    title: sa_orm.Mapped[str] = sa_orm.mapped_column()
+    texts: sa_orm.Mapped[List[Text]] = sa_orm.relationship(
+        default_factory=list, back_populates="folder"
+    )
+```
+
+</TabItem>
+
+<TabItem value="base">
+
+```python showLineNumbers title="base.py"
+import sqlalchemy.orm as sa_orm
+from sqlalchemy.pool import StaticPool
+
+from flask_sqlalchemy_lite import SQLAlchemy
+
+
+__all__ = ("Base", "db")
+
+
+class Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+    pass
+
+
+engine_options = {
+    "connect_args": {"check_same_thread": False},
+    "poolclass": StaticPool,
+}
+
+db = SQLAlchemy(engine_options=engine_options)
+```
+
+</TabItem>
+
+</Tabs>
+
+This application will hold a demo database in the memory, and provide several APIs for
+querying the example data. For example, when the program is running,
+
+<Tabs
+  defaultValue="addr"
+  values={[
+    { label: 'Address', value: 'addr', },
+    { label: 'Response', value: 'resp', },
+  ]
+}>
+
+<TabItem value="addr">
+
+Accessing the following address
+
+```text
+http://127.0.0.1:8080/folder?id=1
+```
+
+will let users query the `Folder` item with `id=1`.
+All texts belonging to this folder will be listed, too.
+
+</TabItem>
+
+<TabItem value="resp">
+
+The response shown in the browser should be:
+
+```json
+{
+  "folder": 1,
+  "message": "Texts of the folder is found.",
+  "texts": [
+    {
+      "id": 1,
+      "title": "F1 Text 1"
+    },
+    {
+      "id": 2,
+      "title": "F1 Text 2"
+    },
+    {
+      "id": 3,
+      "title": "F1 Text 3"
+    },
+    {
+      "id": 4,
+      "title": "F1 Text 4"
+    }
+  ]
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+The next step is to check the details of the text.
+
+<Tabs
+  defaultValue="addr"
+  values={[
+    { label: 'Address', value: 'addr', },
+    { label: 'Response', value: 'resp', },
+  ]
+}>
+
+<TabItem value="addr">
+
+Accessing the following address
+
+```text
+http://127.0.0.1:8080/text?id=1
+```
+
+will let users query the `Text` item with `id=1`. This item has been shown in the
+previous response.
+
+</TabItem>
+
+<TabItem value="resp">
+
+The response shown in the browser should be:
+
+```json
+{
+  "id": 1,
+  "message": "Text is found.",
+  "text": "Lorem ipsum, ...",
+  "title": "F1 Text 1"
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## Extend the compatibility to `Python<3.9`
+
+Migrating to this project will let codes available for `Python 3.7` and `3.8`. The
+change of the codes is quite simple. The only thing that needs to be altered is
+the `base.py`. See the following codes:
+
+<div className="code-diff-move">
+
+```python title="base.py"
+import sqlalchemy.orm as sa_orm
+from sqlalchemy.pool import StaticPool
+
+# diff-remove-next-line
+from flask_sqlalchemy_lite import SQLAlchemy
+# diff-add-next-line
+import flask_sqlalchemy_compat as fsc
+
+
+__all__ = ("Base", "db")
+
+
+# diff-remove-next-line
+class Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+# diff-add-next-line
+class _Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+    pass
+
+
+engine_options = {
+    "connect_args": {"check_same_thread": False},
+    "poolclass": StaticPool,
+}
+
+# diff-remove-next-line
+db = SQLAlchemy(engine_options=engine_options)
+# diff-add-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite(_Base, engine_options=engine_options)
+```
+
+</div>
+
+The main change is that we let `db` and `Base` be given by the factory function
+[`fsc.get_flask_sqlalchemy_lite`](../../apis/auto/get_flask_sqlalchemy_lite.mdx),
+where the first argument of this function is
+the original base model.
+
+This function will do nothing if `flask_sqlalchemy_lite` is installed. In other words,
+`db` would be the same as the one created by `flask_sqlalchemy_lite.SQLAlchemy()`,
+and `Base` will be the same thing compared to `_Base`.
+
+However, if `flask_sqlalchemy_lite` is not installed, this method will attempt to
+find `flask_sqlalchemy` and use `flask_sqlalchemy` to mimic the behaviors of
+`flask_sqlalchemy_lite`. In this case, `db` would be `flask_sqlalchemy.SQLAlchemy()`,
+while `Base` will be different from `_Base` because it is provided by `db.Model`.
+
+:::note
+
+Note that the compatible model will take effect only when `flask_sqlalchemy_lite` is
+not installed.
+
+:::
+
+## Explicitly use `flask-sqlalchemy` to mimic `flask-sqlalchemy-lite`
+
+The above section shows the usage of `fsc.get_flask_sqlalchemy_lite(...)`. It will
+automatically switch to Flask SQLAlchemy if the Lite version is not installed.
+However, in some cases, users may want to deliberately use Flask SQLAlchemy
+to mimic the behaviors of Flask SQLAlchemy Lite. In that case, the script can be
+modified as follows:
+
+<div className="code-diff-move">
+
+```python title="base.py"
+import sqlalchemy.orm as sa_orm
+from sqlalchemy.pool import StaticPool
+
+# diff-remove-next-line
+from flask_sqlalchemy_lite import SQLAlchemy
+# diff-add-next-line
+from flask_sqlalchemy import SQLAlchemy
+# diff-add-next-line
+import flask_sqlalchemy_compat as fsc
+
+__all__ = ("Base", "db")
+
+
+# diff-remove-next-line
+class Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+# diff-add-next-line
+class _Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+    pass
+
+
+engine_options = {
+    "connect_args": {"check_same_thread": False},
+    "poolclass": StaticPool,
+}
+
+# diff-remove-next-line
+db = SQLAlchemy(engine_options=engine_options)
+# diff-add-start
+db = fsc.as_flask_sqlalchemy_lite(
+    db=SQLAlchemy(model_class=_Base, engine_options=engine_options),
+)
+Base = db.Model
+# diff-add-end
+```
+
+</div>
+
+In this case, the database extension `db` will be notated by
+[`fsc.SQLAlchemyLiteProxy`](../../apis/flask_sa_lite_api/SQLAlchemyLiteProxy.mdx)
+which is a wrapper that provides the APIs of `flask_sqlalchemy_lite.SQLAlchemy()` by
+using `flask_sqlalchemy.SQLAlchemy()`.
+
+:::info
+
+When using `fsc.get_flask_sqlalchemy_lite(...)`, it supposes that you are developing
+your codes with `flask_sqlalchemy_lite.SQLAlchemy()`. Therefore, its returned value
+is always notated by `flask_sqlalchemy_lite.SQLAlchemy()` even if the package
+`flask_sqlalchemy_lite` is not installed. In that case, the notation of
+`fsc.get_flask_sqlalchemy_lite(...)` will not work, but that does not matter because
+the environment without `flask_sqlalchemy_lite` is not the developer's environment.
+In run time, the returned value of this function will fall back to the returned value
+of `fsc.as_flask_sqlalchemy_lite(...)` automatically.
+
+:::
+
+:::warning
+
+In the compatible mode, the fall-back option `fsc.SQLAlchemyLiteProxy` will not
+provide all functionalities of `flask_sqlalchemy_lite.SQLAlchemy()`. Currently, the
+following features are not supported yet. If any of the following feature is urgent
+to you, please
+<IconLinkInline text="file an issue" href={repoURL("issues/new/choose")}/>:
+
+- Asynchronous engines and sessions.
+
+These method can be used by `flask_sqlalchemy_lite` but will not work if the backend
+falls back to `fsc.SQLAlchemyLiteProxy` driven by `flask_sqlalchemy`.
+
+:::
+
+## Explicitly notate the extension by the compatible version
+
+As mentioned above, the returned value of `fsc.get_flask_sqlalchemy_lite(...)` is
+always notated by `flask_sqlalchemy_lite.SQLAlchemy()` even if the backend package
+is not available. It may be not a good choice if users want to check the exact
+behavior in the developer's environment. For example, users may want to know which
+API will cause issues in the compatible mode. In that case, a good choice is to
+temporarily replace the extension by `_proxy_ver(...)`.
+
+<div className="code-diff-move">
+
+```python
+# diff-remove-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite(Base, engine_options=engine_options)
+# diff-add-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite_proxy_ver(Base, engine_options=engine_options)
+```
+
+</div>
+
+This modification will not take any effect in run time. The only difference is that
+`db` will be always notated by `fsc.SQLAlchemyLiteProxy` even if `db` is a
+`flask_sqlalchemy_lite.SQLAlchemy()`. Supposes that users have used an unsupported
+functionality like `db.async_session(...)`. Switching to this notation will let the
+static type checker aware of the unsupported method immediately.
+
+## Disable a backend
+
+When users have installed both the `flask_sqlalchemy_lite` and `flask_sqlalchemy`,
+they may want to test the run-time behavior of `fsc.get_flask_sqlalchemy_lite(...)`
+even if the `flask_sqlalchemy_lite` is available. In that case, users can turn off
+the support of `flask_sqlalchemy_lite` globally by using
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+# Make `flask_sqlalchemy_lite` invisible to `fsc`.
+fsc.backends.proxy.fsa_lite = None
+```
+
+This configuration needs to be used before calling `fsc.get_flask_sqlalchemy_lite(...)`.
+It will explicitly make `flask_sqlalchemy_lite` invisible to `fsc`, thus causing the
+method `fsc.get_flask_sqlalchemy_lite(...)` forced to fall back to the compatible mode.
+
+:::danger
+
+You cannot use `fsc.get_flask_sqlalchemy_lite(...)` if neither Flask SQLAlchemy nor
+Flask SQLAlchemy Lite is not installed. Therefore, if the Flask SQLAlchemy Lite is the
+only installed package in your environment, making it invisible will cause
+`fsc.get_flask_sqlalchemy_lite(...)` to raise a `ModuleNotFoundError`.
+
+:::
+
+[link-fsa-lite]: https://flask-sqlalchemy-lite.readthedocs.io

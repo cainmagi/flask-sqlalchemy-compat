@@ -1,0 +1,73 @@
+---
+id: flask-sqlalchemy
+sidebar_label: Regular
+title: "Demo: application of Flask SQLAlchemy"
+description: The demo providing database APIs powered by Flask SQLAlchemy
+slug: /examples/flask-sqlalchemy
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IconExternalLink from "@theme/Icon/ExternalLink";
+import ThemedImage from "@theme/ThemedImage";
+
+import mdiLanguagePython from "@iconify-icons/mdi/language-python";
+
+import {demoURL} from "@site/src/envs/variables";
+import DarkButton from "@site/src/components/DarkButton";
+
+Check the following link to review this demo of a complete Flask application.
+
+<p>
+  <DarkButton to={demoURL("app_fsqla.py")} icon={mdiLanguagePython}>
+    {"app_fsqla.py"}
+  </DarkButton>
+</p>
+
+This demo works totally the same as the [Lite demo](./flask-sqlalchemy-lite.mdx). In
+other words, its APIs and features are totally the same as those of that demo. The only
+differences are:
+
+1. The default backend is powered by Flask SQLAlchemy.
+2. In the codes, we prefer to use the old-style database APIs provided by Flask
+   SQLAlchemy.
+
+## Database structure
+
+The entity-relationship diagram (ERD) of the database is also the same:
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="ERD of the DB-only demo"
+    sources={{
+      light: useBaseUrl("/img/examples/erd-fsql-light.svg"),
+      dark: useBaseUrl("/img/examples/erd-fsql-dark.svg"),
+    }}
+  />
+</div>
+
+Compared to the demo of the lite version, this demo has such different features:
+
+- The default database backend is Flask SQLAlchemy. If the regular version is not
+  available, fall back to Flask SQLAlchemy Lite.
+- For each object-relationship mapping (ORM) model, benefiting from the enhancement
+  of Flask SQLAlchemy, we do not need to manually specify `__tablename__`.
+- The following APIs
+
+  - `db.session.execute(sa.select(...))`
+  - `db.session.query(...)`
+
+  are replaced by the old-style APIs like `Model.query`. Such usages are provided by
+  Flask SQLAlchemy.
+
+- The ID-based entity locating is implemented by `db.get_or_404(...)` rather than
+  `db.session.get(...)`. This `get_or_404(...)` method is provided by Flask SQLAlchemy.
+  It will not return `None` but throw a 404 abort when the model is not found.
+
+## Access the demo
+
+Use the same testing scripts in the
+[Lite demo](./flask-sqlalchemy-lite.mdx#access-the-demo) because the implementation
+of this demo has totally the same APIs of that one.

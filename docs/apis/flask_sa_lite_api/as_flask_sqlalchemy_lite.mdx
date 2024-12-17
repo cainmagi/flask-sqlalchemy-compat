@@ -1,0 +1,53 @@
+---
+id: as_flask_sqlalchemy_lite
+title: as_flask_sqlalchemy_lite
+sidebar_label: as_flask_sqlalchemy_lite
+slug: /apis/flask_sa_lite_api/as_flask_sqlalchemy_lite
+description: Make db works as flask_sqlalchemy_lite.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" source="flask_sa_lite_api.as_flask_sqlalchemy_lite" />
+
+```python
+db: _SQLAlchemyLiteDB = as_flask_sqlalchemy(db: _SQLAlchemyLiteDB)
+db: SQLAlchemyProxy[_SQLAlchemyDB_co] = as_flask_sqlalchemy_lite(db: _SQLAlchemyDB_co)
+```
+
+Make `db` works as `flask_sqlalchemy_lite`.
+
+## Aliases
+
+This function can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.as_flask_sqlalchemy_lite
+fsc.flask_sa_lite_api.as_flask_sqlalchemy_lite
+```
+
+## Arguments
+
+### Requires
+
+| Argument |                  Type                   |             Required              | <center>Description</center>    |
+| :------: | :-------------------------------------: | :-------------------------------: | ------------------------------- |
+|   `db`   | `_SQLAlchemyLiteDB \| _SQLAlchemyDB_co` | <InlineIcon icon={vsiCheckIcon}/> | The db extension to be wrapped. |
+
+- where `_SQLAlchemyLiteDB` is a `TypeVar` of [`fsc.protocols.SQLAlchemyLiteProtocol`](../protocols/SQLAlchemyLiteProtocol.mdx).
+- where `_SQLAlchemyDB_co` is a `TypeVar` of [`fsc.protocols.SQLAlchemyProtocol`](../protocols/SQLAlchemyProtocol.mdx).
+
+### Returns
+
+| Argument |                                                     Type                                                      | <center>Description</center>                                                                                                                                                                                                                                                                              |
+| :------: | :-----------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `db`   | <code>{`flask_sqlalchemy_lite.SQLAlchemy \| `}[SQLAlchemyLiteProxy](./SQLAlchemyLiteProxy.mdx){"(db)"}</code> | <p>If `db` is already provided by `flask_sqlalchemy_lite`, return as it is.</p><p>If `db` is provided by `flask_sqlalchemy`, return a proxy wrapper of it. This wrapper has the same APIs of `flask_sqlalchemy_lite.SQLAlchemy()` but the implementation is based on `flask_sqlalchemy.SQLAlchemy()`.</p> |

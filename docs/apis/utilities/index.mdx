@@ -1,0 +1,34 @@
+---
+id: index
+title: utilities
+sidebar_label: utilities
+slug: /apis/utilities
+description: The extra functionalities used for hooking the original SQLAlchemy extensions.
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="utilities" />
+
+The extra functionalities used for hooking the original SQLAlchemy extensions. The
+extensions need to be hooked because some extra functionalities may need to be
+provided.
+
+## Classes
+
+|                                           Member                                           | <center>Description</center>                |
+| :----------------------------------------------------------------------------------------: | ------------------------------------------- |
+| [<IconObjType type="class" hasText={true} text="DBNotReadyError"/>](./DBNotReadyError.mdx) | Exception raised by `QueryGetter`.          |
+|     [<IconObjType type="class" hasText={true} text="QueryGetter"/>](./QueryGetter.mdx)     | The getter of the `query` property.         |
+| [<IconObjType type="class" hasText={true} text="TableNameGetter"/>](./TableNameGetter.mdx) | The getter of the `__tablename__` property. |
+
+## Functions
+
+|                                           Member                                            | <center>Description</center>                                                                               |
+| :-----------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------- |
+| [<IconObjType type="func" hasText={true} text="hook_classmethod"/>](./hook_classmethod.mdx) | Hook a class method.                                                                                       |
+|  [<IconObjType type="func" hasText={true} text="hook_base_model"/>](./hook_base_model.mdx)  | Add hooks to the given Model class.                                                                        |
+| [<IconObjType type="func" hasText={true} text="apply_to_engines"/>](./apply_to_engines.mdx) | Apply a function to one or multiple engines.                                                               |
+|     [<IconObjType type="func" hasText={true} text="clone_method"/>](./clone_method.mdx)     | A decorator for modifying the static type hint of a method by cloning the signature of another method.     |
+|   [<IconObjType type="func" hasText={true} text="clone_function"/>](./clone_function.mdx)   | A decorator for modifying the static type hint of a function by cloning the signature of another function. |
+|   [<IconObjType type="func" hasText={true} text="get_app_ctx_id"/>](./get_app_ctx_id.mdx)   | Get the ID of the current Flask app context object.                                                        |

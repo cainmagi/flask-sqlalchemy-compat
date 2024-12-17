@@ -1,0 +1,546 @@
+---
+id: SQLAlchemyProxy
+title: SQLAlchemyProxy
+sidebar_label: SQLAlchemyProxy
+slug: /apis/flask_sa_api/SQLAlchemyProxy
+description: Proxy class of flask_sqlalchemy.SQLAlchemy.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" source="flask_sa_api.SQLAlchemyProxy" />
+
+```python
+db_proxy = SQLAlchemyProxy[_SQLAlchemyLiteDB_co, _ModelLite_co](
+    db: _SQLAlchemyLiteDB_co,
+    model_class: type[_ModelLite_co],
+)
+```
+
+Proxy class of `flask_sqlalchemy.SQLAlchemy`.
+
+This class is a wrapper of SQLAlchemy-Lite. By adjusting the behavior of the
+`flask_sqlalchemy_lite.SQLAlchemy`, it can mimic the usage of
+`flask_sqlalchemy.SQLAlchemy`.
+
+Note that not all the functionalities of `flask_sqlalchemy_lite.SQLAlchemy` can
+be exactly the same as the those of `flask_sqlalchemy.SQLAlchemy`. In specific,
+this proxy will do the following things:
+
+- Provide a `Model` based on the given argument `model_class`, where the
+  `__tablename__` will be automatically inferred from `model_class`.
+- Provide a fake `Query` class. This `Query` class is just `sqlalchemy.orm.Query`.
+  In other words, it does not provide any extra functionalities
+- Provide a fake `Table` class. This fake class is actually a method returning
+  an `sqlalchemy.Table` instance, where users do not need to implement `metadata`.
+- Provide a scoped session like that of `flask_sqlalchemy.SQLAlchemy`. This scoped
+  session is managed by this proxy class.
+- Provide other basic methods in `flask_sqlalchemy.SQLAlchemy`. The usages would
+  be equivalent but the implmentation is based on `flask_sqlalchemy_lite`.
+- Any functionality that cannot be used will raise a `NotImplementedError`.
+
+This wrapper can be used when users need to migrate from Flask SQLAlchemy to
+Flask SQLAlchemy-Lite without making too many changes to the Object-Relationship-
+Mapping (ORM) codes. It is also useful if the users is primarily using Flask
+SQLAlchemy but want to support Flask SQLAlchemy Lite in some specific deployments.
+
+## Aliases
+
+This class can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyProxy
+fsc.flask_sa_api.SQLAlchemyProxy
+```
+
+## Arguments
+
+|  Argument   |          Type          |             Required              | <center>Description</center>                                                                                                                                                                                                                                        |
+| :---------: | :--------------------: | :-------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|    `db`     | `_SQLAlchemyLiteDB_co` | <InlineIcon icon={vsiCheckIcon}/> | <p>The database instance exporting the session and engine instances.</p><p>It is provided by the Flask extensions like `flask_sqlachemy_lite`. This wrapper will mimic the behaviors of `flask_sqlalchemy` even if the given instance is from the lite version.</p> |
+| `back_data` |    `_ModelLite_co`     | <InlineIcon icon={vsiCheckIcon}/> | <p>The type of the base model. This `model_class` is mandatory.</p><p>It needs to be used for providing the functionalities related to the metadata.</p>                                                                                                            |
+
+- where `_SQLAlchemyLiteDB_co` is a `TypeVar` of [`fsc.protocols.SQLAlchemyLiteProtocol`](../protocols/SQLAlchemyLiteProtocol.mdx).
+- where `_ModelLite_co` is a `TypeVar` of `sa.orm.DeclarativeBase`.
+
+## Methods
+
+### <IconObjType type="method"/> `init_app`
+
+```python
+db_proxy.init_app(
+    app: Flask,
+)
+```
+
+Register the extension on an application, creating engines from its
+`Flask.config`.
+
+#### Requires
+
+| Argument |  Type   |             Required              | <center>Description</center> |
+| :------: | :-----: | :-------------------------------: | ---------------------------- |
+|  `app`   | `Flask` | <InlineIcon icon={vsiCheckIcon}/> | The application to register. |
+
+---
+
+### <IconObjType type="method"/> `create_all`
+
+```python
+db_proxy.create_all(
+    bind_key: str | None | Sequence[str | None] = "__all__",
+)
+```
+
+Create tables that do not exist in the database by calling
+`metadata.create_all()` for all or some bind keys. This does not
+update existing tables, use a migration library for that.
+
+This requires that a Flask application context is active.
+
+#### Requires
+
+|  Argument  |                  Type                  | Required | <center>Description</center>                                                                                                                       |
+| :--------: | :------------------------------------: | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bind_key` | `str \| None \| Sequence[str \| None]` |          | <p>The name(s) of the engines where the metadata will be applied to.</p><p>If using `__all__`, will apply the metadata to all defined engines.</p> |
+
+---
+
+### <IconObjType type="method"/> `drop_all`
+
+```python
+db_proxy.create_all(
+    bind_key: str | None | Sequence[str | None] = "__all__",
+)
+```
+
+Drop tables by calling `metadata.drop_all()` for all or some bind keys.
+
+This requires that a Flask application context is active.
+
+#### Requires
+
+|  Argument  |                  Type                  | Required | <center>Description</center>                                                                                                                       |
+| :--------: | :------------------------------------: | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bind_key` | `str \| None \| Sequence[str \| None]` |          | <p>A bind key or list of keys of the engines to drop the tables from.</p><p>If using `__all__`, will drop the tables from all defined engines.</p> |
+
+---
+
+### <IconObjType type="method"/> `reflect`
+
+```python
+db_proxy.reflect(
+    bind_key: str | None | Sequence[str | None] = "__all__",
+)
+```
+
+Load table definitions from the database by calling `metadata.reflect()`
+for all or some bind keys.
+
+This requires that a Flask application context is active.
+
+#### Requires
+
+|  Argument  |                  Type                  | Required | <center>Description</center>                                                                                                                             |
+| :--------: | :------------------------------------: | :------: | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bind_key` | `str \| None \| Sequence[str \| None]` |          | <p>A bind key or list of keys of the engines to reflect the tables from.</p><p>If using `__all__`, will reflect the tables from all defined engines.</p> |
+
+---
+
+### <IconObjType type="method"/> `dynamic_loader`
+
+```python
+val: RelationshipProperty[Any] = db_proxy.dynamic_loader(
+    argument: _RelationshipArgumentType[Any] | None = None,
+    **kw: Any,
+)
+```
+
+The same as `sa.orm.relationship`.
+
+Construct a dynamically-loading mapper property.
+
+This is essentially the same as
+using the `lazy="dynamic"` argument with `relationship`.
+
+```python
+dynamic_loader(SomeClass)  # is the same as
+
+relationship(SomeClass, lazy="dynamic")
+```
+
+#### Requires
+
+|  Argument  |               Type               | Required | <center>Description</center>                                       |
+| :--------: | :------------------------------: | :------: | ------------------------------------------------------------------ |
+| `argument` | `_RelationshipArgumentType[Any]` |          | The first argument that can passed to `sa.orm.relationship(...)`.  |
+|   `**kw`   |              `Any`               |          | The other arguments that can passed to `sa.orm.relationship(...)`. |
+
+#### Returns
+
+| Argument |            Type             | <center>Description</center>                  |
+| :------: | :-------------------------: | :-------------------------------------------- |
+|  `val`   | `RelationshipProperty[Any]` | The dynamically loaded relationship property. |
+
+---
+
+### <IconObjType type="method"/> `get_engine`
+
+```python
+engine: sa.engine.Engine = db_proxy.reflect(
+    bind_key: str | None = None,
+)
+```
+
+The same as `self.engines[bind_key]`.
+
+Get the engine for the given bind key for the current application.
+This requires that a Flask application context is active.
+
+#### Requires
+
+|  Argument  |     Type      | Required | <center>Description</center> |
+| :--------: | :-----------: | :------: | ---------------------------- |
+| `bind_key` | `str \| None` |          | The name of the engine.      |
+
+#### Returns
+
+| Argument |    Type     | <center>Description</center>   |
+| :------: | :---------: | :----------------------------- |
+| `engine` | `sa.engine.Engine` | The engine gotten by the name. |
+
+---
+
+### <IconObjType type="method"/> `get_or_404`
+
+```python
+val: T = db_proxy.get_or_404[T](
+    entity: _EntityBindKey[T],
+    ident: _PKIdentityArgument,
+    *,
+    description: str | None = None,
+    **kwargs: Any,
+)
+```
+
+Like `session.get()` but aborts with a `404 Not Found` error instead of
+returning `None`.
+
+The usage is the same as `session.get()` except for the newly added argument
+`description`.
+
+#### Requires
+
+|   Argument    |         Type          |             Required              | <center>Description</center>                  |
+| :-----------: | :-------------------: | :-------------------------------: | --------------------------------------------- |
+|   `entity`    |  `_EntityBindKey[T]`  | <InlineIcon icon={vsiCheckIcon}/> | The model class or entity statement to query. |
+|    `ident`    | `_PKIdentityArgument` | <InlineIcon icon={vsiCheckIcon}/> | The primary key to query.                     |
+| `description` |     `str \| None`     |                                   | A custom message to show on the error page.   |
+|  `**kwargs`   |         `Any`         |                                   | Extra arguments passed to `session.get()`.    |
+
+#### Returns
+
+| Argument | Type | <center>Description</center> |
+| :------: | :--: | :--------------------------- |
+|  `val`   | `T`  | The queried model entity.    |
+
+- where `T` is typically a `TypeVar` of a `Model`. A model can be a subclass of `sa.orm.DeclarativeBase`.
+- where `_EntityBindKey[T]` is typically a `Type[T]`.
+- where `_PKIdentityArgument` is an alias of `Any | tuple[Any]`.
+
+---
+
+### <IconObjType type="method"/> `first_or_404`
+
+```python
+val: T = db_proxy.first_or_404[T](
+    statement: sa.sql.Select[tuple[T]],
+    *,
+    description: str | None = None,
+)
+val: tuple[T, T2, ...] = db_proxy.first_or_404[T, T2, ...](
+    statement: sa.sql.Select[tuple[T, T2, ...]],
+    *,
+    description: str | None = None,
+)
+```
+
+Like `Result.scalar()`, but aborts with a `404 Not Found` error instead of
+returning `None`.
+
+#### Requires
+
+|   Argument    |              Type              |             Required              | <center>Description</center>                |
+| :-----------: | :----------------------------: | :-------------------------------: | ------------------------------------------- |
+|  `statement`  | `sa.sql.Select[Tuple[T, ...]]` | <InlineIcon icon={vsiCheckIcon}/> | The `select` statement to execute.          |
+| `description` |         `str \| None`          |                                   | A custom message to show on the error page. |
+
+#### Returns
+
+| Argument |   Type   | <center>Description</center>                              |
+| :------: | :------: | :-------------------------------------------------------- |
+|  `val`   | `T, ...` | The first returned results when the `statement` is found. |
+
+- where `T, T2, ...` are the types specified in the `sa.select` statement.
+
+---
+
+### <IconObjType type="method"/> `one_or_404`
+
+```python
+val: T = db_proxy.one_or_404[T](
+    statement: sa.sql.Select[tuple[T]],
+    *,
+    description: str | None = None,
+)
+val: tuple[T, T2, ...] = db_proxy.one_or_404[T, T2, ...](
+    statement: sa.sql.Select[tuple[T, T2, ...]],
+    *,
+    description: str | None = None,
+)
+```
+
+Like `Result.scalar_one()` but aborts with a `404 Not Found` error instead
+of raising `NoResultFound` or `MultipleResultsFound`.
+
+#### Requires
+
+|   Argument    |              Type              |             Required              | <center>Description</center>                |
+| :-----------: | :----------------------------: | :-------------------------------: | ------------------------------------------- |
+|  `statement`  | `sa.sql.Select[Tuple[T, ...]]` | <InlineIcon icon={vsiCheckIcon}/> | The `select` statement to execute.          |
+| `description` |         `str \| None`          |                                   | A custom message to show on the error page. |
+
+#### Returns
+
+| Argument |   Type   | <center>Description</center>                                           |
+| :------: | :------: | :--------------------------------------------------------------------- |
+|  `val`   | `T, ...` | The first and the only returned results when the `statement` is found. |
+
+- where `T, T2, ...` are the types specified in the `sa.select` statement.
+
+---
+
+### <IconObjType type="method"/> `paginate`
+
+```python
+db_proxy.paginate(*args: Any, **kwargs: Any)
+```
+
+:::danger
+
+This method is not implemented by the proxy.
+
+:::
+
+### <IconObjType type="method"/> `relationship`
+
+```python
+val: _RelationshipDeclared[Any] = db_proxy.relationship(
+    argument: _RelationshipArgumentType[Any] | None = None,
+    secondary: _RelationshipSecondaryArgument | None = None,
+    *,
+    uselist: bool | None = None,
+    collection_class: type[Collection[Any]] | Callable[[], Collection[Any]] = None,
+    primaryjoin: _RelationshipJoinConditionArgument | None = None,
+    secondaryjoin: _RelationshipJoinConditionArgument | None = None,
+    back_populates: str | None = None,
+    order_by: _ORMOrderByArgument = False,
+    backref: ORMBackrefArgument | None = None,
+    overlaps: str | None = None,
+    post_update: bool = False,
+    cascade: str = "save-update, merge",
+    viewonly: bool = False,
+    init: _NoArg | bool = _NoArg.NO_ARG,
+    repr: _NoArg | bool = _NoArg.NO_ARG,
+    default: _NoArg | _T = _NoArg.NO_ARG,
+    default_factory: _NoArg | Callable[[], _T] = _NoArg.NO_ARG,
+    compare: _NoArg | bool = _NoArg.NO_ARG,
+    kw_only: _NoArg | bool = _NoArg.NO_ARG,
+    hash: _NoArg | bool | None = _NoArg.NO_ARG,
+    lazy: _LazyLoadArgumentType = "select",
+    passive_deletes: Literal["all"] | bool = False,
+    passive_updates: bool = True,
+    active_history: bool = False,
+    enable_typechecks: bool = True,
+    foreign_keys: _ORMColCollectionArgument | None = None,
+    remote_side: _ORMColCollectionArgument | None = None,
+    join_depth: int | None = None,
+    comparator_factory: type[RelationshipProperty.Comparator[Any]] | None = None,
+    single_parent: bool = False,
+    innerjoin: bool = False,
+    distinct_target_key: bool | None = None,
+    load_on_pending: bool = False,
+    query_class: type[Query[Any]] | None = None,
+    info: _InfoType | None = None,
+    omit_join: Literal[None, False] = None,
+    sync_backref: bool | None = None,
+    **kw: Any,
+)
+```
+
+The same as `sa.orm.relationship`. Provide a relationship between two mapped classes.
+
+See the details in the [official document<IconExternalLink/>][link-sa-relationship].
+
+## Properties
+
+### <IconObjType type="param"/> `db`
+
+```python
+db: _SQLAlchemyLiteDB_co = db_proxy.db
+```
+
+The `db` instance provided by the Flask SQLAlchemy extension.
+
+---
+
+### <IconObjType type="param"/> `Model`
+
+```python
+db: type[_ModelLite_co] = db_proxy.Model
+```
+
+The `Model` type. It can be used as the base class of the
+SQLAlchemy models. This value is `model_class` passed to the initialization
+of this wrapper.
+
+---
+
+### <IconObjType type="param"/> `Table`
+
+```python
+table_factory: Callable[[...], sa.Table] = db_proxy.Table
+```
+
+A simplified version of `sa.Table`.
+
+Compared to `sa.Table`. The only difference is that the argument `metadata`
+has been implicitly configured. Users do not need to pass this argument when
+using this constructor.
+
+---
+
+### <IconObjType type="param"/> `Query`
+
+```python
+query_class: sa.orm.Query = db_proxy.Query
+```
+
+The same as `sa.orm.Query`.
+
+ORM-level SQL construction object.
+
+---
+
+### <IconObjType type="param"/> `session`
+
+```python
+sess: sa.orm.scoped_session[sa.orm.Session] = db_proxy.session
+```
+
+The same as `self.db.session`.
+
+The default session for the current application context. It will be
+closed when the context ends.
+
+---
+
+### <IconObjType type="param"/> `metadatas`
+
+```python
+metadatas: dict[str | None, sa.MetaData] = db_proxy.metadatas
+```
+
+The compatible interface of metadatas.
+
+Since `flask_sqlalchemy_lite` does not support `bind_key`, this `metdatas` is
+always implemented by a dictionary with only one member:
+
+```python
+{None: self.metadata}
+```
+
+---
+
+### <IconObjType type="param"/> `metadata`
+
+```python
+metadata: sa.MetaData = db_proxy.metadata
+```
+
+The default metadata used by `Model` and `Table` if no bind key is set.
+
+---
+
+### <IconObjType type="param"/> `engines`
+
+```python
+engines: MutableMapping[str | None, sa.engine.Engine] = db_proxy.engines
+```
+
+The engines associated with the current application.
+
+To make this value compatible with `flask_sqlalchemy`. The returned value is
+added with an extra item: `self.engines[None] is self.engines["default"]`.
+
+---
+
+### <IconObjType type="param"/> `engine`
+
+```python
+engine: sa.engine.Engine = db_proxy.engine
+```
+
+The default engine associated with the current application.
+
+## Operators
+
+### <IconObjType type="op"/> `__getattr__`
+
+```python
+obj: Any = getattr(
+    db_proxy,
+    any_attr: str
+)
+```
+
+Get an attribute of `db_proxy` if the attribute is not explicitly defined.
+
+The attribute will be searched in `sa.orm` and `sa`, respectively. If the attribtue does not exist in `sa.orm`, search it in `sa`.
+
+In particular:
+
+|      Attribtue      |         Value         |
+| :-----------------: | :-------------------: |
+|  `db_proxy.event`   |      `sa.event`       |
+| `db_proxy.relation` | `sa.orm.relationship` |
+
+An example is:
+
+```python
+db_proxy.select
+```
+
+which is the same as `sa.select`.
+
+#### Requires
+
+|  Argument  | Type  |             Required              | <center>Description</center> |
+| :--------: | :---: | :-------------------------------: | ---------------------------- |
+| `any_attr` | `str` | <InlineIcon icon={vsiCheckIcon}/> | The attribute name to get.   |
+
+#### Returns
+
+| Argument | Type  | <center>Description</center>             |
+| :------: | :---: | :--------------------------------------- |
+|  `obj`   | `Any` | The attribtue found in `sa.orm` or `sa`. |
+
+[link-sa-relationship]: https://docs.sqlalchemy.org/en/20/orm/relationship_api.html#sqlalchemy.orm.relationship

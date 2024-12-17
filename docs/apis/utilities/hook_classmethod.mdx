@@ -1,0 +1,105 @@
+---
+id: hook_classmethod
+title: hook_classmethod
+sidebar_label: hook_classmethod
+slug: /apis/utilities/hook_classmethod
+description: Hook a class method.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.hook_classmethod" />
+
+```python
+hooked_method: Callable[P, T] = hook_classmethod[**P, _Type, T](
+    cls_method: Callable[P, T],
+    hook_before: Callable[Concatenate[_Type, P], None] | None = None,
+    hook_after: Callable[Concatenate[_Type, P], None] | None = None,
+)
+```
+
+Hook a class method.
+
+## Arguments
+
+### Requires
+
+|   Argument    |               Type               |             Required              | <center>Description</center>                                                                                                                                      |
+| :-----------: | :------------------------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cls_method`  |           `(**P) -> T`           | <InlineIcon icon={vsiCheckIcon}/> | A class method that is hooked. This is the bounded version of the class method, where the first argument `cls` has been implied and not included in the spec `P`. |
+| `hook_before` | `None \| ((_Type, **P) -> None)` |                                   | The hook that will be run before this class method.                                                                                                               |
+| `hook_after`  | `None \| ((_Type, **P) -> None)` |                                   | The hook that will be run after this class method.                                                                                                                |
+
+### Returns
+
+|    Argument     |     Type     | <center>Description</center>                                         |
+| :-------------: | :----------: | :------------------------------------------------------------------- |
+| `hooked_method` | `(**P) -> T` | The hooked class method, where the first argument (class) is hidden. |
+
+## Examples
+
+### <IconObjType type="term"/> Hook a class with `__init_subclass__` defined
+
+<Tabs
+  defaultValue="codes"
+  values={[
+    { label: 'Codes', value: 'codes', },
+    { label: 'Results', value: 'results', },
+  ]
+}>
+
+<TabItem value="codes">
+
+```python title="hook_init_subclass.py" showLineNumbers
+import flask_sqlalchemy_compat as fsc
+
+
+class ExampleBase:
+    test_val = 0
+
+    def __init_subclass__(cls) -> None:
+        cls.test_val = 1
+
+
+class ExampleA(ExampleBase):
+    pass
+
+
+def hook(cls: ExampleBase) -> None:
+    cls.test_val = 10
+
+
+ExampleBase.__init_subclass__ = fsc.utilities.hook_classmethod(
+    ExampleBase.__init_subclass__, hook_after=hook
+)
+
+
+class ExampleB(ExampleBase):
+    pass
+
+
+if __name__ == "__main__":
+    print("ExampleBase.test_val:", ExampleBase.test_val)
+    print("ExampleA.test_val:", ExampleA.test_val)
+    print("ExampleB.test_val:", ExampleB.test_val)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```python
+ExampleBase.test_val: 0
+ExampleA.test_val: 1
+ExampleB.test_val: 10
+```
+
+</TabItem>
+
+</Tabs>

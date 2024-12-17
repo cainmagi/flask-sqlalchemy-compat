@@ -1,0 +1,42 @@
+---
+id: hook_base_model
+title: hook_base_model
+sidebar_label: hook_base_model
+slug: /apis/utilities/hook_base_model
+description: Add hooks to the given Model class.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.hook_base_model" />
+
+```python
+hooked_model: type[_Model_contra] = hook_base_model[_Model_contra](
+    cls: type[_Model_contra],
+    db: SQLAlchemyProtocol | SQLAlchemyLiteProtocol,
+)
+```
+
+Add hooks to the given Model class. This hook will synthesize the
+`__tablename__`, `query` and `query_cls` properties if any of them is not
+specified in the subclass.
+
+## Arguments
+
+### Requires
+
+| Argument |                               Type                                |             Required              | <center>Description</center>                    |
+| :------: | :---------------------------------------------------------------: | :-------------------------------: | ----------------------------------------------- |
+|  `cls`   |                       `type[_Model_contra]`                       | <InlineIcon icon={vsiCheckIcon}/> | The class to be hooked.                         |
+|   `db`   | `flask_sqlalchemy.SQLAlchemy \| flask_sqlalchemy_lite.SQLAlchemy` |                                   | The db instance used for providing the session. |
+
+- where `_Model_contra` is a `TypeVar` of `DeclarativeBase | DeclarativeBaseNoMeta`.
+
+### Returns
+
+|    Argument    |         Type          | <center>Description</center> |
+| :------------: | :-------------------: | :--------------------------- |
+| `hooked_model` | `type[_Model_contra]` | The hooked base model class. |

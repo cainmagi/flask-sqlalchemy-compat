@@ -1,0 +1,37 @@
+---
+id: SQLAlchemySharedProtocol
+title: SQLAlchemySharedProtocol
+sidebar_label: SQLAlchemySharedProtocol
+slug: /apis/protocols/SQLAlchemySharedProtocol
+description: Protocol compatible with both Flask SQLAlchemy and Flask SQLAlchemy Lite.
+---
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar
+  type="type"
+  isPrivate={true}
+  source="protocols.SQLAlchemySharedProtocol"
+/>
+
+```python
+db: SQLAlchemySharedProtocol
+```
+
+Protocol compatible with both Flask SQLAlchemy and Flask SQLAlchemy Lite.
+
+This protocol only implments limited functionalies that are provided by both
+`flask_sqlalchemy.SQLAlchemy` and `flask_sqlalchemy_lite.SQLAlchemy`.
+Since this procol has the minimal coverage, it can be used for generalized
+purposes.
+
+## Protocol properties
+
+### <IconObjType type="param"/> `engine`
+
+```python
+db.engine: sa.engine.Engine
+```
+
+The default engine associated with the current application.

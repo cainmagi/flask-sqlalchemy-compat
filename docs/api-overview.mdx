@@ -1,0 +1,73 @@
+---
+id: api-overview
+sidebar_label: Overview
+title: Overview of APIs
+description: The overview of all APIs.
+slug: /apis
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+import ThemedImage from "@theme/ThemedImage";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+# Overview of APIs
+
+<APITopBar type="package" source="." />
+
+Support the compatibility between [`flask_sqlalchemy`<IconExternalLink/>][link-fsa]
+and [`flask_sqlalchemy_lite`<IconExternalLink/>][link-fsa-lite]. It allows users to
+make minimal changes when they need to migrate from either one of these two packages
+to each other.
+
+The main motivation of this package is because `flask_sqlalchemy_lite` does not support
+`python<=3.8`. This package is designed for providing the similar usages when users
+have to make the `flask_sqlalchemy_lite` working with `python<=3.8` by using
+`flask_sqlalchemy`. In this case, users can get rid of the difficulty of maintaining
+two sets of codes.
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="Docusaurus themed image"
+    sources={{
+      light: useBaseUrl("/img/overview-light.svg"),
+      dark: useBaseUrl("/img/overview-dark.svg"),
+    }}
+  />
+</div>
+
+This graph shows the high-level overview of the whole package, where only the modules are included.
+
+## Modules
+
+|                                                   Member                                                   | <center>Description</center>                                                                         |
+| :--------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------- |
+|              [<IconObjType type="module" hasText={true} text="auto"/>](./apis/auto/index.mdx)              | Methods used for creating the `SQLAlchemy` extension in the compatible mode.                         |
+|          [<IconObjType type="module" hasText={true} text="backdict"/>](./apis/backdict/index.mdx)          | The implementation of a modified `dict`.                                                             |
+|          [<IconObjType type="module" hasText={true} text="backends"/>](./apis/backends/index.mdx)          | The backends of the `flask_sqlalchemy_compat` package.                                               |
+|      [<IconObjType type="module" hasText={true} text="flask_sa_api"/>](./apis/flask_sa_api/index.mdx)      | The proxy wrapper providing the APIs mimicking the behavior of `flask_sqlalchemy.SQLAlchemy()`.      |
+| [<IconObjType type="module" hasText={true} text="flask_sa_lite_api"/>](./apis/flask_sa_lite_api/index.mdx) | The proxy wrapper providing the APIs mimicking the behavior of `flask_sqlalchemy_lite.SQLAlchemy()`. |
+|         [<IconObjType type="module" hasText={true} text="protocols"/>](./apis/protocols/index.mdx)         | The customized protocol type hints used by this package.                                             |
+|         [<IconObjType type="module" hasText={true} text="utilities"/>](./apis/utilities/index.mdx)         | The extra functionalities used for hooking the original SQLAlchemy extensions.                       |
+
+## Aliases
+
+|                                        Member                                        | <center>Alias of</center>                                                                                 |
+| :----------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------- |
+|         <IconObjType type="type" hasText={true} text="SQLAlchemyProtocol"/>          | [`fsc.protocols.SQLAlchemyProtocol`](./apis/protocols/SQLAlchemyProtocol.mdx)                             |
+|       <IconObjType type="type" hasText={true} text="SQLAlchemyLiteProtocol"/>        | [`fsc.protocols.SQLAlchemyLiteProtocol`](./apis/protocols/SQLAlchemyLiteProtocol.mdx)                     |
+|            <IconObjType type="type" hasText={true} text="ModelProtocol"/>            | [`fsc.protocols.ModelProtocol`](./apis/protocols/ModelProtocol.mdx)                                       |
+|          <IconObjType type="class" hasText={true} text="TableNameGetter"/>           | [`fsc.utilities.TableNameGetter`](./apis/utilities/TableNameGetter.mdx)                                   |
+|            <IconObjType type="class" hasText={true} text="QueryGetter"/>             | [`fsc.utilities.QueryGetter`](./apis/utilities/QueryGetter.mdx)                                           |
+|          <IconObjType type="class" hasText={true} text="SQLAlchemyProxy"/>           | [`fsc.flask_sa_api.SQLAlchemyProxy`](./apis/flask_sa_api/SQLAlchemyProxy.mdx)                             |
+|        <IconObjType type="class" hasText={true} text="SQLAlchemyLiteProxy"/>         | [`fsc.flask_sa_lite_api.SQLAlchemyLiteProxy`](./apis/flask_sa_lite_api/SQLAlchemyLiteProxy.mdx)           |
+|         <IconObjType type="func" hasText={true} text="as_flask_sqlalchemy"/>         | [`fsc.flask_sa_api.as_flask_sqlalchemy`](./apis/flask_sa_api/as_flask_sqlalchemy.mdx)                     |
+|      <IconObjType type="func" hasText={true} text="as_flask_sqlalchemy_lite"/>       | [`fsc.flask_sa_lite_api.as_flask_sqlalchemy_lite`](./apis/flask_sa_lite_api/as_flask_sqlalchemy_lite.mdx) |
+|        <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy"/>         | [`fsc.auto.get_flask_sqlalchemy`](./apis/auto/get_flask_sqlalchemy.mdx)                                   |
+|   <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_proxy_ver"/>    | [`fsc.auto.get_flask_sqlalchemy_proxy_ver`](./apis/auto/get_flask_sqlalchemy_proxy_ver.mdx)               |
+|      <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite"/>      | [`fsc.auto.get_flask_sqlalchemy_lite`](./apis/auto/get_flask_sqlalchemy_lite.mdx)                         |
+| <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite_proxy_ver"/> | [`fsc.auto.get_flask_sqlalchemy_lite_proxy_ver`](./apis/auto/get_flask_sqlalchemy_lite_proxy_ver.mdx)     |
+
+[link-fsa]: https://flask-sqlalchemy.palletsprojects.com
+[link-fsa-lite]: https://flask-sqlalchemy-lite.readthedocs.io

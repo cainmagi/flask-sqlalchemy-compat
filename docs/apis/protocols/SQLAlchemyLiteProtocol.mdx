@@ -1,0 +1,139 @@
+---
+id: SQLAlchemyLiteProtocol
+title: SQLAlchemyLiteProtocol
+sidebar_label: SQLAlchemyLiteProtocol
+slug: /apis/protocols/SQLAlchemyLiteProtocol
+description: Protocol compatible with Flask SQLAlchemy Lite.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="type" source="protocols.SQLAlchemyLiteProtocol" />
+
+```python
+db: SQLAlchemyLiteProtocol
+```
+
+Protocol compatible with Flask SQLAlchemy Lite.
+
+Flask SQLAlchemy Lite provides less functionality compared to Flask SQlAlchemy.
+It is ready since `Python>=3.9`. Although this package is new, it is still
+preferred because it works better with `SQLAlchemy>=2` and Python's `typing`
+system.
+
+This protocol covers most but does not include all functionalities of
+`flask_sqlalchemy_lite.SQLAlchemy`.
+
+## Aliases
+
+This type can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyLiteProtocol
+fsc.protocols.SQLAlchemyLiteProtocol
+```
+
+## Protocol methods
+
+### <IconObjType type="method"/> `init_app`
+
+```python
+db.init_app(app: App)
+```
+
+Register the extension on an application, creating engines from its `Flask.config`.
+
+- where `App` is [`flask.sansio.app.App`<IconExternalLink/>][link-flask-app].
+
+## Protocol properties
+
+### <IconObjType type="param"/> `engine`
+
+```python
+db.engine: sa.engine.Engine
+```
+
+The default engine associated with the current application.
+
+---
+
+### <IconObjType type="param"/> `engines`
+
+```python
+db.engines: dict[str, sa.engine.Engine]
+```
+
+The engines associated with the current application.
+
+---
+
+### <IconObjType type="param"/> `sessionmaker`
+
+```python
+db.sessionmaker: sa.orm.sessionmaker[sa.orm.Session]
+```
+
+The session factory configured for the current application. This can
+be used to create sessions directly, but they will not be closed
+automatically at the end of the application context. Use `session`
+and `get_session` for that.
+
+---
+
+### <IconObjType type="param"/> `session`
+
+```python
+db.session: sa.orm.Session
+```
+
+The default session for the current application context. It will be
+closed when the context ends.
+
+---
+
+### <IconObjType type="param"/> `async_engines`
+
+```python
+db.async_engines: dict[str, sa.async.AsyncEngine]
+```
+
+The async engines associated with the current application.
+
+---
+
+### <IconObjType type="param"/> `async_engine`
+
+```python
+db.async_engine: sa.async.AsyncEngine
+```
+
+The default async engine associated with the current application.
+
+---
+
+### <IconObjType type="param"/> `async_sessionmaker`
+
+```python
+db.async_sessionmaker: sa.async.async_sessionmaker[sa.async.AsyncSession]
+```
+
+The async session factory configured for the current application.
+
+---
+
+### <IconObjType type="param"/> `async_session`
+
+```python
+db.async_session: sa.async.AsyncSession
+```
+
+The default async session for the current application context. It
+will be closed when the context ends.
+
+[link-flask-app]: https://github.com/pallets/flask/blob/6b054f8f3876ff4c31580b014d344c4cf491059d/src/flask/sansio/app.py#L59

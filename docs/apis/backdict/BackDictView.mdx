@@ -1,0 +1,117 @@
+---
+id: BackDictView
+title: BackDictView
+sidebar_label: BackDictView
+slug: /apis/backdict/BackDictView
+description: Internal class. The read-only proxy used by MappingView of BackDict.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backdict.BackDictView" />
+
+```python
+bdict_view = BackDictView[K, V](
+    data: Mapping[K, V],
+    back_data: Mapping[K2, V],
+    key_mapper: Callable[[K], K2],
+    key_back_mapper: Callable[[K2], K],
+)
+```
+
+Internal class. The read-only proxy used by `MappingView` of `BackDict`.
+
+:::danger
+
+This class should be initialized by methods of `BackDict`. Users should not
+explicitly initialize it.
+
+:::
+
+## Arguments
+
+|   Argument   |       Type       |             Required              | <center>Description</center>                                                     |
+| :----------: | :--------------: | :-------------------------------: | -------------------------------------------------------------------------------- |
+|    `data`    | `Mapping[K, T]`  | <InlineIcon icon={vsiCheckIcon}/> | Mutable data internal storage of `BackDict`.                                     |
+| `back_data`  | `Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | <p>Backup immutable data internal storage of `BackDict`.</p>                     |
+| `key_mapper` |   `(K) -> K2`    | <InlineIcon icon={vsiCheckIcon}/> |
+| `key_mapper` |   `(K2) -> K`    | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K2` to `K` when the key needs to be listed to users. |
+
+## Operators
+
+### <IconObjType type="op"/> `__len__`
+
+```python
+vlen: int = len(bdict)
+```
+
+Get the length of the dictionary. This length is also the number of items in this view.
+
+#### Returns
+
+| Argument | Type  | <center>Description</center>                                                                               |
+| :------: | :---: | :--------------------------------------------------------------------------------------------------------- |
+|  `vlen`  | `int` | The number of the keys in the union of the first level dictionary keys and the back-level dictionary keys. |
+
+---
+
+### <IconObjType type="op"/> `__contains__`
+
+```python
+flag: bool = key in bdict
+```
+
+Check whether `key` is in the dictionary view.
+
+#### Requires
+
+| Argument | Type |             Required              | <center>Description</center> |
+| :------: | :--: | :-------------------------------: | ---------------------------- |
+|  `key`   | `K`  | <InlineIcon icon={vsiCheckIcon}/> | The keyword to be checked.   |
+
+#### Returns
+
+| Argument |  Type  | <center>Description</center>                                                                                                                                         |
+| :------: | :----: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  `flag`  | `bool` | If `True`, the given `key` value exists in the dictionary view. If the `key` is not found in the first level but found in the back level, this value is also `True`. |
+
+---
+
+### <IconObjType type="op"/> `__iter__`
+
+```python
+keys: Iterator[K] = iter(bdict)
+```
+
+Iterate each key in the dictionary view.
+
+#### Returns
+
+| Argument |     Type      | <center>Description</center>                                                                                                                                                      |
+| :------: | :-----------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  `keys`  | `Iterator[K]` | An iterator. For each iteration, it will return a key in the dicionary view. For any key in the back-level, the iterator will return the key post-processed by `key_back_mapper`. |
+
+---
+
+### <IconObjType type="op"/> `__getitem__`
+
+```python
+val: V = bdict[key]
+```
+
+Locate one value in the dictionary view. Raise `KeyError` if the keyword is not found.
+
+#### Requires
+
+| Argument | Type |             Required              | <center>Description</center>                                                                                                |
+| :------: | :--: | :-------------------------------: | --------------------------------------------------------------------------------------------------------------------------- |
+|  `key`   | `K`  | <InlineIcon icon={vsiCheckIcon}/> | The keyword used for locating the value. If the value is in the back level. Will use `key_mapper(key)` to locate the value. |
+
+#### Returns
+
+| Argument | Type | <center>Description</center> |
+| :------: | :--: | :--------------------------- |
+|  `val`   | `V`  | The value located by `key`.  |

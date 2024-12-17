@@ -1,0 +1,29 @@
+---
+id: index
+title: flask_sa_lite_api
+sidebar_label: flask_sa_lite_api
+slug: /apis/flask_sa_lite_api
+description: The proxy wrapper providing the APIs mimicking the behavior of flask_sqlalchemy_lite.SQLAlchemy().
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="flask_sa_lite_api" />
+
+The proxy wrapper providing the APIs mimicking the behavior of
+`flask_sqlalchemy_lite.SQLAlchemy()`. This wrapper is used when users need to support
+the features of `flask_sqlalchemy_lite` by using `flask_sqlalchemy`.
+
+## Classes
+
+|                                               Member                                               | <center>Description</center>                       |
+| :------------------------------------------------------------------------------------------------: | -------------------------------------------------- |
+| [<IconObjType type="class" hasText={true} text="SQLAlchemyLiteProxy"/>](./SQLAlchemyLiteProxy.mdx) | Proxy class of `flask_sqlalchemy_lite.SQLAlchemy`. |
+
+## Functions
+
+|                                                   Member                                                    | <center>Description</center>                |
+| :---------------------------------------------------------------------------------------------------------: | ------------------------------------------- |
+| [<IconObjType type="func" hasText={true} text="as_flask_sqlalchemy_lite"/>](./as_flask_sqlalchemy_lite.mdx) | Make `db` works as `flask_sqlalchemy_lite`. |

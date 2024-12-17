@@ -1,0 +1,43 @@
+---
+id: ModulePlaceholder
+title: ModulePlaceholder
+sidebar_label: ModulePlaceholder
+slug: /apis/backends/ModulePlaceholder
+description: The placeholder module.
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backends.ModulePlaceholder" />
+
+```python
+bdict_view = ModulePlaceholder(
+    name: str,
+    doc: str | None = None
+)
+```
+
+The placeholder module.
+
+This module is used as a placeholder of a module that cannot be found.
+It can still provide `__name__` property. However, it does not contain
+the `__spec__` property.
+
+:::danger
+
+This class is only internally used. Users should not use it.
+
+If users need to check whether a module is a placeholder, please use
+[`fsc.backends.is_module_invalid`](./is_module_invalid.mdx).
+
+:::
+
+## Arguments
+
+| Argument |     Type      |             Required              | <center>Description</center>                      |
+| :------: | :-----------: | :-------------------------------: | ------------------------------------------------- |
+|  `name`  |     `str`     | <InlineIcon icon={vsiCheckIcon}/> | The module name. It will be passed to ModuleType. |
+|  `doc`   | `str \| None` |                                   | The docstring of the module placeholder.          |

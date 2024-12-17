@@ -1,0 +1,494 @@
+---
+id: flask-sqlalchemy-lite
+sidebar_label: Lite
+title: "Demo: application of Flask SQLAlchemy Lite"
+description: The demo providing database APIs powered by Flask SQLAlchemy Lite
+slug: /examples/flask-sqlalchemy-lite
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IconExternalLink from "@theme/Icon/ExternalLink";
+import ThemedImage from "@theme/ThemedImage";
+
+import mdiLanguagePython from "@iconify-icons/mdi/language-python";
+
+import {demoURL} from "@site/src/envs/variables";
+import DarkButton from "@site/src/components/DarkButton";
+
+Check the following link to review this demo of a complete Flask application.
+
+<p>
+  <DarkButton to={demoURL("app_fsqla_lite.py")} icon={mdiLanguagePython}>
+    {"app_fsqla_lite.py"}
+  </DarkButton>
+</p>
+
+This demo provides the following features:
+
+1. A log-in system powered by [Flask Login<IconExternalLink/>][link-flask-login].
+2. Two admin users and two regular users.
+3. Only the admin users can access the list of users.
+4. Each user has several entries.
+5. All users can access the entries belonging to them. Furthermore, the admin users can access the entries of any user.
+6. Accessing the user list or the entry details needs the log-in credentials.
+
+## Database structure
+
+The entity-relationship diagram (ERD) of the database is:
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="ERD of the DB-only demo"
+    sources={{
+      light: useBaseUrl("/img/examples/erd-fsql-light.svg"),
+      dark: useBaseUrl("/img/examples/erd-fsql-dark.svg"),
+    }}
+  />
+</div>
+
+The database has the following features:
+
+- The default database backend is Flask SQLAlchemy Lite. If the Lite version is not
+  available, fall back to Flask SQLAlchemy.
+- A one-to-many relationship between users and entries.
+- A many-to-many relationship between users and roles.
+- The role object-relationship mapping (ORM) contains a hybrid property `is_admin`
+  that allows the fast query of the admin users. The property is implemented by
+  checking the `level` column.
+- The user ORM also contains a hybrid property `is_admin` that is implemented by the
+  joined query. Query that property will search the users who has at least one role
+  with the admin level.
+- The password of a user is saved as the hashed version. This form can prevent the
+  passowrd leakage if the database file is leaked. To work with the hashed version,
+  the user ORM provides two methods `set_password(...)` and `validate_passowrd(...)`
+
+## Access the demo
+
+Suppose that the `examples` folder is in the current folder, where the folder structure
+should be like this:
+
+```text
+.examples
+|---__init__.py
+|---...
+|---app_fsqla_lite.py
+`---models_fsqla_lite.py
+```
+
+In the current folder (where `examples` folder is), run the following command:
+
+<Tabs
+  defaultValue="command"
+  values={[
+    { label: "Command", value: 'command', },
+    { label: "Results", value: 'results', },
+  ]
+}>
+
+<TabItem value="command">
+
+```bash
+python -m examples.app_fsqla_lite
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```text
+ * Serving Flask app 'app_fsqla_lite'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://172.17.0.2:8080
+Press CTRL+C to quit
+```
+
+</TabItem>
+
+</Tabs>
+
+The demo serves as an independent Flask application. The application can be accessed
+by a browser. However, here we would not do that, because we need to submit `POST`
+requests to login, and the login credentials need to be stored in the session.
+
+### Test the login status
+
+To test the application, we can use the `requests` package. Install it by:
+
+```python
+python -m pip install requests
+```
+
+The first step is to test the status of the current user. Run the following script:
+
+<Tabs
+  defaultValue="script"
+  values={[
+    { label: "Script", value: 'script', },
+    { label: "Results", value: 'results', },
+  ]
+}>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-login.py"
+import requests
+
+
+# Recall that the address shown in the `app_fsqla_lite` is
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        print(res.json())
+    except requests.exceptions.JSONDecodeError:
+        print(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+        )
+        show_data(res)
+
+        res = sess.post(addr.format("logout"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "reader01", "password": "regular"}
+        )
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, admin01! As an admin, you can review /user or /entry.'}
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, reader01! You can review /entry.'}
+```
+
+</TabItem>
+
+</Tabs>
+
+The script will login as an admin user first, logout, then login as another regular
+user. It can be found that the welcome messages to the admin user and the regular user
+are different.
+
+### Test the admin user
+
+Start another session by the following script, we will test the results when the
+current user is an admin.
+
+<Tabs
+  defaultValue="script"
+  values={[
+    { label: "Script", value: 'script', },
+    { label: "Results", value: 'results', },
+  ]
+}>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-admin.py"
+import requests
+import pprint
+
+
+# Recall that the address shown in the `app_fsqla_lite` is
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        pprint.pprint(res.json())
+    except requests.exceptions.JSONDecodeError:
+        pprint.pprint(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+        )
+        show_data(res)
+
+        res = sess.get(addr.format("user"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"user": 2})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 3, "user": 2})
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, admin01! As an admin, you can review /user or /entry.'}
+{'message': 'Users are found.',
+ 'users': [{'id': 1, 'name': 'admin01'},
+           {'id': 2, 'name': 'reader01'},
+           {'id': 3, 'name': 'admin02'},
+           {'id': 4, 'name': 'reader02'}]}
+{'entries': [1, 2], 'message': 'Entries are found.', 'n_entries': 2, 'user': 1}
+{'entries': [3, 4], 'message': 'Entries are found.', 'n_entries': 2, 'user': 2}
+{'data': "admin's data 1", 'id': 1, 'message': 'Entry is found.', 'user': 1}
+{'data': "reader's data 1", 'id': 3, 'message': 'Entry is found.', 'user': 2}
+```
+
+</TabItem>
+
+</Tabs>
+
+It can be verified that:
+
+- The admin can access the list of all users.
+- The admin can access the entry list of any user, not limited by the current user.
+- The admin can access the entry detail of any user, not limited by the current user.
+
+### Test a regular user
+
+Change the above example by a little bit, and use a regular user rather than the admin,
+then we will get different results:
+
+<Tabs
+  defaultValue="change"
+  values={[
+    { label: "Change", value: 'change', },
+    { label: "Full Script", value: 'script', },
+    { label: "Results", value: 'results', },
+  ]
+}>
+
+<TabItem value="change">
+
+The changes are taken for the following lines:
+
+<div className="code-diff-move">
+
+```python
+...
+if __name__ == "__main__":
+    with requests.session() as sess:
+        ...
+        res = sess.post(
+            # diff-remove-next-line
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+            # diff-add-next-line
+            addr.format("login"), json={"user": "reader01", "password": "regular"}
+        )
+        ...
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+        # diff-add-start
+
+        res = sess.get(addr.format("entry"), params={"id": 1, "user": 1})
+        show_data(res)
+        # diff-add-end
+        ...
+```
+
+</div>
+
+</TabItem>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-user.py"
+import requests
+import pprint
+
+
+# Recall that the address shown in the `app_fsqla_lite` is
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        pprint.pprint(res.json())
+    except requests.exceptions.JSONDecodeError:
+        pprint.pprint(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "reader01", "password": "regular"}
+        )
+        show_data(res)
+
+        res = sess.get(addr.format("user"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"user": 2})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1, "user": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 3, "user": 2})
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, reader01! You can review /entry.'}
+{'message': 'You do not have the access to this page.'}
+{'entries': [3, 4], 'message': 'Entries are found.', 'n_entries': 2, 'user': 2}
+{'entries': [3, 4], 'message': 'Entries are found.', 'n_entries': 2, 'user': 2}
+{'id': 1, 'message': 'Requested entry is not found.', 'user': 2}
+{'id': 1, 'message': 'Requested entry is not found.', 'user': 2}
+{'data': "reader's data 1", 'id': 3, 'message': 'Entry is found.', 'user': 2}
+```
+
+</TabItem>
+
+</Tabs>
+
+It can be verified that:
+
+- The regular user cannot access the user list.
+- The regular user is only able to access the list of entries belonging to the current
+  user. Even if the user ID is specified as a different user, the specified user ID
+  will be ignored.
+- The regular user can not access the entry of a different user. Even if the user ID
+  is explicitly specified, the ID will still get ignored.
+
+### Test the anonymous status
+
+<Tabs
+  defaultValue="change"
+  values={[
+    { label: "Change", value: 'change', },
+    { label: "Full Script", value: 'script', },
+    { label: "Results", value: 'results', },
+  ]
+}>
+
+<TabItem value="change">
+
+The only change is to remove the login request from the session:
+
+<div className="code-diff-move">
+
+```python
+...
+if __name__ == "__main__":
+    with requests.session() as sess:
+        ...
+        # diff-remove-start
+
+        res = sess.post(
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+        )
+        # diff-remove-end
+        ...
+```
+
+</div>
+
+</TabItem>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-anonymous.py"
+import requests
+import pprint
+
+
+# Recall that the address shown in the `app_fsqla_lite` is
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        pprint.pprint(res.json())
+    except requests.exceptions.JSONDecodeError:
+        pprint.pprint(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.get(addr.format("user"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"user": 2})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 3, "user": 2})
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+```
+
+</TabItem>
+
+</Tabs>
+
+Certainly, since the database is protected by Flask Login, any request without the
+login credentials will not be accepted.
+
+[link-flask-login]: https://flask-login.readthedocs.io

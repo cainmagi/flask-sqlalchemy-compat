@@ -1,0 +1,68 @@
+---
+id: get_flask_sqlalchemy_lite
+title: get_flask_sqlalchemy_lite
+sidebar_label: get_flask_sqlalchemy_lite
+slug: /apis/auto/get_flask_sqlalchemy_lite
+description: Get the Flask SQLAlchemy Lite DB instance in the compatible mode.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" source="auto.get_flask_sqlalchemy_lite" />
+
+```python
+(
+    db: flask_sqlalchemy_lite.SQLAlchemy,
+    model_class: type[_ModelLite],
+) = get_flask_sqlalchemy_lite[_ModelLite](
+    model_class: type[_ModelLite],
+    app: Flask | None = None,
+    engine_options: Mapping[str, Any] | None = None,
+    session_options: Mapping[str, Any] | None = None,
+)
+```
+
+Get the Flask SQLAlchemy Lite DB instance in the compatible mode.
+
+This method will attempt to get the `flask_sqlalchemy_lite.SQLAlchemy` DB instance.
+If the attempt fails (package is not installed), will fallback to use
+`flask_sqlalchemy.SQLAlchemy` to imitate the interfaces of
+`flask_sqlalchemy_lite.SQLAlchemy`.
+
+## Aliases
+
+This function can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.get_flask_sqlalchemy_lite
+fsc.auto.get_flask_sqlalchemy_lite
+```
+
+## Arguments
+
+### Requires
+
+|     Argument      |            Type             |             Required              | <center>Description</center>                                                                                                                                                                                                                                                                                                |
+| :---------------: | :-------------------------: | :-------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `model_class`   |     `type[_ModelLite]`      | <InlineIcon icon={vsiCheckIcon}/> | The base model type applied to the whole database. If `flask_sqlalchemy_lite` is available, this type will be directly forwarded as it is. It will not modify anything. However, if the db instance fallback to the version provided by `flask_sqlalchemy`, this type will be used for creating the db-specific model type. |
+|       `app`       |       `Flask \| None`       |                                   | Call `init_app` on this Flask application. If not specified, will not call `init_app`.                                                                                                                                                                                                                                      |
+| `engine_options`  | `Mapping[str, Any] \| None` |                                   | Default arguments passed to `sqlalchemy.create_engine` for each configured engine.                                                                                                                                                                                                                                          |
+| `session_options` | `Mapping[str, Any] \| None` |                                   | Arguments to configure `sessionmaker` with.                                                                                                                                                                                                                                                                                 |
+
+- where `_ModelLite` is a `TypeVar` of `sa.orm.DeclarativeBase`.
+
+### Returns
+
+|   Argument    |                Type                | <center>Description</center>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| :-----------: | :--------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     `db`      | `flask_sqlalchemy_lite.SQLAlchemy` | <p>The SQLAlchemy Lite extension instance. It will be an instance of `flask_sqlalchemy_lite.SQLAlchemy` if the package is available.</p><p>If the package is not available, will attempt to return a `SQLAlchemyLiteProxy[flask_sqlalchemy.SQLAlchemy]` instance. However, this returned value is still notated by `flask_sqlalchemy_lite.SQLAlchemy`, which indicates that users should use `flask_sqlalchemy_lite` to develop their codes, while making this returned value as a falling back option.</p> |
+| `model_class` |         `type[_ModelLite]`         | <p>If `#1` is `flask_sqlalchemy_lite.SQLAlchemy`, will return `model_class` directly.</p><p>If `#1` is `SQLAlchemyLiteProxy[flask_sqlalchemy.SQLAlchemy]`, will return `#1.Model` as the falling back option.</p>                                                                                                                                                                                                                                                                                           |

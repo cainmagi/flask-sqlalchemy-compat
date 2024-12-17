@@ -1,0 +1,60 @@
+---
+id: QueryGetter
+title: QueryGetter
+sidebar_label: QueryGetter
+slug: /apis/utilities/QueryGetter
+description: The getter of the query property.
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isDescriptor={true} source="utilities.QueryGetter" />
+
+```python
+class AnyClass(sa.orm.DeclarativeBase):
+    query = QueryGetter()
+
+val: sa.orm.Query[AnyClass] = AnyClass.query
+```
+
+The getter of the `query` property.
+
+Use this descriptor like this:
+
+```python
+class Base(sa.orm.DeclarativeBase):
+    query = QueryGetter()
+
+class NewModel(Base): ...
+```
+
+It will mimic the behavior of `flask_sqlalchemy`. Using
+
+```python
+NewModel.query.filter(...).all()
+```
+
+will be equivalent with
+
+```python
+db.session.query(NewModel).filter(...).all()
+```
+
+:::warning
+
+After setting the descriptor `query`, users can only call it in the Flask application
+context. Otherwise it will raise a `RuntimeError`.
+
+:::
+
+## Aliases
+
+This type can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.QueryGetter
+fsc.utilities.QueryGetter
+```

@@ -1,0 +1,118 @@
+---
+id: clone_method
+title: clone_method
+sidebar_label: clone_method
+slug: /apis/utilities/clone_method
+description: A decorator for modifying the static type hint of a method by cloning the signature of another method.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar
+  type="func"
+  isPrivate={true}
+  isDecorator={true}
+  source="utilities.clone_method"
+/>
+
+```python
+decorator: Callable[
+  [Callable[Concatenate[S, P], T]],
+  Callable[Concatenate[S, P], T]
+] = clone_method[**P, S, T](
+    func_o: Callable[Concatenate[P], Any],
+)
+
+class Example:
+    @clone_method(func_o)
+    def func(self, val1, val2, ...): ...
+```
+
+A decorator for modifying the static type hint of a method by cloning the
+signature of another method.
+
+This decorator should be only used for cloning the regular bounded method. It is
+not suitable for classmethod, staticmethod or regular functions.
+
+:::note
+
+Note that this decorator will not modify the returned value of the decorated method
+in the signature.
+
+:::
+
+:::note
+
+Note that this decorator will not change the run time behavior of the decorated
+method.
+
+:::
+
+## Arguments
+
+### Requires
+
+| Argument |      Type      |             Required              | <center>Description</center>                                                                                                                                                                    |
+| :------: | :------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `func_o` | `(**P) -> Any` | <InlineIcon icon={vsiCheckIcon}/> | <p>The original function providing the signature to be cloned. Its signature is expected to be the same as the bounded method.</p><p>Note that the function itself is not a bounded method.</p> |
+
+### Returns
+
+|  Argument   |                       Type                       | <center>Description</center>                                                                                                                                                                                                                                       |
+| :---------: | :----------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `decorator` | `((self: S, **P) -> T) -> ((self: S, **P) -> T)` | <p>A wrapper that forward a function as it is directly but the signature of the function will be consistent with the argument `method`.</p><p>The input signature will be copied from `method`. But the output value will be determined by the wrapped method.</p> |
+
+## Examples
+
+### <IconObjType type="term"/> Clone the signature of a function to a method
+
+<Tabs
+  defaultValue="codes"
+  values={[
+    { label: 'Codes', value: 'codes', },
+    { label: 'Results', value: 'results', },
+  ]
+}>
+
+<TabItem value="codes">
+
+```python title="clone_signature_to_method.py" showLineNumbers
+from typing import reveal_type
+import inspect
+import flask_sqlalchemy_compat as fsc
+
+
+def test_func(val1: int, val2: str) -> float: ...
+
+
+class Example:
+    @fsc.utilities.clone_method(test_func)
+    def modified_method(self, *args, **kwargs) -> str:
+        return "not a float!"
+
+
+if __name__ == "__main__":
+    reveal_type(Example().modified_method)
+    print(inspect.signature(Example().modified_method))
+    print(Example().modified_method(1, "2"))
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```python
+Runtime type is 'method'
+(val1: int, val2: str) -> str
+not a float!
+```
+
+</TabItem>
+
+</Tabs>

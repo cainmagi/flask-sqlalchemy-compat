@@ -1,0 +1,73 @@
+---
+id: ModelProtocol
+title: ModelProtocol
+sidebar_label: ModelProtocol
+slug: /apis/protocols/ModelProtocol
+description: Protocol compatible with flask_sqlalchemy.extensions._FSAModel.
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="type" source="protocols.ModelProtocol" />
+
+```python
+model: ModelProtocol
+```
+
+Protocol compatible with
+[`flask_sqlalchemy.extensions._FSAModel` <IconExternalLink/>][link-fsamodel].
+
+This protocol contains the general functionality of the model prototype. Flask
+SQLAlchemy does not use the native SQLAlchemy model but defines its own version.
+That's why we need this protocol for the compatibility issue.
+
+Note that this protocol does not cover every functionality of the Flask SQLAlchemy
+model for the compaiblity of a regular base model from SQLAlchemy.
+
+## Aliases
+
+This type can be acquired by
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.ModelProtocol
+fsc.protocols.ModelProtocol
+```
+
+## Protocol properties
+
+### <IconObjType type="param"/> `query_class`
+
+```python
+model.query_class: ClassVar[type[Any]]
+```
+
+Query class used by `query`. Defaults to `flask_sqlalchemy.SQLAlchemy.Query`.
+
+---
+
+### <IconObjType type="param"/> `query_class`
+
+```python
+model.query: ClassVar[Any]
+```
+
+A SQLAlchemy query for a model. Equivalent to `db.session.query(Model)`. Can
+be customized per-model by overriding `query_class`.
+
+---
+
+### <IconObjType type="param"/> `metadata`
+
+```python
+model.metadata: sa.MetaData
+```
+
+Metadata property synthesized by the `flask_sqlalchemy.SQLAlchemy` instance.
+
+[link-fsamodel]: https://github.com/pallets-eco/flask-sqlalchemy/blob/3e3e92ba557649ab5251eda860a67656cc8c10af/src/flask_sqlalchemy/extension.py#L47
