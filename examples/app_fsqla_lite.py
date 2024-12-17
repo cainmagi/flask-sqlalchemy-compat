@@ -60,7 +60,6 @@ app.secret_key = get_secret(APP_SECRET)
 login_manager = LoginManager()
 
 db.init_app(app)
-print(db)
 login_manager.init_app(app)
 
 

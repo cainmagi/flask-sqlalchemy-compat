@@ -4,6 +4,12 @@
 
 ## CHANGELOG
 
+### 0.2.1 @ 12/17/2024
+
+#### :wrench: Fix
+
+1. Fix: Remove unwanted printed information.
+
 ### 0.2.0 @ 12/13/2024
 
 #### :mega: New
