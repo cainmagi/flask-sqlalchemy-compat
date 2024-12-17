@@ -13,6 +13,10 @@
 3. Fix: Correct the `usage.py` where the instance path and the engine options are not configured properly.
 4. Fix: `utilities.clone_method` and `utilities.clone_function` does not provide correct signature in run time. Correct the signature manually.
 
+#### :floppy_disk: Change
+
+1. Adjust the project information. This change is mainly targeted for adding the documentation link.
+
 ### 0.2.0 @ 12/13/2024
 
 #### :mega: New

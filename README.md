@@ -142,9 +142,6 @@ Compared to the above minimal examples, we also provided a `usage.py` file and e
 
 ## 3. Documentation
 
-> [!CAUTION]
-> The documentation is not accessible now because it is still to be done.
-
 Check the documentation to find more details about the examples and APIs.
 
 https://cainmagi.github.io/flask-sqlalchemy-compat/
