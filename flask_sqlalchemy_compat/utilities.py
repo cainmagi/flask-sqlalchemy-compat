@@ -56,6 +56,7 @@ _Model_contra = TypeVar(
 )
 
 __all__ = (
+    "DBNotReadyError",
     "hook_classmethod",
     "hook_base_model",
     "apply_to_engines",
@@ -96,6 +97,11 @@ def hook_classmethod(
 
     hook_after: `(type, **P) -> T`
         The hook that will be run after this class method.
+
+    Returns
+    -------
+    #1: `(**P) -> T`:
+        The hooked class method, where the first argument (class) is hidden.
     """
 
     if hook_before is None and hook_after is None:
@@ -178,6 +184,11 @@ def hook_base_model(
 
     db: `flask_sqlalchemy.SQLAlchemy | flask_sqlalchemy_lite.SQLAlchemy`
         The db instance used for providing the session.
+
+    Returns
+    -------
+    #1: `cls`
+        The hooked base model class.
     """
 
     try:
@@ -241,7 +252,7 @@ def apply_to_engines(
 
 
 def clone_method(
-    method: Callable[Concatenate[P], Any],
+    func_o: Callable[Concatenate[P], Any],
 ) -> Callable[[Callable[Concatenate[S, P], T]], Callable[Concatenate[S, P], T]]:
     """A decorator for modifying the static type hint of a method by cloning the
     signature of another method.
@@ -251,7 +262,7 @@ def clone_method(
 
     Arguments
     ---------
-    method: `(**P) -> Any`
+    func_o: `(**P) -> Any`
         The original function providing the signature to be cloned. Its signature is
         expected to be the same as the bounded method.
 
@@ -268,17 +279,28 @@ def clone_method(
     """
 
     def wrapper(func: Callable[Concatenate[S, P], T]) -> Callable[Concatenate[S, P], T]:
-        _func = functools.update_wrapper(wrapper=func, wrapped=method)
+        _func = func
         _func.__doc__ = "{0}\n\nOriginal Method\n---------------\n\n{1}".format(
-            inspect.getdoc(func), inspect.getdoc(_func)
+            inspect.getdoc(func_o), inspect.getdoc(_func)
         )
+        sig_func = inspect.signature(_func)
+        sig_o = inspect.signature(func_o)
+        params_func = tuple(sig_func.parameters.values())
+        if params_func:
+            sig_o = sig_o.replace(
+                parameters=(params_func[0], *sig_o.parameters.values()),
+                return_annotation=sig_func.return_annotation,
+            )
+        else:
+            sig_o = sig_o.replace(return_annotation=sig_func.return_annotation)
+        setattr(_func, "__signature__", sig_o)
         return _func
 
     return wrapper
 
 
 def clone_function(
-    func_o: Callable[..., Any]
+    func_o: Callable[P, Any]
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """A decorator for modifying the static type hint of a function by cloning the
     signature of another function.
@@ -302,10 +324,14 @@ def clone_function(
     """
 
     def wrapper(func: Callable[P, T]) -> Callable[P, T]:
-        _func = functools.update_wrapper(wrapper=func, wrapped=func_o)
+        _func = func
         _func.__doc__ = "{0}\n\nOriginal Function\n-----------------n\n{1}".format(
-            inspect.getdoc(func), inspect.getdoc(_func)
+            inspect.getdoc(func_o), inspect.getdoc(_func)
         )
+        sig_o = inspect.signature(func_o).replace(
+            return_annotation=inspect.signature(_func).return_annotation
+        )
+        setattr(_func, "__signature__", sig_o)
         return _func
 
     return wrapper
@@ -321,7 +347,7 @@ class QueryGetter:
 
     Use this descriptor like this:
     ``` python
-    class Base:
+    class Base(sa_orm.DeclarativeBase):
         query = QueryGetter()
 
     class NewModel(Base): ...
@@ -386,7 +412,7 @@ class TableNameGetter:
 
     Use this descriptor like this:
     ``` python
-    class Base:
+    class Base(sa_orm.DeclarativeBase):
         __tablename__ = TableNameGetter()
 
     class NewModel(Base): ...
