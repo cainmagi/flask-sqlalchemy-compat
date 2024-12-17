@@ -2,7 +2,7 @@
 """
 Tests
 =====
-@ Dash JSON Grid Viewer
+@ Flask SQLAlchmey Compat
 
 Author
 ------

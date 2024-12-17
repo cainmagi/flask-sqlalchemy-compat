@@ -9,6 +9,7 @@
 #### :wrench: Fix
 
 1. Fix: Remove unwanted printed information.
+2. Fix: Fix the typos in the docstrings.
 
 ### 0.2.0 @ 12/13/2024
 

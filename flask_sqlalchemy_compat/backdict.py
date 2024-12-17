@@ -88,10 +88,10 @@ class BackDictView(_Mapping[K, V]):
         back_data: `Mapping[K2, T]`
             Backup immutable data internal storage of `BackDict`.
 
-        key_mapper:
+        key_mapper: `(K) -> K2`
             Use this mapper to convert `K` to `K2` when the key is not found in `data`.
 
-        key_back_mapper:
+        key_back_mapper: `(K2) -> K`
             Use this mapper to convert `K2` to `K` when the key needs to be listed to
             users.
         """
@@ -155,10 +155,10 @@ class BackDict(UserDict[K, V]):
             This argument can be a deferred loader. A deferred loader is a function
             that will be called only when the data in `back_dict` is actually accessed.
 
-        key_mapper:
+        key_mapper: `(K) -> K2`
             Use this mapper to convert `K` to `K2` when the key is not found in `data`.
 
-        key_back_mapper:
+        key_back_mapper: `(K2) -> K`
             Use this mapper to convert `K2` to `K` when the key needs to be listed to
             users.
         """
@@ -277,7 +277,7 @@ class BackDict(UserDict[K, V]):
         return self.__back_dict.get(self.__key_mapper(key), default=default)
 
     def copy(self) -> Self:
-        """Make a shallow copy of this `LRUDict`."""
+        """Make a shallow copy of this `BackDict`."""
         res = self.__class__(
             data=self.data,
             back_dict=self.__back_dict,
@@ -287,16 +287,16 @@ class BackDict(UserDict[K, V]):
         return res
 
     def keys(self):
-        """`LRUDict(...).keys()` -> a set-like object providing a view on
-        `LRUDict`'s keys."""
+        """`BackDict(...).keys()` -> a set-like object providing a view on
+        `BackDict`'s keys."""
         return collections.abc.KeysView(self.__view)
 
     def items(self):
-        """`LRUDict(...).items()` -> a set-like object providing a view on
-        `LRUDict`'s items."""
+        """`BackDict(...).items()` -> a set-like object providing a view on
+        `BackDict`'s items."""
         return collections.abc.ItemsView(self.__view)
 
     def values(self):
-        """`LRUDict(...).values()` -> an object providing a view on `LRUDict`'s
+        """`BackDict(...).values()` -> an object providing a view on `BackDict`'s
         values."""
         return collections.abc.ValuesView(self.__view)

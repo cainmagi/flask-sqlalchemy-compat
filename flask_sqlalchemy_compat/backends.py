@@ -60,8 +60,8 @@ class ModulePlaceholder(ModuleType):
     """The placeholder module.
 
     This module is used as a placeholder of a module that cannot be found.
-    It can still provide __name__ property. However, it does not contain
-    the __spec__ property.
+    It can still provide `__name__` property. However, it does not contain
+    the `__spec__` property.
     """
 
     __file__: Optional[str] = None

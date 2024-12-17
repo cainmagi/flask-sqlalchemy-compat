@@ -225,14 +225,14 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
         """The engines associated with the current application.
 
         To make this value compatible with `flask_sqlalchemy`. The returned value is
-        added with an extra item: `self.engines[None] is self.engines["default"]`
+        added with an extra item: `self.engines[None] is self.engines["default"]`.
         """
         default_dict: Dict[Optional[str], sa_engine.Engine] = {None: self.__db.engine}
         return collections.ChainMap(default_dict, cast(Any, self.__db.engines))
 
     @property
     def engine(self) -> sa_engine.Engine:
-        """The engines associated with the current application."""
+        """The default engine associated with the current application."""
         return self.__db.engine
 
     def _teardown_session(self, exc: Optional[BaseException]) -> None:
@@ -289,14 +289,14 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
     def get_engine(
         self, bind_key: Optional[str] = None, **kwargs: Any
     ) -> sa_engine.Engine:
-        """The same as `self.engines[bind_key]`
+        """The same as `self.engines[bind_key]`.
 
         Get the engine for the given bind key for the current application.
         This requires that a Flask application context is active.
 
         Arguments
         ---------
-        bind_key: `str`
+        bind_key: `str | None`
             The name of the engine.
         """
         if "bind" in kwargs:
@@ -324,7 +324,7 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
         Arguments
         ---------
         entity: `Model`
-            The model class to query.
+            The model class or entity statement to query.
 
         ident: `Any | tuple[Any]`
             The primary key to query.
@@ -418,7 +418,7 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
         Returns
         -------
         #1: `T, ...`
-            The first returned results when the `statement` is found.
+            The first and the only returned results when the `statement` is found.
         """
         try:
             return self.session.execute(statement).scalar_one()
@@ -501,12 +501,12 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
 
     @clone_method(sa_orm.relationship)
     def relationship(self, *args: Any, **kwargs: Any):
-        """The same as `sa_orm.relationship`"""
+        """The same as `sa_orm.relationship`."""
         return sa_orm.relationship(*args, **kwargs)
 
     @clone_method(sa_orm.dynamic_loader)
     def dynamic_loader(self, *args: Any, **kwargs: Any):
-        """The same as `sa_orm.dynamic_loader`"""
+        """The same as `sa_orm.dynamic_loader`."""
         return sa_orm.dynamic_loader(*args, **kwargs)
 
     def __getattr__(self, name: str) -> Any:
