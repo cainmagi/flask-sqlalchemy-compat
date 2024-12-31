@@ -130,7 +130,7 @@ class BackDict(UserDict[K, V]):
        first. If it is not found, will return the value in `back_dict` domain. Since
        the modifications of the dictionary will only take effects on the `data` domain,
        this second-level domain will not change.
-    3. The second-level dictionary can have different keyword types. compared to the
+    3. The second-level dictionary can have different keyword types compared to the
        `data` domain. Users need to provide a `key_mapper` and its inverse operator
        `key_back_mapper` to support this feature.
     """
@@ -287,16 +287,16 @@ class BackDict(UserDict[K, V]):
         return res
 
     def keys(self):
-        """`BackDict(...).keys()` -> a set-like object providing a view on
+        """`BackDict(...).keys()` is a set-like object providing a view on
         `BackDict`'s keys."""
         return collections.abc.KeysView(self.__view)
 
     def items(self):
-        """`BackDict(...).items()` -> a set-like object providing a view on
+        """`BackDict(...).items()` is a set-like object providing a view on
         `BackDict`'s items."""
         return collections.abc.ItemsView(self.__view)
 
     def values(self):
-        """`BackDict(...).values()` -> an object providing a view on `BackDict`'s
+        """`BackDict(...).values()` is an object providing a view on `BackDict`'s
         values."""
         return collections.abc.ValuesView(self.__view)

@@ -16,7 +16,7 @@ MIT License
 Description
 -----------
 The backends of the `flask_sqlalchemy_compat` package. These backends are modules
-conditionally loaded. In other words, if the model is intalled, will load the module.
+conditionally loaded. In other words, if the module is intalled, will load the module.
 Otherwise, load a placeholder of the corresponding module.
 
 The backends include:
@@ -89,8 +89,11 @@ class ModulePlaceholder(ModuleType):
 
     def __init__(self, name: str, doc: Optional[str] = None) -> None:
         """Initialization.
-        Arguments:
-            name: The module name. It will be passed to ModuleType.
+
+        Arguments
+        ---------
+        name: `str`
+            The module name. It will be passed to `ModuleType`.
         """
         name = str(name)
         if doc is None:
@@ -185,7 +188,7 @@ else:
 class BackendProxy(Generic[M1, M2]):
     """A proxy class that is used for maintaining the dynamically loaded modules.
 
-    The properties of this module are editable, thus allowing the modules to be
+    The properties of this instance are editable, thus allowing the modules to be
     dynamically changed if necessary.
     """
 

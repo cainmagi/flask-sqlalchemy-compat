@@ -79,12 +79,12 @@ class SQLAlchemyLiteProxy(Generic[_SQLAlchemyDB_co]):
     the `flask_sqlalchemy.SQLAlchemy`, it can mimic the usage of
     `flask_sqlalchemy_lite.SQLAlchemy`.
 
-    Note that not all the functionalities of `flask_sqlalchemy.SQLAlchemy` can be
+    Note that not all the functionalities of this proxy can be
     exactly the same as the those of `flask_sqlalchemy_lite.SQLAlchemy`. In specific,
     this proxy will do the following things:
 
     * Provide a regular session like that of `flask_sqlalchemy_lite.SQLAlchemy`. This
-      regular session is managed by this proxy class.
+      regular session is managed by the instance of this proxy class.
     * Provide other basic methods in `flask_sqlalchemy_lite.SQLAlchemy`. The usages
       would be equivalent but the implmentation is based on `flask_sqlalchemy`.
     * Any functionality that cannot be used will raise a `NotImplementedError`.

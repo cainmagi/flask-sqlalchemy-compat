@@ -205,9 +205,9 @@ def get_flask_sqlalchemy(
         `flask_sqlalchemy.SQLAlchemy` if the package is available.
 
         If the package is not available, will attempt to return a
-        `SQLAlchemyProxy[flask_sqlalchemy_lite.SQLAlchemy]` instance. However, this
-        returned value is still notated by `flask_sqlalchemy.SQLAlchemy`, which
-        indicates that users should use `flask_sqlalchemy` to develop their
+        `SQLAlchemyProxy[flask_sqlalchemy_lite.SQLAlchemy, _ModelLite]` instance.
+        However, this returned value is still notated by `flask_sqlalchemy.SQLAlchemy`,
+        which indicates that users should use `flask_sqlalchemy` to develop their
         codes, while making this returned value as a falling back option.
     """
     if app is not None and not isinstance(app, Flask):

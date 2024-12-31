@@ -78,7 +78,7 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
     `flask_sqlalchemy_lite.SQLAlchemy`, it can mimic the usage of
     `flask_sqlalchemy.SQLAlchemy`.
 
-    Note that not all the functionalities of `flask_sqlalchemy_lite.SQLAlchemy` can
+    Note that not all the functionalities of this proxy can
     be exactly the same as the those of `flask_sqlalchemy.SQLAlchemy`. In specific,
     this proxy will do the following things:
 
@@ -138,14 +138,16 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
 
     @property
     def db(self) -> _SQLAlchemyLiteDB_co:
-        """Property: The `db` instance provided by the Flask SQLAlchemy extension."""
+        """Property: The `db` instance provided by the Flask SQLAlchemy Lite
+        extension."""
         return self.__db
 
     @property
     def Model(self) -> Type[_ModelLite_co]:
         """Property: The `Model` type. It can be used as the base class of the
-        SQLAlchemy models. This value is `model_class` passed to the initialization
-        of this wrapper.
+        SQLAlchemy models. This value is identical to `model_class` passed to the
+        initialization of this wrapper. But note that `model_class` is already
+        modified for supporting extra functionalities.
         """
         return self.__model_class
 
@@ -192,7 +194,7 @@ class SQLAlchemyProxy(Generic[_SQLAlchemyLiteDB_co, _ModelLite_co]):
 
     @property
     def session(self) -> sa_orm.scoped_session[sa_orm.Session]:
-        """The same as `self.db.session`.
+        """The usages are similar to those of `self.db.session`.
 
         The default session for the current application context. It will be
         closed when the context ends."""

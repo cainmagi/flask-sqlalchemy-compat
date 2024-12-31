@@ -15,7 +15,7 @@ MIT License
 
 Description
 -----------
-The extra functionalities used for hooking the original SQLAlchemy extensions. The
+The extra functionalities used for hooking the original `SQLAlchemy` extensions. The
 extensions need to be hooked because some extra functionalities may need to be
 provided.
 """
@@ -272,9 +272,9 @@ def clone_method(
     -------
     #1: `((self: S, **P) -> T) -> ((self: S, **P) -> T)`
         A wrapper that forward a function as it is directly but the signature of the
-        function will be consistent with the argument `method`.
+        function will be consistent with the argument `func_o`.
 
-        The input signature will be copied from `method`. But the output value will
+        The input signature will be copied from `func_o`. But the output value will
         be determined by the wrapped method.
     """
 
@@ -317,10 +317,10 @@ def clone_function(
     -------
     #1: `((**P) -> T) -> ((**P) -> T)`
         A wrapper that forward a function as it is directly but the signature of the
-        function will be consistent with the argument `method`.
+        function will be consistent with the argument `func_o`.
 
-        The input signature will be copied from `method`. But the output value will
-        be determined by the wrapped method.
+        The input signature will be copied from `func_o`. But the output value will
+        be determined by the wrapped function.
     """
 
     def wrapper(func: Callable[P, T]) -> Callable[P, T]:

@@ -213,12 +213,12 @@ class SQLAlchemyProtocol(SQLAlchemySharedProtocol, Protocol):
 
     @property
     def Table(self) -> Callable[..., sa.Table]:
-        """The default query class used by `Model.query` and `lazy="dynamic"`
-        relationships."""
+        """The default data table class that does not require user-specified
+        metadata."""
         ...
 
     @property
     def Model(self) -> Callable[..., ModelProtocol]:
-        """The default query class used by `Model.query` and `lazy="dynamic"`
-        relationships."""
+        """The default object relationship mapping (ORM) model class that has
+        extensive functionalies."""
         ...
