@@ -6,6 +6,10 @@
 
 ### 0.2.2 @ 12/31/2024
 
+#### :wrench: Fix
+
+1. Fix: Correct typos in the `en` documentation.
+
 #### :floppy_disk: Change
 
 1. Upgrade to the new version `0.2.2`.

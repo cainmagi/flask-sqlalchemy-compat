@@ -33,7 +33,7 @@ method defines the logics of how to apply `func` to multiple engines.
 
 |     Argument     |                  Type                  |             Required              | <center>Description</center>                                                                                         |
 | :--------------: | :------------------------------------: | :-------------------------------: | -------------------------------------------------------------------------------------------------------------------- |
-|      `func`      |      `(sa.engine.Engine) -> None`      | <InlineIcon icon={vsiCheckIcon}/> | The class to be hooked.                                                                                              |
+|      `func`      |      `(sa.engine.Engine) -> None`      | <InlineIcon icon={vsiCheckIcon}/> | The function to be applied to a single engine.                                                                       |
 |    `bind_key`    | `str \| None \| Sequence[str \| None]` | <InlineIcon icon={vsiCheckIcon}/> | The name(s) of the engines where the `func` will be applied to.                                                      |
 |    `engines`     |    `Mapping[str, sa.engine.Engine]`    | <InlineIcon icon={vsiCheckIcon}/> | The collection of all registered engines. If `bind_key` is `__all__`, will apply `func` to all engines in this list. |
 | `default_engine` |           `sa.engine.Engine`           | <InlineIcon icon={vsiCheckIcon}/> | The default engine. It should be the same as `engines["default"]`.                                                   |

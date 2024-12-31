@@ -14,8 +14,6 @@ import IconExternalLink from "@theme/Icon/ExternalLink";
 
 import {repoURL} from "@site/src/envs/variables";
 
-# Install the Python package
-
 Run the following command to install the package:
 
 ```shell
@@ -30,12 +28,12 @@ Specify the optional dependencies to enable more features:
 pip install flask-sqlalchemy-compat[option1,option2...]
 ```
 
-|   Option   | <center>Supports</center>                                                                                                                                                    |
-| :--------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|   `test`   | Install the dependencies related to [`pytest`][link-pytest]. These dependencies are not used by the package but used by the unittests. This tier already includes `example`. |
-|   `dev`    | Install the developer's dependencies. These dependencies may be used for building the package. This tier already includes `backends`.                                        |
-| `backends` | Install `flask-sqlalchemy` and `flask-sqlalchemy-lite` if they are available for the current Python version.                                                                 |
-| `example`  | Install the requirements for running the example scripts.                                                                                                                    |
+|   Option   | <center>Supports</center>                                                                                                                                                                       |
+| :--------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `test`   | Install the dependencies related to [`pytest`<IconExternalLink/>][link-pytest]. These dependencies are not used by the package but used by the unittests. This tier already includes `example`. |
+|   `dev`    | Install the developer's dependencies. These dependencies may be used for building the package. This tier already includes `backends`.                                                           |
+| `backends` | Install `flask-sqlalchemy` and `flask-sqlalchemy-lite` if they are available for the current Python version.                                                                                    |
+| `example`  | Install the requirements for running the example scripts.                                                                                                                                       |
 
 ## Backends
 
@@ -46,11 +44,11 @@ or `flask-sqlalchemy-lite` is installed by users.
 Installing the package with the option `backends` will let the following packages
 installed according to the current python version.
 
-| Python version | <center>`flask-sqlalchemy-lite`</center> | <center>`flask-sqlalchemy`</center> | <center>`flask-sqlalchemy-compat-backend-py37`</center> |
-| :------------: | :--------------------------------------: | :---------------------------------: | :-----------------------------------------------------: |
-|    `~=3.7`     |                                          |                                     |            <InlineIcon icon={vsiCheckIcon}/>            |
-|    `~=3.8`     |                                          |  <InlineIcon icon={vsiCheckIcon}/>  |                                                         |
-|    `>=3.9`     |    <InlineIcon icon={vsiCheckIcon}/>     |  <InlineIcon icon={vsiCheckIcon}/>  |                                                         |
+| Python version | <center>`flask-sqlalchemy-lite`</center> | <center>`flask-sqlalchemy`</center> | <center>[`flask-sqlalchemy-compat-backend-py37`<IconExternalLink/>][link-fsqlc-bpy37]</center> |
+| :------------: | :--------------------------------------: | :---------------------------------: | :--------------------------------------------------------------------------------------------: |
+|    `~=3.7`     |                                          |                                     |                               <InlineIcon icon={vsiCheckIcon}/>                                |
+|    `~=3.8`     |                                          |  <InlineIcon icon={vsiCheckIcon}/>  |                                                                                                |
+|    `>=3.9`     |    <InlineIcon icon={vsiCheckIcon}/>     |  <InlineIcon icon={vsiCheckIcon}/>  |                                                                                                |
 
 :::warning
 
@@ -114,3 +112,4 @@ pass the tests, please
 
 [link-git]: https://git-scm.com/downloads
 [link-pytest]: https://docs.pytest.org/
+[link-fsqlc-bpy37]: https://pypi.org/project/Flask-SQLAlchemy-compat-backend-py37

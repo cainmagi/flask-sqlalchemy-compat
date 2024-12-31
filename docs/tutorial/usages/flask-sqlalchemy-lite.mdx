@@ -65,7 +65,7 @@ def create_app() -> flask.Flask:
         if folder is None:
             return flask.abort(404, "Folder is not found.")
         return {
-            "message": "Texts of the folder is found.",
+            "message": "Texts of the folder are found.",
             "folder": folder.id,
             "texts": [{"id": text.id, "title": text.title} for text in folder.texts],
         }
@@ -236,7 +236,7 @@ The response shown in the browser should be:
 ```json
 {
   "folder": 1,
-  "message": "Texts of the folder is found.",
+  "message": "Texts of the folder are found.",
   "texts": [
     {
       "id": 1,
@@ -352,14 +352,15 @@ This function will do nothing if `flask_sqlalchemy_lite` is installed. In other 
 `db` would be the same as the one created by `flask_sqlalchemy_lite.SQLAlchemy()`,
 and `Base` will be the same thing compared to `_Base`.
 
-However, if `flask_sqlalchemy_lite` is not installed, this method will attempt to
+However, if `flask_sqlalchemy_lite` is not installed, this function will attempt to
 find `flask_sqlalchemy` and use `flask_sqlalchemy` to mimic the behaviors of
-`flask_sqlalchemy_lite`. In this case, `db` would be `flask_sqlalchemy.SQLAlchemy()`,
-while `Base` will be different from `_Base` because it is provided by `db.Model`.
+`flask_sqlalchemy_lite`. In this case, `db` would be backended by
+`flask_sqlalchemy.SQLAlchemy()`, while `Base` will be different from `_Base` because
+it is provided by `SQLAlchemy().Model`.
 
 :::note
 
-Note that the compatible model will take effect only when `flask_sqlalchemy_lite` is
+Note that the compatible mode will take effect only when `flask_sqlalchemy_lite` is
 not installed.
 
 :::
@@ -435,13 +436,12 @@ of `fsc.as_flask_sqlalchemy_lite(...)` automatically.
 In the compatible mode, the fall-back option `fsc.SQLAlchemyLiteProxy` will not
 provide all functionalities of `flask_sqlalchemy_lite.SQLAlchemy()`. Currently, the
 following features are not supported yet. If any of the following feature is urgent
-to you, please
-<IconLinkInline text="file an issue" href={repoURL("issues/new/choose")}/>:
+to you, please <IconLinkInline text="file an issue" href={repoURL("issues/new?assignees=&labels=enhancement%2Cto+be+solved&projects=&template=feature_request.yml&title=%5BFeature%5D")}/>.
 
 - Asynchronous engines and sessions.
 
-These method can be used by `flask_sqlalchemy_lite` but will not work if the backend
-falls back to `fsc.SQLAlchemyLiteProxy` driven by `flask_sqlalchemy`.
+These unsupported features can be used by `flask_sqlalchemy_lite` but will not work
+if the backend falls back to `fsc.SQLAlchemyLiteProxy` driven by `flask_sqlalchemy`.
 
 :::
 
@@ -450,9 +450,9 @@ falls back to `fsc.SQLAlchemyLiteProxy` driven by `flask_sqlalchemy`.
 As mentioned above, the returned value of `fsc.get_flask_sqlalchemy_lite(...)` is
 always notated by `flask_sqlalchemy_lite.SQLAlchemy()` even if the backend package
 is not available. It may be not a good choice if users want to check the exact
-behavior in the developer's environment. For example, users may want to know which
-API will cause issues in the compatible mode. In that case, a good choice is to
-temporarily replace the extension by `_proxy_ver(...)`.
+behavior of the compatible mode in the developer's environment. For example, users
+may want to know which API will cause issues in the compatible mode. In that case,
+a good choice is to temporarily replace the extension by `_proxy_ver(...)`.
 
 <div className="code-diff-move">
 
@@ -475,8 +475,8 @@ static type checker aware of the unsupported method immediately.
 
 When users have installed both the `flask_sqlalchemy_lite` and `flask_sqlalchemy`,
 they may want to test the run-time behavior of `fsc.get_flask_sqlalchemy_lite(...)`
-even if the `flask_sqlalchemy_lite` is available. In that case, users can turn off
-the support of `flask_sqlalchemy_lite` globally by using
+in the compatible mode even if the `flask_sqlalchemy_lite` is available. In that case,
+users can turn off the support of `flask_sqlalchemy_lite` globally by using
 
 ```python
 import flask_sqlalchemy_compat as fsc
@@ -497,5 +497,3 @@ only installed package in your environment, making it invisible will cause
 `fsc.get_flask_sqlalchemy_lite(...)` to raise a `ModuleNotFoundError`.
 
 :::
-
-[link-fsa-lite]: https://flask-sqlalchemy-lite.readthedocs.io

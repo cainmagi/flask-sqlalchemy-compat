@@ -33,7 +33,7 @@ A two-level chain map supporting the following feature:
    first. If it is not found, will return the value in `back_dict` domain. Since
    the modifications of the dictionary will only take effects on the `data` domain,
    this second-level domain will not change.
-3. The second-level dictionary can have different keyword types. compared to the
+3. The second-level dictionary can have different keyword types compared to the
    `data` domain. Users need to provide a `key_mapper` and its inverse operator
    `key_back_mapper` to support this feature.
 
@@ -47,12 +47,12 @@ same usage of `dict`.
 
 ## Arguments
 
-|   Argument   |                   Type                   |             Required              | <center>Description</center>                                                                                                                                                                                           |
-| :----------: | :--------------------------------------: | :-------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    `data`    |             `Mapping[K, T]`              | <InlineIcon icon={vsiCheckIcon}/> | Mutable data internal storage of `BackDict`.                                                                                                                                                                           |
-| `back_data`  | `Mapping[K2, T] \| () -> Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | <p>Backup immutable data internal storage of `BackDict`.</p><p>This argument can be a deferred loader. A deferred loader is a function that will be called only when the data in `back_dict` is actually accessed.</p> |
-| `key_mapper` |               `(K) -> K2`                | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K` to `K2` when the key is not found in `data`.                                                                                                                                            |
-| `key_mapper` |               `(K2) -> K`                | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K2` to `K` when the key needs to be listed to users.                                                                                                                                       |
+|     Argument      |                   Type                   |             Required              | <center>Description</center>                                                                                                                                                                                           |
+| :---------------: | :--------------------------------------: | :-------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|      `data`       |             `Mapping[K, T]`              | <InlineIcon icon={vsiCheckIcon}/> | Mutable data internal storage of `BackDict`.                                                                                                                                                                           |
+|    `back_data`    | `Mapping[K2, T] \| () -> Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | <p>Backup immutable data internal storage of `BackDict`.</p><p>This argument can be a deferred loader. A deferred loader is a function that will be called only when the data in `back_dict` is actually accessed.</p> |
+|   `key_mapper`    |               `(K) -> K2`                | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K` to `K2` when the key is not found in `data`.                                                                                                                                            |
+| `key_back_mapper` |               `(K2) -> K`                | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K2` to `K` when the key needs to be listed to users.                                                                                                                                       |
 
 ## Methods
 
@@ -101,7 +101,7 @@ Get a value from the dictionary with a default value provided.
 key_iter: KeysView[BackDictView[K, V]] = bdict.keys()
 ```
 
-`BackDict(...).keys()` -> a set-like object providing a view on
+`BackDict(...).keys()` is a set-like object providing a view on
 `BackDict`'s keys.
 
 #### Returns
@@ -118,7 +118,7 @@ key_iter: KeysView[BackDictView[K, V]] = bdict.keys()
 val_iter: ValuesView[BackDictView[K, V]] = bdict.values()
 ```
 
-`BackDict(...).values()` -> an object providing a view on `BackDict`'s
+`BackDict(...).values()` is an object providing a view on `BackDict`'s
 values.
 
 #### Returns
@@ -135,14 +135,14 @@ values.
 item_iter: ItemsView[BackDictView[K, V]] = bdict.items()
 ```
 
-`BackDict(...).items()` -> a set-like object providing a view on
+`BackDict(...).items()` is a set-like object providing a view on
 `BackDict`'s items.
 
 #### Returns
 
 |  Argument   |              Type               | <center>Description</center>                                                                                                                                                                      |
 | :---------: | :-----------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `item_iter` | `ItemsView[BackDictView[K, V]]` | An iterator on all (key, value) item pairs of this dictionary. The iteration converage includes the items of the `back_data`. For each iteration, it will returns a tuple typed by `Tuple[K, V]`. |
+| `item_iter` | `ItemsView[BackDictView[K, V]]` | An iterator on all (key, value) item pairs of this dictionary. The iteration converage includes the items of the `back_data`. For each iteration, it will returns a tuple typed by `tuple[K, V]`. |
 
 ## Operators
 
@@ -256,7 +256,7 @@ Merge this `BackDict` with another dictionary.
 
 :::note
 
-Note that this method is used only when `any_dict` does not implement the `__or__`
+Note that this operator is used only when `any_dict` does not implement the `__or__`
 operator. Otherwise, the merged value is given by `any_dict.__or__(bdict)`.
 
 :::

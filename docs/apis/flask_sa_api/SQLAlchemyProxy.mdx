@@ -28,16 +28,18 @@ This class is a wrapper of SQLAlchemy-Lite. By adjusting the behavior of the
 `flask_sqlalchemy_lite.SQLAlchemy`, it can mimic the usage of
 `flask_sqlalchemy.SQLAlchemy`.
 
-Note that not all the functionalities of `flask_sqlalchemy_lite.SQLAlchemy` can
+Note that not all the functionalities of this proxy can
 be exactly the same as the those of `flask_sqlalchemy.SQLAlchemy`. In specific,
 this proxy will do the following things:
 
 - Provide a `Model` based on the given argument `model_class`, where the
   `__tablename__` will be automatically inferred from `model_class`.
-- Provide a fake `Query` class. This `Query` class is just `sqlalchemy.orm.Query`.
-  In other words, it does not provide any extra functionalities
+- Provide a fake `Query` class. This `Query` class is just
+  [`sqlalchemy.orm.Query`<IconExternalLink/>][link-saorm-query].
+  In other words, it does not provide any extra functionalities.
 - Provide a fake `Table` class. This fake class is actually a method returning
-  an `sqlalchemy.Table` instance, where users do not need to implement `metadata`.
+  an [`sqlalchemy.Table`<IconExternalLink/>][link-sa-table] instance, where users do
+  not need to implement `metadata`.
 - Provide a scoped session like that of `flask_sqlalchemy.SQLAlchemy`. This scoped
   session is managed by this proxy class.
 - Provide other basic methods in `flask_sqlalchemy.SQLAlchemy`. The usages would
@@ -63,10 +65,10 @@ fsc.flask_sa_api.SQLAlchemyProxy
 
 ## Arguments
 
-|  Argument   |          Type          |             Required              | <center>Description</center>                                                                                                                                                                                                                                        |
-| :---------: | :--------------------: | :-------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|    `db`     | `_SQLAlchemyLiteDB_co` | <InlineIcon icon={vsiCheckIcon}/> | <p>The database instance exporting the session and engine instances.</p><p>It is provided by the Flask extensions like `flask_sqlachemy_lite`. This wrapper will mimic the behaviors of `flask_sqlalchemy` even if the given instance is from the lite version.</p> |
-| `back_data` |    `_ModelLite_co`     | <InlineIcon icon={vsiCheckIcon}/> | <p>The type of the base model. This `model_class` is mandatory.</p><p>It needs to be used for providing the functionalities related to the metadata.</p>                                                                                                            |
+|   Argument    |          Type          |             Required              | <center>Description</center>                                                                                                                                                                                                                                        |
+| :-----------: | :--------------------: | :-------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     `db`      | `_SQLAlchemyLiteDB_co` | <InlineIcon icon={vsiCheckIcon}/> | <p>The database instance exporting the session and engine instances.</p><p>It is provided by the Flask extensions like `flask_sqlachemy_lite`. This wrapper will mimic the behaviors of `flask_sqlalchemy` even if the given instance is from the lite version.</p> |
+| `model_class` |    `_ModelLite_co`     | <InlineIcon icon={vsiCheckIcon}/> | <p>The type of the base model. This `model_class` is mandatory.</p><p>It needs to be used for providing the functionalities related to the metadata.</p>                                                                                                            |
 
 - where `_SQLAlchemyLiteDB_co` is a `TypeVar` of [`fsc.protocols.SQLAlchemyLiteProtocol`](../protocols/SQLAlchemyLiteProtocol.mdx).
 - where `_ModelLite_co` is a `TypeVar` of `sa.orm.DeclarativeBase`.
@@ -213,8 +215,8 @@ This requires that a Flask application context is active.
 
 #### Returns
 
-| Argument |    Type     | <center>Description</center>   |
-| :------: | :---------: | :----------------------------- |
+| Argument |        Type        | <center>Description</center>   |
+| :------: | :----------------: | :----------------------------- |
 | `engine` | `sa.engine.Engine` | The engine gotten by the name. |
 
 ---
@@ -398,7 +400,7 @@ See the details in the [official document<IconExternalLink/>][link-sa-relationsh
 db: _SQLAlchemyLiteDB_co = db_proxy.db
 ```
 
-The `db` instance provided by the Flask SQLAlchemy extension.
+The `db` instance provided by the Flask SQLAlchemy Lite extension.
 
 ---
 
@@ -409,8 +411,9 @@ db: type[_ModelLite_co] = db_proxy.Model
 ```
 
 The `Model` type. It can be used as the base class of the
-SQLAlchemy models. This value is `model_class` passed to the initialization
-of this wrapper.
+SQLAlchemy models. This value is identical to `model_class` passed to the
+initialization of this wrapper. But note that `model_class` is already modified for
+supporting extra functionalities.
 
 ---
 
@@ -446,7 +449,7 @@ ORM-level SQL construction object.
 sess: sa.orm.scoped_session[sa.orm.Session] = db_proxy.session
 ```
 
-The same as `self.db.session`.
+The usages are similar to those of `self.db.session`.
 
 The default session for the current application context. It will be
 closed when the context ends.
@@ -544,3 +547,5 @@ which is the same as `sa.select`.
 |  `obj`   | `Any` | The attribtue found in `sa.orm` or `sa`. |
 
 [link-sa-relationship]: https://docs.sqlalchemy.org/en/20/orm/relationship_api.html#sqlalchemy.orm.relationship
+[link-saorm-query]: https://docs.sqlalchemy.org/en/20/orm/queryguide/query.html#sqlalchemy.orm.Query
+[link-sa-table]: https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Table

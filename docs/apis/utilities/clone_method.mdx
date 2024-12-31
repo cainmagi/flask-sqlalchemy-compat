@@ -66,7 +66,7 @@ method.
 
 |  Argument   |                       Type                       | <center>Description</center>                                                                                                                                                                                                                                       |
 | :---------: | :----------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `decorator` | `((self: S, **P) -> T) -> ((self: S, **P) -> T)` | <p>A wrapper that forward a function as it is directly but the signature of the function will be consistent with the argument `method`.</p><p>The input signature will be copied from `method`. But the output value will be determined by the wrapped method.</p> |
+| `decorator` | `((self: S, **P) -> T) -> ((self: S, **P) -> T)` | <p>A wrapper that forward a function as it is directly but the signature of the function will be consistent with the argument `func_o`.</p><p>The input signature will be copied from `func_o`. But the output value will be determined by the wrapped method.</p> |
 
 ## Examples
 

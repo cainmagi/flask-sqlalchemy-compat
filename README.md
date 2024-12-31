@@ -40,6 +40,12 @@ Run the following command to start a local development server.
 yarn start
 ```
 
+or specify the host explicitly if you are using Linux:
+
+```sh
+yarn start --host $(hostname -I) --port 8080
+```
+
 This command will automatically open up a browser window. Most changes are reflected live without having to restart the server.
 
 ### Update Translations

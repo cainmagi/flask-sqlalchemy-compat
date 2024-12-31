@@ -57,15 +57,15 @@ method.
 
 ### Requires
 
-| Argument |     Type     |             Required              | <center>Description</center>                                                                                                                                                                    |
-| :------: | :----------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Argument |      Type      |             Required              | <center>Description</center>                                       |
+| :------: | :------------: | :-------------------------------: | ------------------------------------------------------------------ |
 | `func_o` | `(**P) -> Any` | <InlineIcon icon={vsiCheckIcon}/> | <p>The original function providing the signature to be cloned.</p> |
 
 ### Returns
 
-|  Argument   |                       Type                       | <center>Description</center>                                                                                                                                                                                                                                       |
-| :---------: | :----------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `decorator` | `((**P) -> T) -> ((**P) -> T)` | <p>A wrapper that forward a function as it is directly but the signature of the function will be consistent with the argument `method`.</p><p>The input signature will be copied from `method`. But the output value will be determined by the wrapped method.</p> |
+|  Argument   |              Type              | <center>Description</center>                                                                                                                                                                                                                                         |
+| :---------: | :----------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `decorator` | `((**P) -> T) -> ((**P) -> T)` | <p>A wrapper that forward a function as it is directly but the signature of the function will be consistent with the argument `func_o`.</p><p>The input signature will be copied from `func_o`. But the output value will be determined by the wrapped function.</p> |
 
 ## Examples
 

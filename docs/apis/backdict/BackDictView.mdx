@@ -33,19 +33,19 @@ explicitly initialize it.
 
 ## Arguments
 
-|   Argument   |       Type       |             Required              | <center>Description</center>                                                     |
-| :----------: | :--------------: | :-------------------------------: | -------------------------------------------------------------------------------- |
-|    `data`    | `Mapping[K, T]`  | <InlineIcon icon={vsiCheckIcon}/> | Mutable data internal storage of `BackDict`.                                     |
-| `back_data`  | `Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | <p>Backup immutable data internal storage of `BackDict`.</p>                     |
-| `key_mapper` |   `(K) -> K2`    | <InlineIcon icon={vsiCheckIcon}/> |
-| `key_mapper` |   `(K2) -> K`    | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K2` to `K` when the key needs to be listed to users. |
+|     Argument      |       Type       |             Required              | <center>Description</center>                                                     |
+| :---------------: | :--------------: | :-------------------------------: | -------------------------------------------------------------------------------- |
+|      `data`       | `Mapping[K, T]`  | <InlineIcon icon={vsiCheckIcon}/> | Mutable data internal storage of `BackDict`.                                     |
+|    `back_data`    | `Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | Backup immutable data internal storage of `BackDict`.                            |
+|   `key_mapper`    |   `(K) -> K2`    | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K` to `K2` when the key is not found in `data`.      |
+| `key_back_mapper` |   `(K2) -> K`    | <InlineIcon icon={vsiCheckIcon}/> | Use this mapper to convert `K2` to `K` when the key needs to be listed to users. |
 
 ## Operators
 
 ### <IconObjType type="op"/> `__len__`
 
 ```python
-vlen: int = len(bdict)
+vlen: int = len(bdict_view)
 ```
 
 Get the length of the dictionary. This length is also the number of items in this view.
@@ -61,7 +61,7 @@ Get the length of the dictionary. This length is also the number of items in thi
 ### <IconObjType type="op"/> `__contains__`
 
 ```python
-flag: bool = key in bdict
+flag: bool = key in bdict_view
 ```
 
 Check whether `key` is in the dictionary view.
@@ -83,7 +83,7 @@ Check whether `key` is in the dictionary view.
 ### <IconObjType type="op"/> `__iter__`
 
 ```python
-keys: Iterator[K] = iter(bdict)
+keys: Iterator[K] = iter(bdict_view)
 ```
 
 Iterate each key in the dictionary view.
@@ -99,7 +99,7 @@ Iterate each key in the dictionary view.
 ### <IconObjType type="op"/> `__getitem__`
 
 ```python
-val: V = bdict[key]
+val: V = bdict_view[key]
 ```
 
 Locate one value in the dictionary view. Raise `KeyError` if the keyword is not found.

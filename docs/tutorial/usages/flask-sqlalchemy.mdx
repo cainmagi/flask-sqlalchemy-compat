@@ -18,7 +18,7 @@ This guide will show the steps of migrating from `flask-sqlalchemy` to this pack
 
 Suppose that you are working with the codes written by Flask SQLAlchemy. You are
 planning to use Flask SQLAlchemy Lite to replace Flask SQLAlchemy. Indeed, the
-best way is to rewrite all codes using Flask SQLAlchemy. However, some legacy APIs
+best way is to rewrite all codes using Flask SQLAlchemy Lite. However, some legacy APIs
 like `Model.query` or `db.query_or_404` are not available in Flask SQLAlchemy Lite.
 In this case, you may want to make minimal changes to deliver a new version first,
 and gradually finalize the code migration plan in the future versions. Then, you
@@ -71,7 +71,7 @@ def create_app() -> flask.Flask:
         if folder is None:
             return flask.abort(404, "Folder is not found.")
         return {
-            "message": "Texts of the folder is found.",
+            "message": "Texts of the folder are found.",
             "folder": folder.id,
             "texts": [{"id": text.id, "title": text.title} for text in folder.texts],
         }
@@ -130,36 +130,13 @@ def init_db_data() -> None:
 
 
 if __name__ == "__main__":
-    import socket
-
-    def get_ip(method: str = "broadcast") -> str:
-        """Detect the IP address of this device."""
-        s_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            # doesn't even have to be reachable
-            if method == "broadcast":
-                s_socket.connect(("10.255.255.255", 1))
-                ip_value = s_socket.getsockname()[0]
-            elif method == "udp":
-                s_socket.connect(("8.8.8.8", 1))
-                ip_value = s_socket.getsockname()[0]
-            elif method == "host":
-                ip_value = socket.gethostbyname(socket.gethostname())
-            else:
-                raise ConnectionError
-        except Exception:  # pylint: disable=broad-except
-            ip_value = "localhost"
-        finally:
-            s_socket.close()
-        return ip_value
-
     app = create_app()
     app.config.update({"SQLALCHEMY_DATABASE_URI": "sqlite://"})
     db.init_app(app)
 
     with app.app_context():
         init_db_data()
-    app.run(host=get_ip(), port=8080)
+    app.run(host="127.0.0.1", port=8080)
 ```
 
 </TabItem>
@@ -263,7 +240,7 @@ The response shown in the browser should be:
 ```json
 {
   "folder": 1,
-  "message": "Texts of the folder is found.",
+  "message": "Texts of the folder are found.",
   "texts": [
     {
       "id": 1,
@@ -331,9 +308,9 @@ The response shown in the browser should be:
 
 ## Extend the compatibility with `flask-sqlalchemy-lite`
 
-Migrating to this project will let codes available for `Python 3.7` and `3.8`. The
-change of the codes is quite simple. The only thing that needs to be altered is
-the `base.py`. See the following codes:
+Migrating to this project will let codes working with the `flask_sqlalchemy_lite`
+backend. The change of the codes is quite simple. The only thing that needs to be
+altered is the `base.py`. See the following codes:
 
 <div className="code-diff-move">
 
@@ -377,11 +354,11 @@ This function will do nothing if `flask_sqlalchemy` is installed. In other words
 the first argument `Base` will be used as the `model_class` arugment when initializing
 the extension.
 
-However, if `flask_sqlalchemy` is not installed, this method will attempt to find
+However, if `flask_sqlalchemy` is not installed, this function will attempt to find
 `flask_sqlalchemy_lite` and use `flask_sqlalchemy_lite` to mimic the behaviors of
-`flask_sqlalchemy`. In this case, `db` would be `flask_sqlalchemy_lite.SQLAlchemy()`,
-while `db.Model` will be a modified `Base` class. The modification is inplace, so
-using `db.Model` is equivalent to using `Base`.
+`flask_sqlalchemy`. In this case, `db` would be backended by
+`flask_sqlalchemy_lite.SQLAlchemy()`, while `db.Model` will be a modified `Base`
+class. The modification is inplace, so using `db.Model` is equivalent to using `Base`.
 
 :::note
 
@@ -457,13 +434,13 @@ fall back to the returned value of `fsc.as_flask_sqlalchemy(...)` automatically.
 In the compatible mode, the fall-back option `fsc.SQLAlchemyProxy` will not provide
 all functionalities of `flask_sqlalchemy.SQLAlchemy()`. Currently, the following
 features are not supported yet. If any of the following feature is urgent to you,
-please <IconLinkInline text="file an issue" href={repoURL("issues/new/choose")}/>:
+please <IconLinkInline text="file an issue" href={repoURL("issues/new?assignees=&labels=enhancement%2Cto+be+solved&projects=&template=feature_request.yml&title=%5BFeature%5D")}/>:
 
 - Extensive methods of `db.Model` like `db.Model.query.get_or_404(...)`.
 - Paginate method `db.paginate(...)`.
 
-These method can be used by `flask_sqlalchemy` but will not work if the backend
-falls back to `fsc.SQLAlchemyProxy` driven by `flask_sqlalchemy_lite`.
+These unsupported features can be used by `flask_sqlalchemy` but will not work if the
+backend falls back to `fsc.SQLAlchemyProxy` driven by `flask_sqlalchemy_lite`.
 
 :::
 
@@ -471,10 +448,10 @@ falls back to `fsc.SQLAlchemyProxy` driven by `flask_sqlalchemy_lite`.
 
 As mentioned above, the returned value of `fsc.get_flask_sqlalchemy(...)` is always
 notated by `flask_sqlalchemy.SQLAlchemy()` even if the backend package is not
-available. It may be not a good choice if users want to check the exact behavior in
-the developer's environment. For example, users may want to know which API will cause
-issues in the compatible mode. In that case, a good choice is to temporarily replace
-the extension by `_proxy_ver(...)`.
+available. It may be not a good choice if users want to check the exact behavior of
+the compatible mode in the developer's environment. For example, users may want to
+know which API will cause issues in the compatible mode. In that case, a good choice
+is to temporarily replace the extension by `_proxy_ver(...)`.
 
 <div className="code-diff-move">
 
@@ -505,9 +482,9 @@ choose the `fsc.SQLAlchemyProxy` notation, the notation will become correct.
 ## Disable a backend
 
 When users have installed both the `flask_sqlalchemy` and `flask_sqlalchemy_lite`,
-they may want to test the run-time behavior of `fsc.get_flask_sqlalchemy(...)` even
-if the `flask_sqlalchemy` is available. In that case, users can turn off the support
-of `flask_sqlalchemy` globally by using
+they may want to test the run-time behavior of `fsc.get_flask_sqlalchemy(...)` in the
+compatible mode even if the `flask_sqlalchemy` is available. In that case, users can
+turn off the support of `flask_sqlalchemy` globally by using
 
 ```python
 import flask_sqlalchemy_compat as fsc
@@ -528,5 +505,3 @@ installed package in your environment, making it invisible will cause
 `fsc.get_flask_sqlalchemy(...)` to raise a `ModuleNotFoundError`.
 
 :::
-
-[link-fsa-lite]: https://flask-sqlalchemy-lite.readthedocs.io

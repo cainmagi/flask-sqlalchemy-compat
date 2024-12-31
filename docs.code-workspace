@@ -16,11 +16,11 @@
       "editor.tabSize": 4
     },
     "[json]": {
-      "editor.defaultFormatter": "vscode.json-language-features",
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
       "editor.tabSize": 2
     },
     "[jsonc]": {
-      "editor.defaultFormatter": "vscode.json-language-features",
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
       "editor.tabSize": 2
     },
     "[html]": {

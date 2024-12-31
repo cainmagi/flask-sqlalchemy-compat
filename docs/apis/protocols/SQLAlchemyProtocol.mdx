@@ -125,7 +125,7 @@ The default query class used by `Model.query` and `lazy="dynamic"` relationships
 db.Table: Callable[..., sa.Table]
 ```
 
-The default query class used by `Model.query` and `lazy="dynamic"` relationships.
+The default data table class that does not require user-specified metadata.
 
 ---
 
@@ -135,7 +135,8 @@ The default query class used by `Model.query` and `lazy="dynamic"` relationships
 db.Model: Callable[..., ModelProtocol]
 ```
 
-The default query class used by `Model.query` and `lazy="dynamic"` relationships.
+The default object relationship mapping (ORM) model class that has extensive
+functionalies.
 
 - where [`ModelProtocol`](./ModelProtocol.mdx) is the protocol of Flask SQLAlchemy
   customized model.

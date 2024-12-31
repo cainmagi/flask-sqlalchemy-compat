@@ -11,7 +11,7 @@ import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
 <APITopBar type="module" source="backdict" />
 
 The implementation of a modified `dict`. The usage of `BackDict` is like that of a two-
-level `collections.ChainMap`. It is used by `flask_sa_lite_api` for supporting the
+level [`collections.ChainMap`<IconExternalLink/>][link-chainmap]. It is used by `flask_sa_lite_api` for supporting the
 mapping strategy from the properties of `flask_sqlalchemy.SQLAlchemy()` to
 `flask_sqlalchemy_lite.SQLAlchemy()`.
 
@@ -21,3 +21,5 @@ mapping strategy from the properties of `flask_sqlalchemy.SQLAlchemy()` to
 | :----------------------------------------------------------------------------------: | ------------------------------------------------------------------------ |
 |     [<IconObjType type="class" hasText={true} text="BackDict"/>](./BackDict.mdx)     | Dictionary with a falling-back level.                                    |
 | [<IconObjType type="class" hasText={true} text="BackDictView"/>](./BackDictView.mdx) | Internal class. The read-only proxy used by `MappingView` of `BackDict`. |
+
+[link-chainmap]: https://docs.python.org/3/library/collections.html#collections.ChainMap

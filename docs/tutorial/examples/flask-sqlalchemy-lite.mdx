@@ -2,7 +2,7 @@
 id: flask-sqlalchemy-lite
 sidebar_label: Lite
 title: "Demo: application of Flask SQLAlchemy Lite"
-description: The demo providing database APIs powered by Flask SQLAlchemy Lite
+description: The demo providing database APIs powered by Flask SQLAlchemy Lite.
 slug: /examples/flask-sqlalchemy-lite
 ---
 
@@ -41,7 +41,7 @@ The entity-relationship diagram (ERD) of the database is:
 
 <div className="mb-default center w-60">
   <ThemedImage
-    alt="ERD of the DB-only demo"
+    alt="ERD of the Lite application demo"
     sources={{
       light: useBaseUrl("/img/examples/erd-fsql-light.svg"),
       dark: useBaseUrl("/img/examples/erd-fsql-dark.svg"),
@@ -56,14 +56,14 @@ The database has the following features:
 - A one-to-many relationship between users and entries.
 - A many-to-many relationship between users and roles.
 - The role object-relationship mapping (ORM) contains a hybrid property `is_admin`
-  that allows the fast query of the admin users. The property is implemented by
+  that allows the fast query of the admin roles. The property is implemented by
   checking the `level` column.
 - The user ORM also contains a hybrid property `is_admin` that is implemented by the
   joined query. Query that property will search the users who has at least one role
   with the admin level.
 - The password of a user is saved as the hashed version. This form can prevent the
   passowrd leakage if the database file is leaked. To work with the hashed version,
-  the user ORM provides two methods `set_password(...)` and `validate_passowrd(...)`
+  the user ORM provides two methods `set_password(...)` and `validate_passowrd(...)`.
 
 ## Access the demo
 
