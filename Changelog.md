@@ -13,6 +13,7 @@
 #### :wrench: Fix
 
 1. Fix: Correct typos in the `en` documentation.
+2. Fix: Add the missing imports on `/docs/apis/backdict`.
 
 #### :floppy_disk: Change
 
