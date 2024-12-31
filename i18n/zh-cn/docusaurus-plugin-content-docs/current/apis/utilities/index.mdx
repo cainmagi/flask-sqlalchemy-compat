@@ -1,0 +1,32 @@
+---
+id: index
+title: utilities
+sidebar_label: utilities
+slug: /apis/utilities
+description: 用来钩入原始SQLAlchemy扩展的额外功能。
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="utilities" />
+
+用来钩入原始`SQLAlchemy`扩展的额外功能。之所以需要这些扩展的钩子，是因为需要提供某些额外的功能。
+
+## 类 {#classes}
+
+|                                            成员                                            | <center>说明</center>         |
+| :----------------------------------------------------------------------------------------: | ----------------------------- |
+| [<IconObjType type="class" hasText={true} text="DBNotReadyError"/>](./DBNotReadyError.mdx) | `QueryGetter`抛出的异常。     |
+|     [<IconObjType type="class" hasText={true} text="QueryGetter"/>](./QueryGetter.mdx)     | `query`属性的访问器。         |
+| [<IconObjType type="class" hasText={true} text="TableNameGetter"/>](./TableNameGetter.mdx) | `__tablename__`属性的访问器。 |
+
+## 函数 {#functions}
+
+|                                            成员                                             | <center>说明</center>                                      |
+| :-----------------------------------------------------------------------------------------: | :--------------------------------------------------------- |
+| [<IconObjType type="func" hasText={true} text="hook_classmethod"/>](./hook_classmethod.mdx) | 针对类方法的钩子。                                         |
+|  [<IconObjType type="func" hasText={true} text="hook_base_model"/>](./hook_base_model.mdx)  | 向某个给定的模型类添加钩子。                               |
+| [<IconObjType type="func" hasText={true} text="apply_to_engines"/>](./apply_to_engines.mdx) | 向一个或多个engine调用一个函数。                         |
+|     [<IconObjType type="func" hasText={true} text="clone_method"/>](./clone_method.mdx)     | 装饰器，透过克隆另一个方法的签名，来修改某方法的静态注解。 |
+|   [<IconObjType type="func" hasText={true} text="clone_function"/>](./clone_function.mdx)   | 装饰器，透过克隆另一个函数的签名，来修改某函数的静态注解。 |
+|   [<IconObjType type="func" hasText={true} text="get_app_ctx_id"/>](./get_app_ctx_id.mdx)   | 获得当前Flask应用上下文对象的ID。                       |

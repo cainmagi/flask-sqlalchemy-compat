@@ -1,0 +1,261 @@
+---
+id: BackDict
+title: BackDict
+sidebar_label: BackDict
+slug: /apis/backdict/BackDict
+description: 有备用层级的字典。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backdict.BackDict" />
+
+```python
+bdict = BackDict[K, V](
+    data: Mapping[K, V],
+    back_dict: Mapping[K2, V] | Callable[[], Mapping[K2, V]],
+    key_mapper: Callable[[K], K2],
+    key_back_mapper: Callable[[K2], K],
+)
+```
+
+有备用层级的字典。
+
+作为一个两级的链式映射，其支持以下特性：
+
+1. 第一级`data`是可读写域。对此字典的任何修改都会作用于`data`域。
+2. 第二级`back_dict`是只读域。遍历或检索该字典时，首先会在`data`域搜索。若未找到，则会返回位于`back_dict`域的值。有鉴于对字典的修改只作用于`data`域，这个第二级域将保持不变。
+3. 第二级域可以有和`data`域不同的关键字。用户需要提供`key_mapper`和它的反变换`key_back_mapper`来支持该功能。
+
+:::note
+
+须知，此类型是`dict`的子类，亦即是说，下文里若有任何没有专门提及的方法或运算符，则其用法与`dict`相同。
+
+:::
+
+## 参数 {#arguments}
+
+|       参数        |                   类型                   |               必选                | <center>说明</center>                                                                                                                                             |
+| :---------------: | :--------------------------------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|      `data`       |             `Mapping[K, T]`              | <InlineIcon icon={vsiCheckIcon}/> | `BackDict`的可变数据存储区。                                                                                                                                      |
+|    `back_dict`    | `Mapping[K2, T] \| () -> Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | <p>`BackDict`不可变的备用内部存储区。</p><p>该值可以是一个延迟加载器。所谓延迟加载器，指的是一个函数，当且仅当`back_dict`域内的数据首次被访问到的时候才调用。</p> |
+|   `key_mapper`    |               `(K) -> K2`                | <InlineIcon icon={vsiCheckIcon}/> | 当关键字未在`data`中搜索到时，用于将要搜索的关键字从`K`类型一一映射到`K2`。                                                                                       |
+| `key_back_mapper` |               `(K2) -> K`                | <InlineIcon icon={vsiCheckIcon}/> | 当需要向用户展示可用的关键字时，用来将备用域中`K2`类型的关键字一一映射到`K`。                                                                                     |
+
+## 方法 {#methods}
+
+### <IconObjType type="method"/> `copy` {#-copy}
+
+```python
+bdict_copy: BackDict[K, V] = bdict.copy()
+```
+
+创建`BackDict`的浅拷贝。
+
+#### 输出 {#returns}
+
+|     参数     |       类型       | <center>说明</center>        |
+| :----------: | :--------------: | :--------------------------- |
+| `bdict_copy` | `BackDict[K, V]` | 针对该定制化两级字典的拷贝。 |
+
+---
+
+### <IconObjType type="method"/> `get` {#-get}
+
+```python
+val: V | S = bdict.get(key: K, default: S = None)
+```
+
+从字典中获取一个值，并提供默认返回值。
+
+#### 输入 {#requires}
+
+|   参数    | 类型 |               必选                | <center>说明</center>                                                |
+| :-------: | :--: | :-------------------------------: | -------------------------------------------------------------------- |
+|   `key`   | `K`  | <InlineIcon icon={vsiCheckIcon}/> | 用于定位值的关键字。若所要搜索的值皆不存在于两级域中，则返回默认值。 |
+| `default` | `S`  |                                   | 用户提供的默认值。若在字典中未找到`key`，返回该值。                  |
+
+#### 输出 {#returns-1}
+
+| 参数  |   类型   | <center>说明</center>                              |
+| :---: | :------: | :------------------------------------------------- |
+| `val` | `V \| S` | 若找到了关键字，返回所定位的值。否则，返回默认值。 |
+
+---
+
+### <IconObjType type="method"/> `keys` {#-keys}
+
+```python
+key_iter: KeysView[BackDictView[K, V]] = bdict.keys()
+```
+
+`BackDict(...).keys()`是用来提供`BackDict`关键字视图的类集合对象。
+
+#### 输出 {#returns-2}
+
+|    参数    |              类型              | <center>说明</center>                                                                            |
+| :--------: | :----------------------------: | :----------------------------------------------------------------------------------------------- |
+| `key_iter` | `KeysView[BackDictView[K, V]]` | 针对该字典全部关键字的迭代器。迭代的范围也涵盖`back_dict`的关键字。每次迭代返回一个`K`类型的值。 |
+
+---
+
+### <IconObjType type="method"/> `values` {#-values}
+
+```python
+val_iter: ValuesView[BackDictView[K, V]] = bdict.values()
+```
+
+`BackDict(...).keys()`是用来提供`BackDict`值视图的类集合对象。
+
+#### 输出 {#returns-3}
+
+|    参数    |               类型               | <center>说明</center>                                                                    |
+| :--------: | :------------------------------: | :--------------------------------------------------------------------------------------- |
+| `val_iter` | `ValuesView[BackDictView[K, V]]` | 针对该字典全部值的迭代器。迭代的范围也涵盖`back_dict`的值。每次迭代返回一个`V`类型的值。 |
+
+---
+
+### <IconObjType type="method"/> `items` {#-items}
+
+```python
+item_iter: ItemsView[BackDictView[K, V]] = bdict.items()
+```
+
+`BackDict(...).keys()`是用来提供`BackDict`键值对视图的类集合对象。
+
+#### 输出 {#returns-4}
+
+|    参数     |              类型               | <center>说明</center>                                                                                          |
+| :---------: | :-----------------------------: | :------------------------------------------------------------------------------------------------------------- |
+| `item_iter` | `ItemsView[BackDictView[K, V]]` | 针对该字典全部键值对的迭代器。迭代的范围也涵盖`back_dict`的键值对。每次迭代返回一个`tuple[K, V]`类型的二元组。 |
+
+## 运算符 {#operators}
+
+### <IconObjType type="op"/> `__len__`
+
+```python
+vlen: int = len(bdict)
+```
+
+获取字典的长度。
+
+#### 输出 {#returns-5}
+
+|  参数  | 类型  | <center>说明</center>                      |
+| :----: | :---: | :----------------------------------------- |
+| `vlen` | `int` | 字典两级存储关键字的并集之中、关键字数目。 |
+
+---
+
+### <IconObjType type="op"/> `__contains__`
+
+```python
+flag: bool = key in bdict
+```
+
+检查`key`是否存在于字典中。
+
+#### 输入 {#requires-1}
+
+| 参数  | 类型 |               必选                | <center>说明</center> |
+| :---: | :--: | :-------------------------------: | --------------------- |
+| `key` | `K`  | <InlineIcon icon={vsiCheckIcon}/> | 要检查的关键字。      |
+
+#### 输出 {#returns-6}
+
+|  参数  |  类型  | <center>说明</center>                                                                                        |
+| :----: | :----: | :----------------------------------------------------------------------------------------------------------- |
+| `flag` | `bool` | 若为`True`，则表面给定的`key`存在于字典中。若`key`不存在第一级域中、但能在第二级域检索到，该值还是为`True`。 |
+
+---
+
+### <IconObjType type="op"/> `__iter__`
+
+```python
+keys: Iterator[K] = iter(bdict)
+```
+
+遍历字典中的每个关键字。
+
+#### 输出 {#returns-7}
+
+|  参数  |     类型      | <center>说明</center>                                                                                                     |
+| :----: | :-----------: | :------------------------------------------------------------------------------------------------------------------------ |
+| `keys` | `Iterator[K]` | 迭代器。每次迭代返回字典中的一个关键字。若所返回的关键字来自备用域，迭代器所返回的关键字会经过`key_back_mapper`的后处理。 |
+
+---
+
+### <IconObjType type="op"/> `__getitem__`
+
+```python
+val: V = bdict[key]
+```
+
+定位字典中的一个值。若关键字未找到，抛出`KeyError`。
+
+#### 输入 {#requires-2}
+
+| 参数  | 类型 |               必选                | <center>说明</center>                                                   |
+| :---: | :--: | :-------------------------------: | ----------------------------------------------------------------------- |
+| `key` | `K`  | <InlineIcon icon={vsiCheckIcon}/> | 用来定位值的关键字。若值来自备用域，则会使用`key_mapper(key)`来定位值。 |
+
+#### 输出 {#returns-8}
+
+| 参数  | 类型 | <center>说明</center> |
+| :---: | :--: | :-------------------- |
+| `val` | `V`  | 由`key`定位到的值。   |
+
+---
+
+### <IconObjType type="op"/> `__or__`
+
+```python
+any_dict: Mapping[K, V]
+new_bdict: BackDict[K, V] = bdict | any_dict
+```
+
+将该`BackDict`与另一个字典合并。
+
+#### 输入 {#requires-3}
+
+|    参数    |      类型       |               必选                | <center>说明</center>                                              |
+| :--------: | :-------------: | :-------------------------------: | ------------------------------------------------------------------ |
+| `any_dict` | `Mapping[K, V]` | <InlineIcon icon={vsiCheckIcon}/> | 要与该`BackDict`合并的映射。该映射需要和本字典有相同的键、值类型。 |
+
+#### 输出 {#returns-9}
+
+|    参数     |       类型       | <center>说明</center>                                                                               |
+| :---------: | :--------------: | :-------------------------------------------------------------------------------------------------- |
+| `new_bdict` | `BackDict[K, V]` | 一个由当前字典`bdict`与`any_dict`合并而来的新字典。若关键字有所重合，则优选采用来自`any_dict`的值。 |
+
+---
+
+### <IconObjType type="op"/> `__ror__`
+
+```python
+any_dict: Mapping[K, V]
+new_bdict: BackDict[K, V] = any_dict | bdict
+```
+
+将该`BackDict`与另一个字典合并。
+
+:::note
+
+须知，该运算符仅在`any_dict`未实现`__or__`运算符时才会起效。否则，所合并的值由`any_dict.__or__(bdict)`给定。
+
+:::
+
+#### 输入 {#requires-4}
+
+|    参数    |      类型       |               必选                | <center>说明</center>                                              |
+| :--------: | :-------------: | :-------------------------------: | ------------------------------------------------------------------ |
+| `any_dict` | `Mapping[K, V]` | <InlineIcon icon={vsiCheckIcon}/> | 要与该`BackDict`合并的映射。该映射需要和本字典有相同的键、值类型。 |
+
+#### 输出 {#returns-10}
+
+|    参数     |       类型       | <center>说明</center>                                                                               |
+| :---------: | :--------------: | :-------------------------------------------------------------------------------------------------- |
+| `new_bdict` | `BackDict[K, V]` | 一个由当前字典`bdict`与`any_dict`合并而来的新字典。若关键字有所重合，则优选采用来自该`BackDict`的值。 |

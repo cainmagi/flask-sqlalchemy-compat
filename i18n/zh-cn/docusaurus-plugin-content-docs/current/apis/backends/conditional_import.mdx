@@ -1,0 +1,36 @@
+---
+id: conditional_import
+title: conditional_import
+sidebar_label: conditional_import
+slug: /apis/backends/conditional_import
+description: 如果模块存在，则导入该模块，否则返回一个ModulePlaceholder。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="backends.conditional_import" />
+
+```python
+module: ModuleType = conditional_import(
+    name: str
+)
+```
+
+{<p>如果模块存在，则导入该模块，否则返回一个[`ModulePlaceholder`](./ModulePlaceholder.mdx)。</p>}
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+|  参数  | 类型  |               必选                | <center>说明</center>    |
+| :----: | :---: | :-------------------------------: | ------------------------ |
+| `name` | `str` | <InlineIcon icon={vsiCheckIcon}/> | 所要条件导入的模块名称。 |
+
+### 输出 {#returns}
+
+|   参数   |     类型     | <center>说明</center>                                                                          |
+| :------: | :----------: | :--------------------------------------------------------------------------------------------- |
+| `module` | `ModuleType` | 若模块存在，该值就是导入后的模块。否则，该值是[`ModulePlaceholder`](./ModulePlaceholder.mdx)。 |

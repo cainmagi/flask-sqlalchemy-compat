@@ -1,0 +1,130 @@
+---
+id: SQLAlchemyLiteProtocol
+title: SQLAlchemyLiteProtocol
+sidebar_label: SQLAlchemyLiteProtocol
+slug: /apis/protocols/SQLAlchemyLiteProtocol
+description: 和Flask SQLAlchemy Lite兼容的协议。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="type" source="protocols.SQLAlchemyLiteProtocol" />
+
+```python
+db: SQLAlchemyLiteProtocol
+```
+
+和Flask SQLAlchemy Lite兼容的协议。
+
+相比Flask SQlAlchemy，Flask SQLAlchemy Lite提供的功能更少，并且它只支持`Python>=3.9`。尽管该包较新，但仍建议使用它，因为它与`SQLAlchemy>=2`和Python的`typing`系统契合得更好。
+
+该协议涵盖了`flask_sqlalchemy_lite.SQLAlchemy`的大多数、但非全部功能。
+
+## 别名 {#aliases}
+
+该类型可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyLiteProtocol
+fsc.protocols.SQLAlchemyLiteProtocol
+```
+
+## 协议方法 {#protocol-methods}
+
+### <IconObjType type="method"/> `init_app` {#-init_app}
+
+```python
+db.init_app(app: App)
+```
+
+按照`Flask.config`创建engine，并将数据库扩展注册到应用中。
+
+- 其中`App`是[`flask.sansio.app.App`<IconExternalLink/>][link-flask-app]的`TypeVar`。
+
+## 协议属性 {#protocol-properties}
+
+### <IconObjType type="param"/> `engine` {#-engine}
+
+```python
+db.engine: sa.engine.Engine
+```
+
+当前应用关联的默认engine。
+
+---
+
+### <IconObjType type="param"/> `engines` {#-engines}
+
+```python
+db.engines: dict[str, sa.engine.Engine]
+```
+
+当前应用关联的所有engine。
+
+---
+
+### <IconObjType type="param"/> `sessionmaker` {#-sessionmaker}
+
+```python
+db.sessionmaker: sa.orm.sessionmaker[sa.orm.Session]
+```
+
+当前应用所设置的会话工厂类，可直接用来创建会话。但须知透过这种方式创建的会话、不会在离开应用上下文时、自动关闭。若需要该功能，建议使用`session`或`get_session`。
+
+---
+
+### <IconObjType type="param"/> `session` {#-session}
+
+```python
+db.session: sa.orm.Session
+```
+
+当前应用的默认会话。在离开应用上下文时、自动关闭。
+
+---
+
+### <IconObjType type="param"/> `async_engines` {#-async_engines}
+
+```python
+db.async_engines: dict[str, sa.async.AsyncEngine]
+```
+
+当前应用关联的所有异步engine。
+
+---
+
+### <IconObjType type="param"/> `async_engine` {#-async_engine}
+
+```python
+db.async_engine: sa.async.AsyncEngine
+```
+
+当前应用关联的默认异步engine。
+
+---
+
+### <IconObjType type="param"/> `async_sessionmaker` {#-async_sessionmaker}
+
+```python
+db.async_sessionmaker: sa.async.async_sessionmaker[sa.async.AsyncSession]
+```
+
+当前应用所设置的异步会话工厂类。
+
+---
+
+### <IconObjType type="param"/> `async_session` {#-async_session}
+
+```python
+db.async_session: sa.async.AsyncSession
+```
+
+当前应用的默认异步会话。在离开应用上下文时、自动关闭。
+
+[link-flask-app]: https://github.com/pallets/flask/blob/6b054f8f3876ff4c31580b014d344c4cf491059d/src/flask/sansio/app.py#L59

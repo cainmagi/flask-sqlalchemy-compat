@@ -1,0 +1,68 @@
+---
+id: ModelProtocol
+title: ModelProtocol
+sidebar_label: ModelProtocol
+slug: /apis/protocols/ModelProtocol
+description: 和flask_sqlalchemy.extensions._FSAModel兼容的协议。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="type" source="protocols.ModelProtocol" />
+
+```python
+model: ModelProtocol
+```
+
+和[`flask_sqlalchemy.extensions._FSAModel` <IconExternalLink/>][link-fsamodel]兼容的协议。
+
+该协议涵盖了模型原型所具备的大致功能。Flask SQLAlchemy并不使用原生的SQLAlchemy基模型，而是定义了它自己的版本。这就是需要该协议来处理兼容性问题的原因。
+
+须知为了同时和一个来自SQLAlchemy的普通基模型兼容，该协议并不涵盖Flask SQLAlchemy模型的所有功能。
+
+## 别名 {#aliases}
+
+该类型可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.ModelProtocol
+fsc.protocols.ModelProtocol
+```
+
+## 协议属性 {#protocol-properties}
+
+### <IconObjType type="param"/> `query_class` {#-query_class}
+
+```python
+model.query_class: ClassVar[type[Any]]
+```
+
+`query`所使用的Query类。默认值为`flask_sqlalchemy.SQLAlchemy.Query`。
+
+---
+
+### <IconObjType type="param"/> `query_class` {#-query_class-1}
+
+```python
+model.query: ClassVar[Any]
+```
+
+某个模型的SQLAlchemy query，等价于`db.session.query(Model)`。可以透过重载`query_class`来为各模型定制query的功能。
+
+---
+
+### <IconObjType type="param"/> `metadata` {#-metadata}
+
+```python
+model.metadata: sa.MetaData
+```
+
+为`flask_sqlalchemy.SQLAlchemy`实例合成的元数据属性。
+
+[link-fsamodel]: https://github.com/pallets-eco/flask-sqlalchemy/blob/3e3e92ba557649ab5251eda860a67656cc8c10af/src/flask_sqlalchemy/extension.py#L47

@@ -1,0 +1,24 @@
+---
+id: index
+title: backdict
+sidebar_label: backdict
+slug: /apis/backdict
+description: 一个调整后的dict实现。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="backdict" />
+
+一个调整后的`dict`实现。`BackDict`的用法与一个两级的[`collections.ChainMap`<IconExternalLink/>][link-chainmap]相若，并用于在`flask_sa_lite_api`中提供从`flask_sqlalchemy.SQLAlchemy()`到`flask_sqlalchemy_lite.SQLAlchemy()`的属性映射策略。
+
+## 类 {#classes}
+
+|                                         成员                                         | <center>说明</center>                                   |
+| :----------------------------------------------------------------------------------: | ------------------------------------------------------- |
+|     [<IconObjType type="class" hasText={true} text="BackDict"/>](./BackDict.mdx)     | 有备用层级的字典。                                      |
+| [<IconObjType type="class" hasText={true} text="BackDictView"/>](./BackDictView.mdx) | 内部类。用于在`BackDict`中提供`MappingView`的只读代理。 |
+
+[link-chainmap]: https://docs.python.org/zh-cn/3.13/library/collections.html#collections.ChainMap

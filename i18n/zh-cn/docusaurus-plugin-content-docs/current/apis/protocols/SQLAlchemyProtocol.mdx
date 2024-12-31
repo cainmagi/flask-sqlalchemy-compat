@@ -1,0 +1,130 @@
+---
+id: SQLAlchemyProtocol
+title: SQLAlchemyProtocol
+sidebar_label: SQLAlchemyProtocol
+slug: /apis/protocols/SQLAlchemyProtocol
+description: 和Flask SQLAlchemy兼容的协议。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="type" source="protocols.SQLAlchemyProtocol" />
+
+```python
+db: SQLAlchemyProtocol
+```
+
+和Flask SQLAlchemy兼容的协议。
+
+Flask SQLAlchemy已经维护了多年，拥有庞大的社区和大量用户，并且长期地在各种应用中、支持许多插件。然而，有鉴于SQLAlchemy深度依赖于现代的类型注解系统，该包与`SQLAlchemy<2`更契合。这个老旧的扩展包、与新的SQLAlchemy之间还存在许多未解决的兼容性问题。
+
+特别时对于使用`Python<3.9`的用户来说，该包仍然是不二选择，因为Flask SQLAlchemy Lite不支持旧的Python版本。
+
+该协议涵盖了`flask_sqlalchemy.SQLAlchemy`的大多数、但非全部功能。
+
+## 别名 {#aliases}
+
+该类型可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyProtocol
+fsc.protocols.SQLAlchemyProtocol
+```
+
+## 协议方法 {#protocol-methods}
+
+### <IconObjType type="method"/> `init_app` {#-init_app}
+
+```python
+db.init_app(app: Flask)
+```
+
+使用该扩展实例来初始化Flask应用。必须在访问数据库的engine或会话之前，调用该方法。
+
+## 协议属性 {#protocol-properties}
+
+### <IconObjType type="param"/> `engine` {#-engine}
+
+```python
+db.engine: sa.engine.Engine
+```
+
+当前应用关联的默认engine。
+
+---
+
+### <IconObjType type="param"/> `engines` {#-engines}
+
+```python
+db.engines: Mapping[str | None, sa.engine.Engine]
+```
+
+当前应用下、绑定关键字到`sqlalchemy.engine.Engine`的映射。关键字`None`引用到默认engine。
+
+---
+
+### <IconObjType type="param"/> `session` {#-session}
+
+```python
+db.session: sa_orm.scoped_session[Any]
+```
+
+当前应用的默认会话。在离开应用上下文时、自动关闭。
+
+---
+
+### <IconObjType type="param"/> `metadatas` {#-metadatas}
+
+```python
+db.metadatas: Mapping[str | None, sa.MetaData]
+```
+
+当前应用下、绑定关键字到`sqlalchemy.schema.MetaData`的映射。关键字`None`引用到默认engine。
+
+---
+
+### <IconObjType type="param"/> `metadata` {#-metadata}
+
+```python
+db.metadata: sa.MetaData
+```
+
+未指定绑定关键字的情况下，`Model`与`Table`所使用的默认元数据。
+
+---
+
+### <IconObjType type="param"/> `Query` {#-query}
+
+```python
+db.Query: Callable[..., sa.orm.Query]
+```
+
+`Model.query`与`lazy="dynamic"`关系所使用的默认检索类。
+
+---
+
+### <IconObjType type="param"/> `Table` {#-table}
+
+```python
+db.Table: Callable[..., sa.Table]
+```
+
+无需显式指定元数据的默认数据表类。
+
+---
+
+### <IconObjType type="param"/> `Model` {#-model}
+
+```python
+db.Model: Callable[..., ModelProtocol]
+```
+
+具备扩展功能的默认对象关系映射模型类。
+
+- 其中[`ModelProtocol`](./ModelProtocol.mdx)是Flask SQLAlchemy所定制的模型类的协议。

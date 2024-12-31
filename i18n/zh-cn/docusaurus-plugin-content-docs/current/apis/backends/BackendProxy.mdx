@@ -1,0 +1,77 @@
+---
+id: BackendProxy
+title: BackendProxy
+sidebar_label: BackendProxy
+slug: /apis/backends/BackendProxy
+description: 作为代理的类，用来维护动态加载的模块。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backends.BackendProxy" />
+
+```python
+proxy = BackendProxy[M1, M2](
+    fsa: M1,
+    fsa_lite: M2,
+)
+```
+
+作为代理的类，用来维护动态加载的模块。
+
+对于该类的实例，其属性是可修改的，从而允许在特定需要出现时、动态修改其所维护的模块。
+
+:::danger
+
+
+该类仅在内部使用。用户不应使用它。
+
+若用户希望访问模块的代理，请使用[`fsc.backends.proxy`](./proxy.mdx)。
+
+:::
+
+## 参数 {#arguments}
+
+|    参数    | 类型 |               必选                | <center>说明</center>                                             |
+| :--------: | :--: | :-------------------------------: | ----------------------------------------------------------------- |
+|   `fsa`    | `M1` | <InlineIcon icon={vsiCheckIcon}/> | 模块或模块占位符。若模块可用，该模块应当是`flask_sqlalchemy`。    |
+| `fsa_lite` | `M2` | <InlineIcon icon={vsiCheckIcon}/> | 模块或模块占位符。若模块可用，该模块应当是`flask_sqlalchemy_lite` |
+
+- 其中，`M1`和`M2`都是`ModuleType`的`TypeVar`。
+
+## 属性 {#properties}
+
+### <IconObjType type="param"/> `fsa` {#-fsa}
+
+```python
+import flask_sqlalchemy
+
+fsa: module("flask_sqlalchemy") | ModulePlaceholder = proxy.fsa
+
+new_fsa: module("flask_sqlalchemy") | True | False | None
+proxy.fsa = new_fsa
+```
+
+指向`flask_sqlalchemy`的引用。
+
+该值可以被修改为`True`，`False`，或`None`。若修改为`True`，则会试图将该属性复原到本模块包刚完成加载后的状态。若修改为`False`或`None`，则该属性会变更为占位符。
+
+---
+
+### <IconObjType type="param"/> `fsa_lite` {#-fsa_lite}
+
+```python
+import flask_sqlalchemy_lite
+
+fsa_lite: module("flask_sqlalchemy_lite") | ModulePlaceholder = proxy.fsa_lite
+
+new_fsa_lite: module("flask_sqlalchemy_lite") | True | False | None
+proxy.fsa_lite = new_fsa_lite
+```
+
+指向`flask_sqlalchemy_lite`的引用。
+
+该值可以修改为`True`，`False`，或`None`。若修改为`True`，则会试图将该属性复原到本模块包刚完成加载后的状态。若修改为`False`或`None`，则该属性会变更为占位符。

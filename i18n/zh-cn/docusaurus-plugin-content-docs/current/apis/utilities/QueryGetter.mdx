@@ -1,0 +1,60 @@
+---
+id: QueryGetter
+title: QueryGetter
+sidebar_label: QueryGetter
+slug: /apis/utilities/QueryGetter
+description: query属性的访问器。
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isDescriptor={true} source="utilities.QueryGetter" />
+
+```python
+class AnyClass(sa.orm.DeclarativeBase):
+    query = QueryGetter()
+
+val: sa.orm.Query[AnyClass] = AnyClass.query
+```
+
+`query`属性的访问器。
+
+按照以下方式使用该描述器：
+
+```python
+class Base(sa.orm.DeclarativeBase):
+    query = QueryGetter()
+
+class NewModel(Base): ...
+```
+
+它模拟了`flask_sqlalchemy`的行为。使用
+
+```python
+NewModel.query.filter(...).all()
+```
+
+和以下做法等价
+
+```python
+db.session.query(NewModel).filter(...).all()
+```
+
+:::warning
+
+设置了`query`描述器之后，用户只能在Flask应用上下文的范围内调用它。否则，将会抛出`RuntimeError`。
+
+:::
+
+## 别名 {#aliases}
+
+
+该类可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.QueryGetter
+fsc.utilities.QueryGetter
+```

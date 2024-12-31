@@ -1,0 +1,106 @@
+---
+id: install
+sidebar_label: 安装
+title: 安装本项目的Python包
+description: 安装本项目的PyPI发布版、或开发版本。
+slug: /install
+---
+
+import DarkButton from "@site/src/components/DarkButton";
+import InlineIcon from "@site/src/components/InlineIcon";
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+import octInfo16 from "@iconify-icons/octicon/info-16";
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import {repoURL} from "@site/src/envs/variables";
+
+运行以下命令，安装模块包：
+
+```shell
+pip install flask-sqlalchemy-compat
+```
+
+## 额外功能 {#extra-features}
+
+透过设置可选依赖项，可以安装更多功能：
+
+```shell
+pip install flask-sqlalchemy-compat[option1,option2...]
+```
+
+|    选项    | <center>支持的功能</center>                                                                                            |
+| :--------: | :--------------------------------------------------------------------------------------------------------------------- |
+|   `test`   | 安装用于进行[`pytest`<IconExternalLink/>][link-pytest]测试的依赖项。这些依赖项只用于单元测试，不用于提供任何实际功能。 |
+|   `dev`    | 安装开发者依赖项。构建模块包的时候才有可能需要这些依赖项。                                                             |
+| `backends` | 安装`flask-sqlalchemy`和`flask-sqlalchemy-lite`。若当前 Python 版本不支持，则会跳过安装对应的包。                      |
+| `example`  | 安装用来运行范例脚本的依赖项。                                                                                         |
+
+## 后端 {#backends}
+
+默认情况下，安装此模块包、并不会同时安装`flask-sqlalchemy`或`flask-sqlalchemy-lite`。这是因为本项目假设了用户已经自行决定、并安装过二者之一。
+
+安装时，若附加上`backends`可选项、则会根据当前Python的版本，按照以下列表安装对应的包。
+
+| Python 版本 | <center>`flask-sqlalchemy-lite`</center> | <center>`flask-sqlalchemy`</center> | <center>[`flask-sqlalchemy-compat-backend-py37`<IconExternalLink/>][link-fsqlc-bpy37]</center> |
+| :---------: | :--------------------------------------: | :---------------------------------: | :--------------------------------------------------------------------------------------------: |
+|   `~=3.7`   |                                          |                                     |                               <InlineIcon icon={vsiCheckIcon}/>                                |
+|   `~=3.8`   |                                          |  <InlineIcon icon={vsiCheckIcon}/>  |                                                                                                |
+|   `>=3.9`   |    <InlineIcon icon={vsiCheckIcon}/>     |  <InlineIcon icon={vsiCheckIcon}/>  |       
+
+:::warning
+
+为了在`Python=3.7`时确保兼容性，用户需要安装一个非官方版本的`flask-sqlalchemy`，参见
+
+https://github.com/pallets-eco/flask-sqlalchemy/issues/1140#issuecomment-1577921154
+
+该非官方版本可以透过以下方式安装：
+
+```bash
+python -m pip install flask-sqlalchemy-compat[backends]
+```
+
+:::
+
+## 安装GitHub版本 {#install-the-github-version}
+
+在开发阶段，GitHub上的版本有可能比在PyPI发布的版本新。如果用户需要安装GitHub版本，请确保已经安装了[Git<IconExternalLink/>][link-git]。
+
+确保一些需要的软件都准备无虞后，运行下列命令安装开发者版本：
+
+```shell
+git clone https://github.com/cainmagi/flask-sqlalchemy-compat
+cd flask-sqlalchemy-compat
+python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m pip install .[dev]
+```
+
+:::tip
+
+若有需要，可以在`pip install`命令的后面加上`-e`。这将令所安装的模块支持即时修改。亦即，对从GitHub上clone的项目做出的任何改动都将反馈到全局安装的`flask_sqlalchemy_compat`模块包上。
+
+:::
+
+## 运行测试 {#run-the-tests}
+
+要检查此项目是否兼容当前设备，请确保已经安装了[Git<IconExternalLink/>][link-git]。
+
+确保一些需要的软件都准备无虞后，运行下列命令进行单元测试：
+
+```shell
+git clone https://github.com/cainmagi/flask-sqlalchemy-compat
+cd flask-sqlalchemy-compat
+python -m pip install -r requirements.txt -r requirements-backends.txt -r tests/requirements.txt
+python -m pytest
+```
+
+本项目只兼容到`python>=3.7`版本。如果你发现你所使用的版本无法通过单元测试，请提交问题报告：
+
+<p>
+  <DarkButton href={repoURL("issues/new/choose")} icon={octInfo16}>
+    {"报告问题"}
+  </DarkButton>
+</p>
+
+[link-git]: https://git-scm.com/downloads
+[link-pytest]: https://docs.pytest.org/
+[link-fsqlc-bpy37]: https://pypi.org/project/Flask-SQLAlchemy-compat-backend-py37

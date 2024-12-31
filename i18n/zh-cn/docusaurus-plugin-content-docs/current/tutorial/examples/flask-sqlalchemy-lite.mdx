@@ -1,0 +1,476 @@
+---
+id: flask-sqlalchemy-lite
+sidebar_label: Lite版
+title: "范例：基于Flask SQLAlchemy Lite的应用"
+description: 以下范例，使用Flask SQLAlchemy Lite查询数据，并构建数据库API。
+slug: /examples/flask-sqlalchemy-lite
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IconExternalLink from "@theme/Icon/ExternalLink";
+import ThemedImage from "@theme/ThemedImage";
+
+import mdiLanguagePython from "@iconify-icons/mdi/language-python";
+
+import {demoURL} from "@site/src/envs/variables";
+import DarkButton from "@site/src/components/DarkButton";
+
+查看以下链接，以阅览一个完整的Flask应用范例。
+
+<p>
+  <DarkButton to={demoURL("app_fsqla_lite.py")} icon={mdiLanguagePython}>
+    {"app_fsqla_lite.py"}
+  </DarkButton>
+</p>
+
+该范例提供了以下功能：
+
+1. 透过[Flask Login<IconExternalLink/>][link-flask-login]实现的登录系统。
+2. 两个管理员账号、两个普通用户账号。
+3. 只有管理员账号能访问用户列表。
+4. 每个用户有数条信息。
+5. 所有的用户都能访问属于自己的信息。另外，管理员账户还能访问任意用户的信息。
+6. 访问用户列表、或信息详情，都需要登录凭证。
+
+## 数据库结构 {#database-structure}
+
+数据库的实体关系图（entity-relationship diagram, ERD）如下：
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="Lite版应用的ERD"
+    sources={{
+      light: useBaseUrl("/img/examples/erd-fsql-light.svg"),
+      dark: useBaseUrl("/img/examples/erd-fsql-dark.svg"),
+    }}
+  />
+</div>
+
+数据库具备以下功能：
+
+- 默认的数据库后端是Flask SQLAlchemy Lite。若Lite版不可用，则退回到Flask SQLAlchemy。
+- 用户（User）和信息（Entry）之间透过一对多关系链接。
+- 用户和角色（Role）之间透过多对多关系链接。
+- 角色的对象关系映射（ORM）包含一个混合属性`is_admin`。访问该属性可以快速检索具备管理员资格的角色。该属性透过检查`level`值实现。
+- 用户的ORM同样包含一个混合属性`is_admin`。该属性透过联合查询（joined query）实现。查询该属性，将会搜索所有“具备至少一个管理员等级的角色”的用户。
+- 用户的密码以hash形式保存。这种形式可以在数据库泄露的情况下，阻止密码的内容泄露。要使用hash形式的密码，用户的ORM提供了两个方法`set_password(...)`和`validate_passowrd(...)`。
+
+## 访问范例 {#access-the-demo}
+
+假设`examples`下载到了当前目录下，且目录结构如下所示：
+
+```text
+.examples
+|---__init__.py
+|---...
+|---app_fsqla_lite.py
+`---models_fsqla_lite.py
+```
+
+在当前目录下（其中有`examples`子目录），运行以下命令：
+
+<Tabs
+  defaultValue="command"
+  values={[
+    { label: "命令", value: 'command', },
+    { label: "结果", value: 'results', },
+  ]
+}>
+
+<TabItem value="command">
+
+```bash
+python -m examples.app_fsqla_lite
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```text
+ * Serving Flask app 'app_fsqla_lite'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://172.17.0.2:8080
+Press CTRL+C to quit
+```
+
+</TabItem>
+
+</Tabs>
+
+该范例持续运行一个独立的Flask服务应用。虽然可由浏览器访问应用内容。但这里不会采用这种方式访问，因为需要透过发送`POST`请求登入，且登录凭据需要储存在会话（session）中。
+
+### 测试登入状态 {#test-the-login-status}
+
+要测试该应用，可以选择使用`requests`包。透过以下方式安装：
+
+```python
+python -m pip install requests
+```
+
+测试的第一步是检验当前用户。运行以下脚本：
+
+<Tabs
+  defaultValue="script"
+  values={[
+    { label: "脚本", value: 'script', },
+    { label: "结果", value: 'results', },
+  ]
+}>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-login.py"
+import requests
+
+
+# 前述已经说明，`app_fsqla_lite`显示的地址是
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        print(res.json())
+    except requests.exceptions.JSONDecodeError:
+        print(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+        )
+        show_data(res)
+
+        res = sess.post(addr.format("logout"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "reader01", "password": "regular"}
+        )
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, admin01! As an admin, you can review /user or /entry.'}
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, reader01! You can review /entry.'}
+```
+
+</TabItem>
+
+</Tabs>
+
+该脚本将会先登入一个管理员账户，然后登出，再登入另一个普通用户。可以确认对管理员用户和对普通用户的欢迎信息是不同的。
+
+### 测试管理员账户 {#test-the-admin-user}
+
+透过以下脚本启动另一个会话，并测试当前用户是管理员时，各种响应的内容。
+
+<Tabs
+  defaultValue="script"
+  values={[
+    { label: "脚本", value: 'script', },
+    { label: "结果", value: 'results', },
+  ]
+}>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-admin.py"
+import requests
+import pprint
+
+
+# 前述已经说明，`app_fsqla_lite`显示的地址是
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        pprint.pprint(res.json())
+    except requests.exceptions.JSONDecodeError:
+        pprint.pprint(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+        )
+        show_data(res)
+
+        res = sess.get(addr.format("user"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"user": 2})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 3, "user": 2})
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, admin01! As an admin, you can review /user or /entry.'}
+{'message': 'Users are found.',
+ 'users': [{'id': 1, 'name': 'admin01'},
+           {'id': 2, 'name': 'reader01'},
+           {'id': 3, 'name': 'admin02'},
+           {'id': 4, 'name': 'reader02'}]}
+{'entries': [1, 2], 'message': 'Entries are found.', 'n_entries': 2, 'user': 1}
+{'entries': [3, 4], 'message': 'Entries are found.', 'n_entries': 2, 'user': 2}
+{'data': "admin's data 1", 'id': 1, 'message': 'Entry is found.', 'user': 1}
+{'data': "reader's data 1", 'id': 3, 'message': 'Entry is found.', 'user': 2}
+```
+
+</TabItem>
+
+</Tabs>
+
+可以确认：
+
+- 管理员可以访问全体用户列表。
+- 管理员可以访问任意用户的信息列表，不仅仅局限于当前用户（自身）。
+- 管理员可以访问任意用户的任意信息详情，不局限于当前用户（自身）的信息。
+
+### 测试普通账户 {#test-a-regular-user}
+
+对上例作出略微修改，并使用一个普通用户、而非管理员登入，将得到不同的结果：
+
+<Tabs
+  defaultValue="change"
+  values={[
+    { label: "改动", value: 'change', },
+    { label: "完整脚本", value: 'script', },
+    { label: "结果", value: 'results', },
+  ]
+}>
+
+<TabItem value="change">
+
+对以下几行作出改动：
+
+<div className="code-diff-move">
+
+```python
+...
+if __name__ == "__main__":
+    with requests.session() as sess:
+        ...
+        res = sess.post(
+            # diff-remove-next-line
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+            # diff-add-next-line
+            addr.format("login"), json={"user": "reader01", "password": "regular"}
+        )
+        ...
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+        # diff-add-start
+
+        res = sess.get(addr.format("entry"), params={"id": 1, "user": 1})
+        show_data(res)
+        # diff-add-end
+        ...
+```
+
+</div>
+
+</TabItem>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-user.py"
+import requests
+import pprint
+
+
+# 前述已经说明，`app_fsqla_lite`显示的地址是
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        pprint.pprint(res.json())
+    except requests.exceptions.JSONDecodeError:
+        pprint.pprint(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.post(
+            addr.format("login"), json={"user": "reader01", "password": "regular"}
+        )
+        show_data(res)
+
+        res = sess.get(addr.format("user"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"user": 2})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1, "user": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 3, "user": 2})
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'Hi, reader01! You can review /entry.'}
+{'message': 'You do not have the access to this page.'}
+{'entries': [3, 4], 'message': 'Entries are found.', 'n_entries': 2, 'user': 2}
+{'entries': [3, 4], 'message': 'Entries are found.', 'n_entries': 2, 'user': 2}
+{'id': 1, 'message': 'Requested entry is not found.', 'user': 2}
+{'id': 1, 'message': 'Requested entry is not found.', 'user': 2}
+{'data': "reader's data 1", 'id': 3, 'message': 'Entry is found.', 'user': 2}
+```
+
+</TabItem>
+
+</Tabs>
+
+可以确认：
+
+- 普通用户无法访问用户列表。
+- 普通用户只能访问属于当前用户的信息列表。即使将用户ID指为其他用户，所指定的ID也会被忽略。
+- 普通用户无法访问其他用户的信息。即使显式指定了其他用户的ID，所指定的ID也会被忽略。
+
+### 测试匿名状态 {#test-the-anonymous-status}
+
+<Tabs
+  defaultValue="change"
+  values={[
+    { label: "改动", value: 'change', },
+    { label: "完整脚本", value: 'script', },
+    { label: "结果", value: 'results', },
+  ]
+}>
+
+<TabItem value="change">
+
+只需从会话中删除登入请求即可：
+
+<div className="code-diff-move">
+
+```python
+...
+if __name__ == "__main__":
+    with requests.session() as sess:
+        ...
+        # diff-remove-start
+
+        res = sess.post(
+            addr.format("login"), json={"user": "admin01", "password": "imadmin"}
+        )
+        # diff-remove-end
+        ...
+```
+
+</div>
+
+</TabItem>
+
+<TabItem value="script">
+
+```python showLineNumbers title="demo-anonymous.py"
+import requests
+import pprint
+
+
+# 前述已经说明，`app_fsqla_lite`显示的地址是
+# http://172.17.0.2:8080
+addr = "http://172.17.0.2:8080/{0}"
+
+
+def show_data(res: requests.Response):
+    try:
+        pprint.pprint(res.json())
+    except requests.exceptions.JSONDecodeError:
+        pprint.pprint(res.content)
+
+
+if __name__ == "__main__":
+    with requests.session() as sess:
+        res = sess.get(addr.format("login"))
+        show_data(res)
+
+        res = sess.get(addr.format("user"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"user": 2})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 1})
+        show_data(res)
+
+        res = sess.get(addr.format("entry"), params={"id": 3, "user": 2})
+        show_data(res)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```json
+{'message': 'Use POST method and provide user/password to login.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+{'message': 'This API cannot be accessed without logging in.'}
+```
+
+</TabItem>
+
+</Tabs>
+
+当然，由于数据库已经受到了Flask Login的保护，任何不使用登录凭据的请求都不会接收。
+
+[link-flask-login]: https://flask-login.readthedocs.io

@@ -1,0 +1,116 @@
+---
+id: BackDictView
+title: BackDictView
+sidebar_label: BackDictView
+slug: /apis/backdict/BackDictView
+description: 内部类。用于在BackDict中提供MappingView的只读代理。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backdict.BackDictView" />
+
+```python
+bdict_view = BackDictView[K, V](
+    data: Mapping[K, V],
+    back_data: Mapping[K2, V],
+    key_mapper: Callable[[K], K2],
+    key_back_mapper: Callable[[K2], K],
+)
+```
+
+内部类。用于在`BackDict`中提供`MappingView`的只读代理。
+
+:::danger
+
+该类需要由`BackDict`的方法实例化。用户不应当显式地初始化该类的实例。
+
+:::
+
+## 参数 {#arguments}
+
+|       参数        |       类型       |               必选                | <center>说明</center>                                                         |
+| :---------------: | :--------------: | :-------------------------------: | ----------------------------------------------------------------------------- |
+|      `data`       | `Mapping[K, T]`  | <InlineIcon icon={vsiCheckIcon}/> | `BackDict`的可变数据存储区。                                                  |
+|    `back_data`    | `Mapping[K2, T]` | <InlineIcon icon={vsiCheckIcon}/> | `BackDict`不可变的备用内部存储区。                                            |
+|   `key_mapper`    |   `(K) -> K2`    | <InlineIcon icon={vsiCheckIcon}/> | 当关键字未在`data`中搜索到时，用于将要搜索的关键字从`K`类型一一映射到`K2`。   |
+| `key_back_mapper` |   `(K2) -> K`    | <InlineIcon icon={vsiCheckIcon}/> | 当需要向用户展示可用的关键字时，用来将备用域中`K2`类型的关键字一一映射到`K`。 |
+
+## 运算符 {#operators}
+
+### <IconObjType type="op"/> `__len__`
+
+```python
+vlen: int = len(bdict_view)
+```
+
+获取字典的长度。该长度同时也是该视图中键值对的数目。
+
+#### 输出 {#returns}
+
+|  参数  | 类型  | <center>说明</center>                      |
+| :----: | :---: | :----------------------------------------- |
+| `vlen` | `int` | 字典两级存储关键字的并集之中、关键字数目。 |
+
+---
+
+### <IconObjType type="op"/> `__contains__`
+
+```python
+flag: bool = key in bdict_view
+```
+
+检查`key`是否存在于该字典视图中。
+
+#### 输入 {#requires}
+
+| 参数  | 类型 |               必选                | <center>说明</center> |
+| :---: | :--: | :-------------------------------: | --------------------- |
+| `key` | `K`  | <InlineIcon icon={vsiCheckIcon}/> | 要检查的关键字。      |
+
+#### 输出 {#returns-1}
+
+|  参数  |  类型  | <center>说明</center>                                                                                            |
+| :----: | :----: | :--------------------------------------------------------------------------------------------------------------- |
+| `flag` | `bool` | 若为`True`，则表面给定的`key`存在于字典视图中。若`key`不存在第一级域中、但能在第二级域检索到，该值还是为`True`。 |
+
+---
+
+### <IconObjType type="op"/> `__iter__`
+
+```python
+keys: Iterator[K] = iter(bdict_view)
+```
+
+遍历字典视图中的每个关键字。
+
+#### 输出 {#returns-2}
+
+|  参数  |     类型      | <center>说明</center>                                                                                                         |
+| :----: | :-----------: | :---------------------------------------------------------------------------------------------------------------------------- |
+| `keys` | `Iterator[K]` | 迭代器。每次迭代返回字典视图中的一个关键字。若所返回的关键字来自备用域，迭代器所返回的关键字会经过`key_back_mapper`的后处理。 |
+
+---
+
+### <IconObjType type="op"/> `__getitem__`
+
+```python
+val: V = bdict_view[key]
+```
+
+定位字典视图中的一个值。若关键字未找到，抛出`KeyError`。
+
+#### 输入 {#requires-1}
+
+| 参数  | 类型 |               必选                | <center>说明</center>                                                   |
+| :---: | :--: | :-------------------------------: | ----------------------------------------------------------------------- |
+| `key` | `K`  | <InlineIcon icon={vsiCheckIcon}/> | 用来定位值的关键字。若值来自备用域，则会使用`key_mapper(key)`来定位值。 |
+
+#### 输出 {#returns-3}
+
+| 参数  | 类型 | <center>说明</center> |
+| :---: | :--: | :-------------------- |
+| `val` | `V`  | 由`key`定位到的值。   |

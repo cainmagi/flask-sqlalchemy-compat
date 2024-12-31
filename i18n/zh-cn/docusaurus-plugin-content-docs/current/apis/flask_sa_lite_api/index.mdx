@@ -1,0 +1,27 @@
+---
+id: index
+title: flask_sa_lite_api
+sidebar_label: flask_sa_lite_api
+slug: /apis/flask_sa_lite_api
+description: 用来模拟flask_sqlalchemy_lite.SQLAlchemy() API效果的代理封装。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="flask_sa_lite_api" />
+
+用来模拟`flask_sqlalchemy_lite.SQLAlchemy()` API效果的代理封装。该封装用来向用户提供、藉由`flask_sqlalchemy`实现的、`flask_sqlalchemy_lite`的特性。
+
+## 类 {#classes}
+
+|                                                成员                                                | <center>说明</center>                        |
+| :------------------------------------------------------------------------------------------------: | -------------------------------------------- |
+| [<IconObjType type="class" hasText={true} text="SQLAlchemyLiteProxy"/>](./SQLAlchemyLiteProxy.mdx) | `flask_sqlalchemy_lite.SQLAlchemy`的代理类。 |
+
+## 函数 {#functions}
+
+|                                                    成员                                                     | <center>说明</center>                         |
+| :---------------------------------------------------------------------------------------------------------: | --------------------------------------------- |
+| [<IconObjType type="func" hasText={true} text="as_flask_sqlalchemy_lite"/>](./as_flask_sqlalchemy_lite.mdx) | 令`db`按照`flask_sqlalchemy_lite`的方式工作。 |

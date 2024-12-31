@@ -1,0 +1,55 @@
+---
+id: proxy
+title: proxy
+sidebar_label: proxy
+slug: /apis/backends/proxy
+description: 用来访问内部使用模块（后端）的代理。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="obj" source="backends.proxy" />
+
+```python
+proxy: BackendProxy[module("flask_sqlalchemy"), module("flask_sqlalchemy_lite")]
+```
+
+用来访问内部使用模块（后端）的代理。在需要测试时，该实例的属性可以动态修改为`None`，`True`，或`False`，从而开关其所管理的模块。修改该实例的属性，将会全局作用于那些用来加载数据库扩展的功能。例如，当该实例的属性`fsa`刻意设置为`True`或`False`时，[`flask_sa_api.as_flask_sqlalchemy(...)`](../flask_sa_api/as_flask_sqlalchemy.mdx)将无法使用Flask SQLAlchemy。
+
+## 属性 {#properties}
+
+### <IconObjType type="param"/> `fsa` {#-fsa}
+
+```python
+import flask_sqlalchemy
+
+fsa: module("flask_sqlalchemy") | ModulePlaceholder = proxy.fsa
+
+new_fsa: module("flask_sqlalchemy") | True | False | None
+proxy.fsa = new_fsa
+```
+
+
+指向`flask_sqlalchemy`的引用。
+
+该值可以被修改为`True`，`False`，或`None`。若修改为`True`，则会试图将该属性复原到本模块包刚完成加载后的状态。若修改为`False`或`None`，则该属性会变更为占位符。
+
+---
+
+### <IconObjType type="param"/> `fsa_lite` {#-fsa_lite}
+
+```python
+import flask_sqlalchemy_lite
+
+fsa_lite: module("flask_sqlalchemy_lite") | ModulePlaceholder = proxy.fsa_lite
+
+new_fsa_lite: module("flask_sqlalchemy_lite") | True | False | None
+proxy.fsa_lite = new_fsa_lite
+```
+
+指向`flask_sqlalchemy_lite`的引用。
+
+该值可以被修改为`True`，`False`，或`None`。若修改为`True`，则会试图将该属性复原到本模块包刚完成加载后的状态。若修改为`False`或`None`，则该属性会变更为占位符。

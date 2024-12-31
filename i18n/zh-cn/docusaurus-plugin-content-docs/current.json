@@ -1,0 +1,58 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.tutorial.category.Usages": {
+    "message": "用法",
+    "description": "The label for category Usages in sidebar tutorial"
+  },
+  "sidebar.tutorial.category.Usages.link.generated-index.title": {
+    "message": "如何使用Flask SQLAlchemy Compat",
+    "description": "The generated-index page title for category Usages in sidebar tutorial"
+  },
+  "sidebar.tutorial.category.Usages.link.generated-index.description": {
+    "message": "简明教程，展示从Flask SQLAlchemy迁移到此兼容包的方法。",
+    "description": "The generated-index page description for category Usages in sidebar tutorial"
+  },
+  "sidebar.tutorial.category.Examples": {
+    "message": "范例",
+    "description": "The label for category Examples in sidebar tutorial"
+  },
+  "sidebar.tutorial.category.Examples.link.generated-index.title": {
+    "message": "范例",
+    "description": "The generated-index page title for category Examples in sidebar tutorial"
+  },
+  "sidebar.tutorial.category.Examples.link.generated-index.description": {
+    "message": "针对范例代码的解读。",
+    "description": "The generated-index page description for category Examples in sidebar tutorial"
+  },
+  "sidebar.apis.category.auto": {
+    "message": "auto",
+    "description": "The label for category auto in sidebar apis"
+  },
+  "sidebar.apis.category.backdict": {
+    "message": "backdict",
+    "description": "The label for category backdict in sidebar apis"
+  },
+  "sidebar.apis.category.backends": {
+    "message": "backends",
+    "description": "The label for category backends in sidebar apis"
+  },
+  "sidebar.apis.category.flask_sa_api": {
+    "message": "flask_sa_api",
+    "description": "The label for category flask_sa_api in sidebar apis"
+  },
+  "sidebar.apis.category.flask_sa_lite_api": {
+    "message": "flask_sa_lite_api",
+    "description": "The label for category flask_sa_lite_api in sidebar apis"
+  },
+  "sidebar.apis.category.protocols": {
+    "message": "protocols",
+    "description": "The label for category protocols in sidebar apis"
+  },
+  "sidebar.apis.category.utilities": {
+    "message": "utilities",
+    "description": "The label for category utilities in sidebar apis"
+  }
+}

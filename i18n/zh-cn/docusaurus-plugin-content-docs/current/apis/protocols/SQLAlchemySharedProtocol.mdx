@@ -1,0 +1,34 @@
+---
+id: SQLAlchemySharedProtocol
+title: SQLAlchemySharedProtocol
+sidebar_label: SQLAlchemySharedProtocol
+slug: /apis/protocols/SQLAlchemySharedProtocol
+description: 同时和Flask SQLAlchemy、Flask SQLAlchemy Lite兼容的协议。
+---
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar
+  type="type"
+  isPrivate={true}
+  source="protocols.SQLAlchemySharedProtocol"
+/>
+
+```python
+db: SQLAlchemySharedProtocol
+```
+
+同时和Flask SQLAlchemy、Flask SQLAlchemy Lite兼容的协议。
+
+该协议仅仅实现了同时存在于`flask_sqlalchemy.SQLAlchemy`和`flask_sqlalchemy_lite.SQLAlchemy`的有限功能。由于该协议具备最小的涵盖范围，它可以用于广泛的目的。
+
+## 协议属性 {#protocol-properties}
+
+### <IconObjType type="param"/> `engine` {#-engine}
+
+```python
+db.engine: sa.engine.Engine
+```
+
+当前应用关联的默认engine。

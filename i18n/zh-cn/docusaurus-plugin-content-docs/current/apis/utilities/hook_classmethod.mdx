@@ -1,0 +1,105 @@
+---
+id: hook_classmethod
+title: hook_classmethod
+sidebar_label: hook_classmethod
+slug: /apis/utilities/hook_classmethod
+description: 针对类方法的钩子。
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.hook_classmethod" />
+
+```python
+hooked_method: Callable[P, T] = hook_classmethod[**P, _Type, T](
+    cls_method: Callable[P, T],
+    hook_before: Callable[Concatenate[_Type, P], None] | None = None,
+    hook_after: Callable[Concatenate[_Type, P], None] | None = None,
+)
+```
+
+针对类方法的钩子。
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+|     参数      |               类型               |               必选                | <center>说明</center>                                                                            |
+| :-----------: | :------------------------------: | :-------------------------------: | ------------------------------------------------------------------------------------------------ |
+| `cls_method`  |           `(**P) -> T`           | <InlineIcon icon={vsiCheckIcon}/> | 要钩入的类方法。该类方法是已经绑定后的版本，其中第一个参数`cls`已经隐含，且不存在于spec `P`中。 |
+| `hook_before` | `None \| ((_Type, **P) -> None)` |                                   | 在调用该类方法之前，要运行的钩子。                                                               |
+| `hook_after`  | `None \| ((_Type, **P) -> None)` |                                   | 在调用该类方法之后，要运行的钩子。                                                               |
+
+### 输出 {#returns}
+
+|      参数       |     类型     | <center>说明</center>                                    |
+| :-------------: | :----------: | :------------------------------------------------------- |
+| `hooked_method` | `(**P) -> T` | 添加了钩子后的类方法，其中第一个参数（类本身）是隐含的。 |
+
+## 范例 {#examples}
+
+### <IconObjType type="term"/> 钩入一个已经定义`__init_subclass__`的方法 {#-hook-a-class-with-&#95;&#95;init&#95;subclass&#95;&#95;-defined}
+
+<Tabs
+  defaultValue="codes"
+  values={[
+    { label: '代码', value: 'codes', },
+    { label: '结果', value: 'results', },
+  ]
+}>
+
+<TabItem value="codes">
+
+```python title="hook_init_subclass.py" showLineNumbers
+import flask_sqlalchemy_compat as fsc
+
+
+class ExampleBase:
+    test_val = 0
+
+    def __init_subclass__(cls) -> None:
+        cls.test_val = 1
+
+
+class ExampleA(ExampleBase):
+    pass
+
+
+def hook(cls: ExampleBase) -> None:
+    cls.test_val = 10
+
+
+ExampleBase.__init_subclass__ = fsc.utilities.hook_classmethod(
+    ExampleBase.__init_subclass__, hook_after=hook
+)
+
+
+class ExampleB(ExampleBase):
+    pass
+
+
+if __name__ == "__main__":
+    print("ExampleBase.test_val:", ExampleBase.test_val)
+    print("ExampleA.test_val:", ExampleA.test_val)
+    print("ExampleB.test_val:", ExampleB.test_val)
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```python
+ExampleBase.test_val: 0
+ExampleA.test_val: 1
+ExampleB.test_val: 10
+```
+
+</TabItem>
+
+</Tabs>

@@ -1,0 +1,64 @@
+---
+id: api-overview
+sidebar_label: 总览
+title: API总览
+description: 对所有API的总览。
+slug: /apis
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+import ThemedImage from "@theme/ThemedImage";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="package" source="." />
+
+本项目提供了针对[`flask_sqlalchemy`<IconExternalLink/>][link-fsa]和[`flask_sqlalchemy_lite`<IconExternalLink/>][link-fsa-lite]的兼容性支持。藉此以最小的修改，实现从其中之一向另一包的相互迁移。
+
+设计此包的主要目的，是因为`flask_sqlalchemy_lite`不支持`python<=3.8`。此包在`python<=3.8`时，透过`flask_sqlalchemy`实现了类似`flask_sqlalchemy_lite`的接口、并提供了相似的用法。因此，当用户需要兼容到低版本时，此包免去了维护两套代码的麻烦。
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="Docusaurus themed image"
+    sources={{
+      light: useBaseUrl("/img/overview-light.svg"),
+      dark: useBaseUrl("/img/overview-dark.svg"),
+    }}
+  />
+</div>
+
+上图展示了整个模块包的大体结构，其中只包含各个模块。
+
+## 模块 {#modules}
+
+|                                                    成员                                                    | <center>说明</center>                                            |
+| :--------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------- |
+|              [<IconObjType type="module" hasText={true} text="auto"/>](./apis/auto/index.mdx)              | 用来在兼容模式下构建`SQLAlchemy`扩展的方法。                     |
+|          [<IconObjType type="module" hasText={true} text="backdict"/>](./apis/backdict/index.mdx)          | 一个调整后的`dict`实现。                                         |
+|          [<IconObjType type="module" hasText={true} text="backends"/>](./apis/backends/index.mdx)          | `flask_sqlalchemy_compat`的后端引擎包。                          |
+|      [<IconObjType type="module" hasText={true} text="flask_sa_api"/>](./apis/flask_sa_api/index.mdx)      | 用来模拟`flask_sqlalchemy.SQLAlchemy()` API效果的代理封装。      |
+| [<IconObjType type="module" hasText={true} text="flask_sa_lite_api"/>](./apis/flask_sa_lite_api/index.mdx) | 用来模拟`flask_sqlalchemy_lite.SQLAlchemy()` API效果的代理封装。 |
+|         [<IconObjType type="module" hasText={true} text="protocols"/>](./apis/protocols/index.mdx)         | 该包定制的协议类型注解。                                         |
+|         [<IconObjType type="module" hasText={true} text="utilities"/>](./apis/utilities/index.mdx)         | 用来钩入原始`SQLAlchemy`扩展的额外功能。                       |
+
+## 别名 {#aliases}
+
+|                                         成员                                         | <center>别名取自</center>                                                                                 |
+| :----------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------- |
+|         <IconObjType type="type" hasText={true} text="SQLAlchemyProtocol"/>          | [`fsc.protocols.SQLAlchemyProtocol`](./apis/protocols/SQLAlchemyProtocol.mdx)                             |
+|       <IconObjType type="type" hasText={true} text="SQLAlchemyLiteProtocol"/>        | [`fsc.protocols.SQLAlchemyLiteProtocol`](./apis/protocols/SQLAlchemyLiteProtocol.mdx)                     |
+|            <IconObjType type="type" hasText={true} text="ModelProtocol"/>            | [`fsc.protocols.ModelProtocol`](./apis/protocols/ModelProtocol.mdx)                                       |
+|          <IconObjType type="class" hasText={true} text="TableNameGetter"/>           | [`fsc.utilities.TableNameGetter`](./apis/utilities/TableNameGetter.mdx)                                   |
+|            <IconObjType type="class" hasText={true} text="QueryGetter"/>             | [`fsc.utilities.QueryGetter`](./apis/utilities/QueryGetter.mdx)                                           |
+|          <IconObjType type="class" hasText={true} text="SQLAlchemyProxy"/>           | [`fsc.flask_sa_api.SQLAlchemyProxy`](./apis/flask_sa_api/SQLAlchemyProxy.mdx)                             |
+|        <IconObjType type="class" hasText={true} text="SQLAlchemyLiteProxy"/>         | [`fsc.flask_sa_lite_api.SQLAlchemyLiteProxy`](./apis/flask_sa_lite_api/SQLAlchemyLiteProxy.mdx)           |
+|         <IconObjType type="func" hasText={true} text="as_flask_sqlalchemy"/>         | [`fsc.flask_sa_api.as_flask_sqlalchemy`](./apis/flask_sa_api/as_flask_sqlalchemy.mdx)                     |
+|      <IconObjType type="func" hasText={true} text="as_flask_sqlalchemy_lite"/>       | [`fsc.flask_sa_lite_api.as_flask_sqlalchemy_lite`](./apis/flask_sa_lite_api/as_flask_sqlalchemy_lite.mdx) |
+|        <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy"/>         | [`fsc.auto.get_flask_sqlalchemy`](./apis/auto/get_flask_sqlalchemy.mdx)                                   |
+|   <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_proxy_ver"/>    | [`fsc.auto.get_flask_sqlalchemy_proxy_ver`](./apis/auto/get_flask_sqlalchemy_proxy_ver.mdx)               |
+|      <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite"/>      | [`fsc.auto.get_flask_sqlalchemy_lite`](./apis/auto/get_flask_sqlalchemy_lite.mdx)                         |
+| <IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite_proxy_ver"/> | [`fsc.auto.get_flask_sqlalchemy_lite_proxy_ver`](./apis/auto/get_flask_sqlalchemy_lite_proxy_ver.mdx)     |
+
+[link-fsa]: https://flask-sqlalchemy.palletsprojects.com
+[link-fsa-lite]: https://flask-sqlalchemy-lite.readthedocs.io

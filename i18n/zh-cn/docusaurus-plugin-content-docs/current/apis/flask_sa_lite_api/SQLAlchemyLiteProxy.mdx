@@ -1,0 +1,266 @@
+---
+id: SQLAlchemyLiteProxy
+title: SQLAlchemyLiteProxy
+sidebar_label: SQLAlchemyLiteProxy
+slug: /apis/flask_sa_lite_api/SQLAlchemyLiteProxy
+description: flask_sqlalchemy_lite.SQLAlchemy的代理类。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" source="flask_sa_lite_api.SQLAlchemyLiteProxy" />
+
+```python
+db_proxy = SQLAlchemyLiteProxy[_SQLAlchemyDB_co](
+    db: _SQLAlchemyLiteDB_co,
+)
+```
+
+`flask_sqlalchemy_lite.SQLAlchemy`的代理类。
+
+该类是针对普通版SQLAlchemy的封装。透过调整`flask_sqlalchemy.SQLAlchemy`，来模拟`flask_sqlalchemy_lite.SQLAlchemy`的用法。
+
+须知并非所有来自`flask_sqlalchemy_lite.SQLAlchemy`都能精准复刻。准确来说，该代理只完成了以下工作：
+
+- 像`flask_sqlalchemy_lite.SQLAlchemy`那样、提供一个普通的会话（session），该普通会话由该代理类的实例管理。
+- 提供`flask_sqlalchemy_lite.SQLAlchemy`的主要、基本的功能。用法完全等价，但具体的实现是透过`flask_sqlalchemy`完成的。
+- 任何无法复刻的功能，都会抛出`NotImplementedError`。
+
+## 别名 {#aliases}
+
+该类可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyLiteProxy
+fsc.flask_sa_lite_api.SQLAlchemyLiteProxy
+```
+
+## 参数 {#arguments}
+
+| 参数 |        类型        |               必选                | <center>说明</center>                                                                                                                                             |
+| :--: | :----------------: | :-------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `db` | `_SQLAlchemyDB_co` | <InlineIcon icon={vsiCheckIcon}/> | <p>用来导出session和engine实例的数据库扩展。</p><p>由`flask_sqlachemy`提供。封装该参数后，可以在参数来自非lite版的情况下、模拟`flask_sqlalchemy_lite`的行为。</p> |
+
+- 其中，`_SQLAlchemyDB_co`是[`fsc.protocols.SQLAlchemyProtocol`](../protocols/SQLAlchemyProtocol.mdx)的`TypeVar`。
+
+## 方法 {#methods}
+
+### <IconObjType type="method"/> `init_app` {#-init_app}
+
+```python
+db_proxy.init_app(
+    app: Flask,
+)
+```
+
+按照`Flask.config`创建engine，并将数据库扩展注册到应用中。
+
+#### 输入 {#requires}
+
+| 参数  |  类型   |               必选                | <center>说明</center>        |
+| :---: | :-----: | :-------------------------------: | ---------------------------- |
+| `app` | `Flask` | <InlineIcon icon={vsiCheckIcon}/> | The application to register. |
+
+---
+
+### <IconObjType type="method"/> `get_engine` {#-get_engine}
+
+```python
+db_proxy.get_engine(
+    name: str = "default"
+)
+```
+
+获取当前应用关联的某个engine。
+
+属性`engine`可用来获取默认engine，其实现可视为该方法无参调用的语法糖。
+
+#### 输入 {#requires-1}
+
+|  参数  | 类型  | 必选 | <center>说明</center> |
+| :----: | :---: | :--: | --------------------- |
+| `name` | `str` |      | engine的名字。       |
+
+#### 输出 {#returns}
+
+|   参数   |        类型        | <center>说明</center>     |
+| :------: | :----------------: | :------------------------ |
+| `engine` | `sa.engine.Engine` | 按照名字获取到的engine。 |
+
+---
+
+### <IconObjType type="method"/> `get_session` {#-get_session}
+
+```python
+sess: sa.orm.Session = db_proxy.get_session(
+    name: str = "default"
+)
+```
+
+创建一个`sa.orm.Session`，并预定在离开应用上下文时关闭它。在同一应用上下文内、以相同的参数、反复调用该方法，将会返回同一会话。
+
+属性`session`可用来获取默认会话，其实现可视为该方法无参调用的语法糖。
+
+#### 输入 {#requires-2}
+
+|  参数  | 类型  | 必选 | <center>说明</center>    |
+| :----: | :---: | :--: | ------------------------ |
+| `name` | `str` |      | 用来寄存会话的独一名称。 |
+
+#### 输出 {#returns-1}
+
+|  参数  |       类型       | <center>说明</center>  |
+| :----: | :--------------: | :--------------------- |
+| `sess` | `sa.orm.Session` | 按照名字获取到的会话。 |
+
+---
+
+### <IconObjType type="method"/> `get_async_engines` {#-get_async_engines}
+
+```python
+db_proxy.get_async_engines(*args: Any, **kwargs: Any)
+```
+
+:::danger
+
+该代理类并未实现该方法。
+
+:::
+
+---
+
+### <IconObjType type="method"/> `get_async_session` {#-get_async_session}
+
+```python
+db_proxy.get_async_session(*args: Any, **kwargs: Any)
+```
+
+:::danger
+
+该代理类并未实现该方法。
+
+:::
+
+## 属性 {#properties}
+
+### <IconObjType type="param"/> `db` {#-db}
+
+```python
+db: _SQLAlchemyDB_co = db_proxy.db
+```
+
+Flask SQLAlchemy Lite扩展所提供的`db`实例。
+
+---
+
+### <IconObjType type="param"/> `sessionmaker` {#-sessionmaker}
+
+```python
+sessionmaker: sa.orm.sessionmaker[sa.orm.Session] = db_proxy.sessionmaker
+```
+
+和`flask_sqlalchemy_lite.SQLAlchemy().sessionmaker`相同。
+
+当前应用所设置的会话工厂类，可直接用来创建会话。但须知透过这种方式创建的会话、不会在离开应用上下文时、自动关闭。若需要该功能，建议使用`session`或`get_session`。
+
+此工厂类亦可用于在`self.init_app`之后更新会话选项。具体的做法时调用它的`sa.orm.sessionmaker.configure`方法。
+
+---
+
+### <IconObjType type="param"/> `session` {#-session}
+
+```python
+sess: sa.orm.Session = db_proxy.session
+```
+
+和`flask_sqlalchemy_lite.SQLAlchemy().session`相同。
+
+当前应用的默认会话。在离开应用上下文时、自动关闭。
+
+---
+
+### <IconObjType type="param"/> `engines` {#-engines}
+
+```python
+engines: dict[str, sa.engine.Engine] = db_proxy.engines
+```
+
+和`flask_sqlalchemy_lite.SQLAlchemy().engines`相同。
+
+这是注册在该扩展内的所有具名engine构成的字典。
+
+---
+
+### <IconObjType type="param"/> `engine` {#-engine}
+
+```python
+engine: sa.engine.Engine = db_proxy.engine
+```
+
+和`flask_sqlalchemy_lite.SQLAlchemy().engine`相同。
+
+当前应用关联的默认engine。
+
+---
+
+### <IconObjType type="param"/> `async_engines` {#-async_engines}
+
+```python
+db_proxy.async_engines
+```
+
+:::danger
+
+该代理类并未实现该属性。
+
+:::
+
+---
+
+### <IconObjType type="param"/> `async_engine` {#-async_engine}
+
+```python
+db_proxy.async_engine
+```
+
+:::danger
+
+该代理类并未实现该属性。
+
+:::
+
+---
+
+### <IconObjType type="param"/> `async_sessionmaker` {#-async_sessionmaker}
+
+```python
+db_proxy.async_sessionmaker
+```
+
+:::danger
+
+该代理类并未实现该属性。
+
+:::
+
+---
+
+### <IconObjType type="param"/> `async_session` {#-async_session}
+
+```python
+db_proxy.async_session
+```
+
+:::danger
+
+该代理类并未实现该属性。
+
+:::

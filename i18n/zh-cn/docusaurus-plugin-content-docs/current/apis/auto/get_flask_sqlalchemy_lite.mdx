@@ -1,0 +1,65 @@
+---
+id: get_flask_sqlalchemy_lite
+title: get_flask_sqlalchemy_lite
+sidebar_label: get_flask_sqlalchemy_lite
+slug: /apis/auto/get_flask_sqlalchemy_lite
+description: 在兼容前提下，获取Flask SQLAlchemy Lite数据库扩展实例。
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" source="auto.get_flask_sqlalchemy_lite" />
+
+```python
+(
+    db: flask_sqlalchemy_lite.SQLAlchemy,
+    model_class: type[_ModelLite],
+) = get_flask_sqlalchemy_lite[_ModelLite](
+    model_class: type[_ModelLite],
+    app: Flask | None = None,
+    engine_options: Mapping[str, Any] | None = None,
+    session_options: Mapping[str, Any] | None = None,
+)
+```
+
+在兼容前提下，获取Flask SQLAlchemy Lite数据库扩展实例。
+
+该方法将试图获取`flask_sqlalchemy_lite.SQLAlchemy`数据库扩展对象。若失败（所依赖的包未安装），则退回到使用`flask_sqlalchemy.SQLAlchemy`模拟`flask_sqlalchemy_lite.SQLAlchemy`接口的做法。
+
+## 别名 {#aliases}
+
+该函数可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.get_flask_sqlalchemy_lite
+fsc.auto.get_flask_sqlalchemy_lite
+```
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+|       参数        |            类型             |               必选                | <center>说明</center>                                                                                                                                                                                                      |
+| :---------------: | :-------------------------: | :-------------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   `model_class`   |     `type[_ModelLite]`      | <InlineIcon icon={vsiCheckIcon}/> | 应用到整个数据库的基础ORM模型类型。若`flask_sqlalchemy_lite`可用，该类型将会直接按原样传递到输出，且不作任何改动。不过，若数据库对象退回到了`flask_sqlalchemy`提供的版本，该类型则仅用于创建数据库扩展所持有的模型类型。 |
+|       `app`       |       `Flask \| None`       |                                   | 向该Flask应用调用`init_app`方法。若未指定该值，则不会调用`init_app`。                                                                                                                                                    |
+| `engine_options`  | `Mapping[str, Any] \| None` |                                   | 该配置将会在创建每个引擎时，传递给构造函数`sqlalchemy.create_engine`。                                                                                                                                                     |
+| `session_options` | `Mapping[str, Any] \| None` |                                   | 用来配置`sessionmaker`的参数。                                                                                                                                                                                             |
+
+- 其中，`_ModelLite`是`sa.orm.DeclarativeBase`的`TypeVar`。
+
+### 输出 {#returns}
+
+|     参数      |                类型                | <center>说明</center>                                                                                                                                                                                                                                                                                                                                                                                     |
+| :-----------: | :--------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     `db`      | `flask_sqlalchemy_lite.SQLAlchemy` | <p>SQLAlchemy Lite扩展实例。当所需的包可用时，该值将是`flask_sqlalchemy_lite.SQLAlchemy`的实例。</p><p>若缺少所需的包，会尝试返回[`SQLAlchemyLiteProxy[flask_sqlalchemy.SQLAlchemy]`](../flask_sa_lite_api/SQLAlchemyLiteProxy.mdx)实例。但这种情况下，返回值仍然会注解为`flask_sqlalchemy_lite.SQLAlchemy`。亦即是说，用户应当使用`flask_sqlalchemy_lite`开发代码，并将该返回值作为一个备选来处理。</p> |
+| `model_class` |         `type[_ModelLite]`         | <p>若`db`是`flask_sqlalchemy_lite.SQLAlchemy`，则直接返回`model_class`参数。</p><p>若`db`是`SQLAlchemyLiteProxy[flask_sqlalchemy.SQLAlchemy]`，则返回`db.Model`作为备选。</p>                                                                                                                                                                                                                             |

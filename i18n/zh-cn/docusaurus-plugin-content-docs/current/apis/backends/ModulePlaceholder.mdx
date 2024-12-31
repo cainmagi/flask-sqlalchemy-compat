@@ -1,0 +1,40 @@
+---
+id: ModulePlaceholder
+title: ModulePlaceholder
+sidebar_label: ModulePlaceholder
+slug: /apis/backends/ModulePlaceholder
+description: 占位符模块。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" isPrivate={true} source="backends.ModulePlaceholder" />
+
+```python
+bdict_view = ModulePlaceholder(
+    name: str,
+    doc: str | None = None
+)
+```
+
+占位符模块。
+
+在某个模块无法找到时，使用该模块作为占位符。在此情况下，占位符仍然能提供`__name__`属性，但无法提供`__spec__`属性。
+
+:::danger
+
+该类仅在内部使用。用户不应使用它。
+
+若用户希望检查某个模块是否是占位符，请使用[`fsc.backends.is_module_invalid`](./is_module_invalid.mdx)。
+
+:::
+
+## 参数 {#arguments}
+
+|  参数  |     类型      |               必选                | <center>说明</center>                  |
+| :----: | :-----------: | :-------------------------------: | -------------------------------------- |
+| `name` |     `str`     | <InlineIcon icon={vsiCheckIcon}/> | 模块名。该值会传递给基类`ModuleType`。 |
+| `doc`  | `str \| None` |                                   | 占位符模块的 docstring。               |

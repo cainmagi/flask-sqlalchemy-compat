@@ -1,0 +1,447 @@
+---
+id: flask-sqlalchemy-lite
+sidebar_label: 使用Lite版
+title: 使用Flask SQLAlchemy Lite
+description: 简明教程，展示了如何从flask-sqlalchemy-lite迁移到本项目。
+slug: /usages/flask-sqlalchemy-lite
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import {IconLinkInline} from "@site/src/components/IconLink";
+import {repoURL} from "@site/src/envs/variables";
+
+本指南展示了从`flask-sqlalchemy-lite`迁移到本项目的步骤。
+
+## 背景 {#background}
+
+假设你正在使用Flask SQLAlchemy Lite撰写代码。然而，现在、在一些旧的设备上，你必须支持`Python 3.7`或`Python 3.8`。以下代码可以作为一个完整的Flask项目的范例：
+
+<Tabs
+  defaultValue="app"
+  values={[
+    { label: 'app.py', value: 'app', },
+    { label: 'models.py', value: 'models', },
+    { label: 'base.py', value: 'base', },
+  ]
+}>
+
+<TabItem value="app">
+
+```python showLineNumbers title="app.py"
+import sqlalchemy as sa
+import flask
+from flask import request
+from werkzeug.exceptions import HTTPException
+
+from models import db, Base, Folder, Text
+
+
+def create_app() -> flask.Flask:
+    app = flask.Flask(__name__)
+
+    @app.route("/")
+    def index():
+        """主页，遍历所有文件夹数据项。"""
+        return {
+            "message": "找到了所有文件夹。",
+            "folders": [
+                {"id": folder.id, "title": folder.title}
+                for folder in db.session.scalars(sa.select(Folder).order_by(Folder.id))
+            ],
+        }
+
+    @app.route("/folder")
+    def folder():
+        """检索一个文件夹数据项，并返回其内含的所有文本项。"""
+        folder_id = request.args.get("id", None, int)
+        if folder_id is None:
+            return flask.abort(404, "未指定文件夹ID。")
+        folder = db.session.get(Folder, folder_id)
+        if folder is None:
+            return flask.abort(404, "未找到文件夹。")
+        return {
+            "message": "找到了文件夹内的文本项。",
+            "folder": folder.id,
+            "texts": [{"id": text.id, "title": text.title} for text in folder.texts],
+        }
+
+    @app.route("/text")
+    def text():
+        """检索一个文本数据项。"""
+        text_id = request.args.get("id", None, int)
+        if text_id is None:
+            return flask.abort(404, "未指定文本ID。")
+        text = db.session.get(Text, text_id)
+        if text is None:
+            return flask.abort(404, "未找到文本。")
+        return {
+            "message": "找到了文本。",
+            "id": text.id,
+            "title": text.title,
+            "text": text.text,
+        }
+
+    @app.errorhandler(HTTPException)
+    def handle_exception(exc: HTTPException):
+        """针对HTTP错误，返回JSON而非HTML。"""
+        response = flask.make_response(
+            {
+                "code": exc.code,
+                "name": exc.name,
+                "description": exc.description,
+            },
+            exc.code,
+            exc.get_headers(),
+        )
+        response.content_type = "application/json"
+        return response
+
+    return app
+
+
+def init_db_data() -> None:
+    Base.metadata.drop_all(db.engine)
+    Base.metadata.create_all(db.engine)
+
+    folder_1 = Folder(title="Folder 1")
+    folder_1.texts.append(Text(title="F1 Text 1", text="Lorem ipsum, ..."))
+    folder_1.texts.append(Text(title="F1 Text 2", text="dolor sit amet, ..."))
+    folder_1.texts.append(Text(title="F1 Text 3", text="consectetur adipiscing, ..."))
+    folder_1.texts.append(Text(title="F1 Text 4", text="elit, sed do eiusmod, ..."))
+    db.session.add(folder_1)
+
+    folder_2 = Folder(title="Folder 2")
+    folder_2.texts.append(Text(title="F2 Code", text="Code is 0887967868"))
+    folder_2.texts.append(Text(title="F2 Report", text="The report of the ..."))
+    db.session.add(folder_2)
+
+    db.session.commit()
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.config.update({"SQLALCHEMY_ENGINES": {"default": "sqlite://"}})
+    db.init_app(app)
+
+    with app.app_context():
+        init_db_data()
+    app.run(host="127.0.0.1", port=8080)
+```
+
+</TabItem>
+
+<TabItem value="models">
+
+```python showLineNumbers title="models.py"
+from typing import Optional
+
+try:
+    from typing import List
+except ImportError:
+    from builtins import list as List
+
+import sqlalchemy as sa
+import sqlalchemy.orm as sa_orm
+
+from base import Base, db
+
+
+__all__ = ("db", "Base", "Text", "Folder")
+
+
+class Text(Base):
+    __tablename__ = "text"
+    id: sa_orm.Mapped[int] = sa_orm.mapped_column(init=False, primary_key=True)
+    title: sa_orm.Mapped[str] = sa_orm.mapped_column()
+    text: sa_orm.Mapped[str] = sa_orm.mapped_column(sa.Text, deferred=True)
+
+    folder_id: sa_orm.Mapped[Optional[int]] = sa_orm.mapped_column(
+        sa.ForeignKey("folder.id"), default=None, nullable=True
+    )
+    folder: sa_orm.Mapped[Optional["Folder"]] = sa_orm.relationship(default=None)
+
+
+class Folder(Base):
+    __tablename__ = "folder"
+    id: sa_orm.Mapped[int] = sa_orm.mapped_column(init=False, primary_key=True)
+    title: sa_orm.Mapped[str] = sa_orm.mapped_column()
+    texts: sa_orm.Mapped[List[Text]] = sa_orm.relationship(
+        default_factory=list, back_populates="folder"
+    )
+```
+
+</TabItem>
+
+<TabItem value="base">
+
+```python showLineNumbers title="base.py"
+import sqlalchemy.orm as sa_orm
+from sqlalchemy.pool import StaticPool
+
+from flask_sqlalchemy_lite import SQLAlchemy
+
+
+__all__ = ("Base", "db")
+
+
+class Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+    pass
+
+
+engine_options = {
+    "connect_args": {"check_same_thread": False},
+    "poolclass": StaticPool,
+}
+
+db = SQLAlchemy(engine_options=engine_options)
+```
+
+</TabItem>
+
+</Tabs>
+
+该应用会在内存里维护一个范例数据库，并提供用来检索范例数据的一些API。例如，当程序正在运行之时，
+
+<Tabs
+  defaultValue="addr"
+  values={[
+    { label: '地址', value: 'addr', },
+    { label: '响应', value: 'resp', },
+  ]
+}>
+
+<TabItem value="addr">
+
+访问以下地址：
+
+```text
+http://127.0.0.1:8080/folder?id=1
+```
+
+将检索`Folder`类型、`id=1`的数据项。所有属于该文件夹下的文字数据项亦都会展示。
+
+</TabItem>
+
+<TabItem value="resp">
+
+浏览器返回的响应应当如下：
+
+```json
+{
+  "folder": 1,
+  "message": "找到了文件夹内的文本项。",
+  "texts": [
+    {
+      "id": 1,
+      "title": "F1 Text 1"
+    },
+    {
+      "id": 2,
+      "title": "F1 Text 2"
+    },
+    {
+      "id": 3,
+      "title": "F1 Text 3"
+    },
+    {
+      "id": 4,
+      "title": "F1 Text 4"
+    }
+  ]
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+下一步是检查文本项的详情。
+
+<Tabs
+  defaultValue="addr"
+  values={[
+    { label: '地址', value: 'addr', },
+    { label: '响应', value: 'resp', },
+  ]
+}>
+
+<TabItem value="addr">
+
+访问以下地址：
+
+```text
+http://127.0.0.1:8080/text?id=1
+```
+
+将检索`Text`类型、`id=1`的数据项。该数据项已经列出在上一个响应的内容里。
+
+</TabItem>
+
+<TabItem value="resp">
+
+
+浏览器返回的响应应当如下：
+
+```json
+{
+  "id": 1,
+  "message": "找到了文本。",
+  "text": "Lorem ipsum, ...",
+  "title": "F1 Text 1"
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+## 扩展兼容性到`Python<3.9` {#extend-the-compatibility-to-python39}
+
+迁移到本项目，将使得以上代码可以在`Python 3.7`和`3.8`使用。所要做的修改非常简单。唯一需要改动之处是`base.py`，参见以下代码：
+
+<div className="code-diff-move">
+
+```python title="base.py"
+import sqlalchemy.orm as sa_orm
+from sqlalchemy.pool import StaticPool
+
+# diff-remove-next-line
+from flask_sqlalchemy_lite import SQLAlchemy
+# diff-add-next-line
+import flask_sqlalchemy_compat as fsc
+
+
+__all__ = ("Base", "db")
+
+
+# diff-remove-next-line
+class Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+# diff-add-next-line
+class _Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+    pass
+
+
+engine_options = {
+    "connect_args": {"check_same_thread": False},
+    "poolclass": StaticPool,
+}
+
+# diff-remove-next-line
+db = SQLAlchemy(engine_options=engine_options)
+# diff-add-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite(_Base, engine_options=engine_options)
+```
+
+</div>
+
+此处作出的主要改动，是令`db`和`Base`由工厂函数[`fsc.get_flask_sqlalchemy_lite`](../../apis/auto/get_flask_sqlalchemy_lite.mdx)给定。该函数的第一个输入值，是原始的基ORM模型。
+
+若`flask_sqlalchemy_lite`已经安装，则该函数不会产生任何实际效果。换言之，`db`将与调用`flask_sqlalchemy_lite.SQLAlchemy()`构建的对象相同，且返回值`Base`和输入`_Base`是同一对象。
+
+不过，若`flask_sqlalchemy_lite`未安装，则该函数会试图寻找`flask_sqlalchemy`，并使用`flask_sqlalchemy`模拟`flask_sqlalchemy_lite`的行为。在此情况下，`db`将实际由`flask_sqlalchemy.SQLAlchemy()`驱动，且`Base`将与`_Base`不同，因为该值实际上由`SQLAlchemy().Model`提供。
+
+:::note
+
+注意，兼容模式只会在`flask_sqlalchemy_lite`未安装时生效。
+
+:::
+
+## 显式使用`flask-sqlalchemy`模拟`flask-sqlalchemy-lite` {#explicitly-use-flask-sqlalchemy-to-mimic-flask-sqlalchemy-lite}
+
+上一节展示了`fsc.get_flask_sqlalchemy_lite(...)`的用法。在Lite版未安装时，该方法会自动切换到Flask SQLAlchemy。然而，在某些情况下，用户可能会需要刻意地使用Flask SQLAlchemy来模拟Flask SQLAlchemy Lite的行为。在此情形下，上述的脚本可以修改如下：
+
+<div className="code-diff-move">
+
+```python title="base.py"
+import sqlalchemy.orm as sa_orm
+from sqlalchemy.pool import StaticPool
+
+# diff-remove-next-line
+from flask_sqlalchemy_lite import SQLAlchemy
+# diff-add-next-line
+from flask_sqlalchemy import SQLAlchemy
+# diff-add-next-line
+import flask_sqlalchemy_compat as fsc
+
+__all__ = ("Base", "db")
+
+
+# diff-remove-next-line
+class Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+# diff-add-next-line
+class _Base(sa_orm.MappedAsDataclass, sa_orm.DeclarativeBase):
+    pass
+
+
+engine_options = {
+    "connect_args": {"check_same_thread": False},
+    "poolclass": StaticPool,
+}
+
+# diff-remove-next-line
+db = SQLAlchemy(engine_options=engine_options)
+# diff-add-start
+db = fsc.as_flask_sqlalchemy_lite(
+    db=SQLAlchemy(model_class=_Base, engine_options=engine_options),
+)
+Base = db.Model
+# diff-add-end
+```
+
+</div>
+
+在此情形下，数据库扩展`db`将会注解为[`fsc.SQLAlchemyLiteProxy`](../../apis/flask_sa_lite_api/SQLAlchemyLiteProxy.mdx)。这是用来提供`flask_sqlalchemy_lite.SQLAlchemy()`的API的、一个针对`flask_sqlalchemy.SQLAlchemy()`的封装。
+
+:::info
+
+使用`fsc.get_flask_sqlalchemy_lite(...)`隐含了”用户正在使用`flask_sqlalchemy_lite.SQLAlchemy()`开发代码”的背景信息。因此，即使`flask_sqlalchemy_lite`并未安装，该函数的返回值也总是注解为`flask_sqlalchemy_lite.SQLAlchemy()`。未安装`flask_sqlalchemy_lite`时，`fsc.get_flask_sqlalchemy_lite(...)`的注解当然不会工作，但那并不产生什么实际影响，因为未安装`flask_sqlalchemy_lite`的环境、并非是用来开发代码的环境。在运行时，该函数的返回值能自动退到`fsc.as_flask_sqlalchemy_lite(...)`的返回值。
+
+:::
+
+:::warning
+
+兼容模式下，回退的封装`fsc.SQLAlchemyLiteProxy`不能提供`flask_sqlalchemy_lite.SQLAlchemy()`的全部特性。目前，以下的功能还未得到支持。若其中某些功能是你目前急需的，请<IconLinkInline text="报告问题" href={repoURL("issues/new?assignees=&labels=enhancement%2Cto+be+solved&projects=&template=feature_request.yml&title=%5BFeature%5D")}/>。
+
+- 异步engine和异步session。
+
+这些未支持的功能可以在`flask_sqlalchemy_lite`中使用，但若是退化到`flask_sqlalchemy`驱动的`fsc.SQLAlchemyLiteProxy`，则不会工作。
+
+:::
+
+## 显式地将扩展标记成兼容版本 {#explicitly-notate-the-extension-by-the-compatible-version}
+
+如上文所述，即使后端的包不可用，`fsc.get_flask_sqlalchemy_lite(...)`也总是注解为`flask_sqlalchemy_lite.SQLAlchemy()`。如果用户想要在开发者环境里、了解兼容模式下确切的行为，这就有可能不是一个较好的选择。例如，用户可能需要知道，哪些API在兼容模式下可能会引发异常。在此情形下，推荐将用来获取扩展的函数暂时修改为`_proxy_ver(...)`。
+
+<div className="code-diff-move">
+
+```python
+# diff-remove-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite(Base, engine_options=engine_options)
+# diff-add-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite_proxy_ver(Base, engine_options=engine_options)
+```
+
+</div>
+
+该修改在运行时下不会产生任何效果。改动唯一的效果是、即使`db`已经是`flask_sqlalchemy_lite.SQLAlchemy()`对象，其也会总是注解为`fsc.SQLAlchemyLiteProxy`。假设用户使用了不支持的功能，例如`db.async_session(...)`，切换到该注解将有助于静态类型检查器立刻发现不支持的方法。
+
+## 禁用一种后端 {#disable-a-backend}
+
+设若用户同时安装了`flask_sqlalchemy_lite`和`flask_sqlalchemy`，那就有可能需要在`flask_sqlalchemy_lite`存在的情况下，测试`fsc.get_flask_sqlalchemy_lite(...)`的兼容模式行为。在此情形下，用户可以按照下例、全局地关闭`flask_sqlalchemy_lite`的支持：
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+# 令`flask_sqlalchemy_lite`在`fsc`中不可见。
+fsc.backends.proxy.fsa_lite = None
+```
+
+该设置需要在调用`fsc.get_flask_sqlalchemy_lite(...)`之前完成。这会使得`flask_sqlalchemy_lite`在`fsc`中不可见，从而使得`fsc.get_flask_sqlalchemy_lite(...)`强行退到兼容模式下。
+
+:::danger
+
+倘若Flask SQLAlchemy和Flask SQLAlchemy Lite都没有安装，则不可以使用`fsc.get_flask_sqlalchemy_lite(...)`。因此，假使环境中只安装了Flask SQLAlchemy Lite，将其标记为不可见、将会导致`fsc.get_flask_sqlalchemy_lite(...)`抛出`ModuleNotFoundError`。
+
+:::

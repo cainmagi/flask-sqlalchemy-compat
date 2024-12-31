@@ -1,0 +1,210 @@
+---
+id: introduction
+title: 简介
+description: 介绍Flask SQLAlchemy Compat。Flask SQLAlchemy Compat是用来增强Flask SQLAlchemy和Flask SQLAlchemy Lite兼容性的包。
+slug: /
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import octClock16 from "@iconify-icons/octicon/clock-16";
+import octLaw16 from "@iconify-icons/octicon/law-16";
+import octRepoForked16 from "@iconify-icons/octicon/repo-forked-16";
+import octShareAndroid16 from "@iconify-icons/octicon/share-android-16";
+import octiconShield16 from "@iconify-icons/octicon/shield-16";
+
+import {rawURL, repoURL, demoURL} from "@site/src/envs/variables";
+import DarkButton from "@site/src/components/DarkButton";
+
+本项目提供了针对`flask_sqlalchemy`和`flask_sqlalchemy_lite`的兼容性支持。藉此以最小的修改，实现从其中之一向另一包的相互迁移。
+
+适用场景如下：
+
+* 令使用`flask_sqlitealchemy_lite`的代码支持到`Python 3.7~3.8`：
+
+  设计此包的主要目的，是因为`flask_sqlalchemy_lite`不支持`python<=3.8`。此包在`python<=3.8`时，透过`flask_sqlalchemy`实现了类似`flask_sqlalchemy_lite`的接口、并提供了相似的用法。因此，当用户需要兼容到低版本时，此包免去了维护两套代码的麻烦。
+
+* 在使用`flask_sqlalchemy_lite`时，仍需使用`flask_sqlalchemy`的API：
+
+  相比`flask_sqlalchemy_lite`，历史更久的`flask_sqlalchemy`支持更多的功能。由于这些功能大多用来撰写老旧风格的代码，在`flask_sqlalchemy_lite`就不再得到支持。然而，若用户想要从`flask_sqlalchemy`迁移到`flask_sqlalchemy_lite`，又不愿修改过多的代码，此包就可以作为一个可用方案。
+
+* 在`Python 3.7`的环境下，仍需使用`sqlalchemy>=2.0.0`提供的`sa.orm.DeclarativeBase`功能：
+
+  SQLAlchemy 2代码风格提供了`sa.orm.DeclarativeBase`和`sa.orm.Mapped`。这些用法本身是支持`Python 3.7`的。然而，`flask_sqlalchemy`对`Python 3.7`支持的最高版本仅到`3.0.5`，并且不支持`DeclarativeBase`的功能。此项目提供了一个`flask_sqlalchemy`的兼容版本，允许用户在`Python 3.7`的前提下，使用`DeclarativeBase`。
+
+## 用法 {#usage}
+
+<Tabs
+  defaultValue="fsa-lite"
+  values={[
+    { label: 'Flask SQLAlchemy Lite', value: 'fsa-lite', },
+    { label: 'Flask SQLAlchemy', value: 'fsa', },
+  ]
+}>
+
+<TabItem value="fsa-lite">
+
+当你主要使用`flask_sqlalchemy_lite`时，以下代码可以帮助你的代码，在`flask_sqlalchemy_lite`未安装、而`flask_sqlalchemy`又安装了的情况下，退到兼容模式。
+
+```python showLineNumbers title="use_flask_sqlalchemy_lite_style.py"
+import sqlalchemy as sa
+import sqlalchemy.orm as sa_orm
+import flask_sqlalchemy_compat as fsc
+
+
+class _Base(sa_orm.DeclarativeBase): ...
+
+
+# highlight-next-line
+db, Base = fsc.get_flask_sqlalchemy_lite(_Base)
+
+
+class NewModel(Base):
+    __tablename__ = "new_model"
+
+    id: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
+    name: sa_orm.Mapped[str] = sa_orm.mapped_column()
+
+
+if __name__ == "__main__":
+    import os
+    import flask
+
+    app = flask.Flask(__name__, instance_path=os.path.abspath("./instance"))
+    app.config.update({"SQLALCHEMY_ENGINES": {"default": "sqlite:///main.db"}})
+    db.init_app(app)
+
+    with app.app_context():
+        Base.metadata.create_all(db.engine)
+
+        db.session.add(NewModel(name="new"))
+        db.session.commit()
+
+        model = db.session.scalar(sa.select(NewModel))
+        print(model.id, model.name) if model is not None else print("NOT FOUND.")
+```
+
+这意味着，只要你安装了`flask_sqlalchemy`，即使你没有安装`flask_sqlalchemy_lite`，以上代码仍然能正常工作。
+
+</TabItem>
+
+<TabItem value="fsa">
+
+类似地，下例则是为`flask_sqlalchemy`所写。其会在`flask-sqlalchemy`未安装、但`flask-sqlalchemy_lite`已安装时，退到兼容模式。
+
+```python showLineNumbers title="use_flask_sqlalchemy_style.py"
+import sqlalchemy as sa
+import sqlalchemy.orm as sa_orm
+import flask_sqlalchemy_compat as fsc
+
+
+class _Base(sa_orm.DeclarativeBase): ...
+
+
+# highlight-next-line
+db = fsc.get_flask_sqlalchemy(_Base)
+
+
+class NewModel(db.Model):
+    id: sa_orm.Mapped[int] = sa_orm.mapped_column(primary_key=True)
+    name: sa_orm.Mapped[str] = sa_orm.mapped_column()
+
+
+if __name__ == "__main__":
+    import os
+    import flask
+
+    app = flask.Flask(__name__, instance_path=os.path.abspath("./instance"))
+    app.config.update({"SQLALCHEMY_DATABASE_URI": "sqlite:///main.db"})
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
+        # 诚然，flask-sqlalchemy直到`3.1.x`、还存在类型标记错误。
+        # 但这并不妨碍运行时的表现。参见
+        # https://github.com/pallets-eco/flask-sqlalchemy/issues/1312
+        # error-mark-next-line
+        db.session.add(NewModel(name="new"))
+        db.session.commit()
+
+        model = db.session.scalar(sa.select(NewModel))
+        print(model.id, model.name) if model is not None else print("NOT FOUND.")
+```
+
+若你并未安装`flask_sqlalchemy`、却安装了`flask_sqlalchemy_lite`，以上范例代码仍然能正常工作。
+
+</TabItem>
+
+</Tabs>
+
+## 鸣谢 {#acknowledgements}
+
+- [Pallets-Eco/Flask-SQLAlchemy-Lite<IconExternalLink/>][git-fsa-lite]：新的、Flask的SQLAlchemy扩展。仅支持`Python>=3.9`。
+- [Pallets-Eco/Flask-SQLAlchemy<IconExternalLink/>][git-fsa]：旧的、Flask的SQLAlchemy扩展。
+- [SQLAlchemy/SQLAlchemy<IconExternalLink/>][git-sqla]：SQL工具箱、以及对象关系映射引擎。
+
+## 相关材料 {#related-materials}
+
+更新手记：
+
+<p>
+  {
+    <DarkButton href={repoURL("blob/main/Changelog.md")} icon={octClock16}>
+      更新手记
+    </DarkButton>
+  }
+</p>
+
+本项目的许可证：
+
+<p>
+  {
+    <DarkButton href={repoURL("blob/main/LICENSE")} icon={octLaw16}>
+      MIT协议
+    </DarkButton>
+  }
+</p>
+
+合作与贡献指南：
+
+<p>
+  {
+    <DarkButton
+      href={repoURL("blob/main/CONTRIBUTING.md")}
+      icon={octRepoForked16}
+    >
+      贡献本项目
+    </DarkButton>
+  }
+</p>
+
+贡献者利用规约：
+
+<p>
+  {
+    <DarkButton
+      href={repoURL("blob/main/CODE_OF_CONDUCT.md")}
+      icon={octShareAndroid16}
+    >
+      利用规约
+    </DarkButton>
+  }
+</p>
+
+漏洞防治与安全策略：
+
+<p>
+  {
+    <DarkButton href={repoURL("blob/main/SECURITY.md")} icon={octiconShield16}>
+      安全策略
+    </DarkButton>
+  }
+</p>
+
+[git-fsa]: https://github.com/pallets-eco/flask-sqlalchemy
+[git-fsa-lite]: https://github.com/pallets-eco/flask-sqlalchemy-lite
+[git-sqla]: https://github.com/sqlalchemy/sqlalchemy

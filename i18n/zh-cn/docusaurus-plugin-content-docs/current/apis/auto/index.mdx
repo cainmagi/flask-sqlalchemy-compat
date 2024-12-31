@@ -1,0 +1,26 @@
+---
+id: index
+title: auto
+sidebar_label: auto
+slug: /apis/auto
+description: 用来在兼容模式下构建SQLAlchemy扩展的方法。
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="auto" />
+
+用来在兼容模式下构建`SQLAlchemy`扩展的方法。透过自动回退机制、实现兼容性。例如：
+
+1. `get_flask_sqlalchemy_lite(...)`是用来返回`flask_sqlalchemy_lite.SQLAlchemy()`数据库扩展对象的方法。
+2. 若`flask_sqlalchemy_lite`未安装、但`flask_sqlalchemy`已安装，则返回由`flask_sqlalchemy.SQLAlchemy()`驱动的一个数据库扩展对象。该扩展经过了用来模拟`flask_sqlalchemy_lite.SQLAlchemy()`行为的封装。
+3. 若`flask_sqlalchemy`和`flask_sqlalchemy_lite`均未安装，抛出`ModuleNotFoundError`。
+
+## 函数 {#functions}
+
+|                                                               成员                                                                | <center>说明</center>                                     |
+| :-------------------------------------------------------------------------------------------------------------------------------: | --------------------------------------------------------- |
+|           [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite"/>](./get_flask_sqlalchemy_lite.mdx)           | 在兼容前提下，获取Flask SQLAlchemy Lite数据库扩展实例。 |
+| [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_lite_proxy_ver"/>](./get_flask_sqlalchemy_lite_proxy_ver.mdx) | `get_flask_sqlalchemy_lite`注解为代理的版本。             |
+|                [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy"/>](./get_flask_sqlalchemy.mdx)                | 在兼容前提下，获取Flask SQLAlchemy数据库扩展实例。       |
+|      [<IconObjType type="func" hasText={true} text="get_flask_sqlalchemy_proxy_ver"/>](./get_flask_sqlalchemy_proxy_ver.mdx)      | `get_flask_sqlalchemy`注解为代理的版本。                  |

@@ -1,0 +1,519 @@
+---
+id: SQLAlchemyProxy
+title: SQLAlchemyProxy
+sidebar_label: SQLAlchemyProxy
+slug: /apis/flask_sa_api/SQLAlchemyProxy
+description: flask_sqlalchemy.SQLAlchemy的代理类。
+---
+
+import IconExternalLink from "@theme/Icon/ExternalLink";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="class" source="flask_sa_api.SQLAlchemyProxy" />
+
+```python
+db_proxy = SQLAlchemyProxy[_SQLAlchemyLiteDB_co, _ModelLite_co](
+    db: _SQLAlchemyLiteDB_co,
+    model_class: type[_ModelLite_co],
+)
+```
+
+`flask_sqlalchemy.SQLAlchemy`的代理类。
+
+该类是针对SQLAlchemy-Lite的封装。透过调整`flask_sqlalchemy_lite.SQLAlchemy`，来模拟`flask_sqlalchemy.SQLAlchemy`的用法。
+
+须知并非所有来自`flask_sqlalchemy.SQLAlchemy`都能精准复刻。准确来说，该代理只完成了以下工作：
+
+- 按照给定的初始化参数`model_class`，提供一个`Model`类，其`__tablename__`属性可以从`model_class`自动推断。
+- 提供一个假的`Query`类。该`Query`类其实就是[`sqlalchemy.orm.Query`<IconExternalLink/>][link-saorm-query]。换言之，其不会提供任何额外的功能。
+- 提供一个假的`Table`类。这个假类实质上是一个创建[`sqlalchemy.Table`<IconExternalLink/>][link-sa-table]实例的工厂函数。使用该函数的好处是，用户可以略过提供`metadata`的步骤。
+- 像`flask_sqlalchemy.SQLAlchemy`那样，提供一个域内会话（scoped session）。该域内会话由该代理类的实例直接管理。
+- 提供`flask_sqlalchemy.SQLAlchemy`的主要、基本的功能。用法完全等价，但具体的实现是透过`flask_sqlalchemy_lite`完成的。
+- 任何无法复刻的功能，都会抛出`NotImplementedError`。
+
+若用户希望从Flask SQLAlchemy迁移到Flask SQLAlchemy-Lite，又不想过多地改动与对象关系映射（ORM）有关的代码，则可以考虑使用该封装。还有一种可用的场景，是用户主要使用Flask SQLAlchemy开发、却需要在某些特殊的部署条件下，使用Flask SQLAlchemy Lite。
+
+## 别名 {#aliases}
+
+该类可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.SQLAlchemyProxy
+fsc.flask_sa_api.SQLAlchemyProxy
+```
+
+## 参数 {#arguments}
+
+|     参数      |          类型          |               必选                | <center>说明</center>                                                                                                                                               |
+| :-----------: | :--------------------: | :-------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     `db`      | `_SQLAlchemyLiteDB_co` | <InlineIcon icon={vsiCheckIcon}/> | <p>用来导出session和engine实例的数据库扩展。</p><p>由`flask_sqlachemy_lite`提供。封装该参数后，可以在参数来自lite版的情况下、模拟`flask_sqlalchemy`的行为。</p> |
+| `model_class` |    `_ModelLite_co`     | <InlineIcon icon={vsiCheckIcon}/> | <p>基模型的类。该`model_class`参数是必需的。</p><p>该参数将会用来提供一些与metadata有关的功能。</p>                                                                 |
+
+- 其中，`_SQLAlchemyLiteDB_co`是[`fsc.protocols.SQLAlchemyLiteProtocol`](../protocols/SQLAlchemyLiteProtocol.mdx)的`TypeVar`。
+- 其中，`_ModelLite_co`是`sa.orm.DeclarativeBase`的`TypeVar`。
+
+## 方法 {#methods}
+
+### <IconObjType type="method"/> `init_app` {#-init_app}
+
+```python
+db_proxy.init_app(
+    app: Flask,
+)
+```
+
+按照`Flask.config`创建engine，并将数据库扩展注册到应用中。
+
+#### 输入 {#requires}
+
+| 参数  |  类型   |               必选                | <center>说明</center> |
+| :---: | :-----: | :-------------------------------: | --------------------- |
+| `app` | `Flask` | <InlineIcon icon={vsiCheckIcon}/> | 要注册到的应用。      |
+
+---
+
+### <IconObjType type="method"/> `create_all` {#-create_all}
+
+```python
+db_proxy.create_all(
+    bind_key: str | None | Sequence[str | None] = "__all__",
+)
+```
+
+透过调用`metadata.create_all()`，在数据表不存在的情况下，在数据库中、为某个、某些、或全部`bind_key`创建数据表。该操作不会更新那些已经存在的数据表。如果用户需要这种更新，应当使用迁移（migration）库。
+
+该方法需要在启动的Flask应用上下文之内调用。
+
+#### 输入 {#requires-1}
+
+|    参数    |                  类型                  | 必选 | <center>说明</center>                                                                                               |
+| :--------: | :------------------------------------: | :--: | ------------------------------------------------------------------------------------------------------------------- |
+| `bind_key` | `str \| None \| Sequence[str \| None]` |      | <p>一个或多个、要设置metadata的engine的名称。</p><p>如果该值为`__all__`，则会向配置中的所有engine设置metadata。</p> |
+
+---
+
+### <IconObjType type="method"/> `drop_all` {#-drop_all}
+
+```python
+db_proxy.create_all(
+    bind_key: str | None | Sequence[str | None] = "__all__",
+)
+```
+
+透过调用`metadata.drop_all()`、为某个、某些、或全部`bind_key`删除所有数据表。
+
+该方法需要在启动的Flask应用上下文之内调用。
+
+#### 输入 {#requires-2}
+
+|    参数    |                  类型                  | 必选 | <center>说明</center>                                                                                               |
+| :--------: | :------------------------------------: | :--: | ------------------------------------------------------------------------------------------------------------------- |
+| `bind_key` | `str \| None \| Sequence[str \| None]` |      | <p>一个或多个、要删去数据表的engine的名称。</p><p>如果该值为`__all__`，则会令配置中的所有engine删去其数据表。</p> |
+
+---
+
+### <IconObjType type="method"/> `reflect` {#-reflect}
+
+```python
+db_proxy.reflect(
+    bind_key: str | None | Sequence[str | None] = "__all__",
+)
+```
+
+透过调用`metadata.reflect()`，为某个、某些、或全部`bind_key`从数据库本身加载数据表的定义。
+
+该方法需要在启动的Flask应用上下文之内调用。
+
+#### 输入 {#requires-3}
+
+|    参数    |                  类型                  | 必选 | <center>说明</center>                                                                                             |
+| :--------: | :------------------------------------: | :--: | ----------------------------------------------------------------------------------------------------------------- |
+| `bind_key` | `str \| None \| Sequence[str \| None]` |      | <p>一个或多个、要反射数据表的engine的名称。</p><p>如果该值为`__all__`，则会令配置中的所有engine反射其数据表。</p> |
+
+---
+
+### <IconObjType type="method"/> `dynamic_loader` {#-dynamic_loader}
+
+```python
+val: RelationshipProperty[Any] = db_proxy.dynamic_loader(
+    argument: _RelationshipArgumentType[Any] | None = None,
+    **kw: Any,
+)
+```
+
+和`sa.orm.relationship`相同。
+
+用来构建动态载入的mapper属性。
+
+本质上，它和使用`relationship`的时候、设置`lazy="dynamic"`是一样的。
+
+```python
+dynamic_loader(SomeClass)  # 等同于
+
+relationship(SomeClass, lazy="dynamic")
+```
+
+#### 输入 {#requires-4}
+
+|    参数    |               类型               | 必选 | <center>说明</center>                            |
+| :--------: | :------------------------------: | :--: | ------------------------------------------------ |
+| `argument` | `_RelationshipArgumentType[Any]` |      | 第一个要传递到`sa.orm.relationship(...)`的参数。 |
+|   `**kw`   |              `Any`               |      | 其他要传递到`sa.orm.relationship(...)`的参数。   |
+
+#### 输出 {#returns}
+
+| 参数  |            类型             | <center>说明</center> |
+| :---: | :-------------------------: | :-------------------- |
+| `val` | `RelationshipProperty[Any]` | 动态载入的关系属性。  |
+
+---
+
+### <IconObjType type="method"/> `get_engine` {#-get_engine}
+
+```python
+engine: sa.engine.Engine = db_proxy.reflect(
+    bind_key: str | None = None,
+)
+```
+
+和`self.engines[bind_key]`相同。
+
+按照指定的`bind_key`来获取当前应用对应关联的engine。该方法需要在启动的Flask应用上下文之内调用。
+
+#### 输入 {#requires-5}
+
+|    参数    |     类型      | 必选 | <center>说明</center> |
+| :--------: | :-----------: | :--: | --------------------- |
+| `bind_key` | `str \| None` |      | engine的名字。       |
+
+#### 输出 {#returns-1}
+
+|   参数   |        类型        | <center>说明</center>     |
+| :------: | :----------------: | :------------------------ |
+| `engine` | `sa.engine.Engine` | 按照名字获取到的engine。 |
+
+---
+
+### <IconObjType type="method"/> `get_or_404` {#-get_or_404}
+
+```python
+val: T = db_proxy.get_or_404[T](
+    entity: _EntityBindKey[T],
+    ident: _PKIdentityArgument,
+    *,
+    description: str | None = None,
+    **kwargs: Any,
+)
+```
+
+与`session.get()`相若，但不会返回`None`，而是会抛出`404 Not Found`错误、并拒绝请求。
+
+除了该方法的特有参数`description`，其他的参数、用法与`session.get()`相同。
+
+#### 输入 {#requires-6}
+
+|     参数      |         类型          |               必选                | <center>说明</center>              |
+| :-----------: | :-------------------: | :-------------------------------: | ---------------------------------- |
+|   `entity`    |  `_EntityBindKey[T]`  | <InlineIcon icon={vsiCheckIcon}/> | 要检索的模型类、或实体语句。       |
+|    `ident`    | `_PKIdentityArgument` | <InlineIcon icon={vsiCheckIcon}/> | 要检索的主键。                     |
+| `description` |     `str \| None`     |                                   | 用来在抛出错误时、显示的定制信息。 |
+|  `**kwargs`   |         `Any`         |                                   | 其他传递到`session.get()`的参数。  |
+
+#### 输出 {#returns-2}
+
+| 参数  | 类型 | <center>说明</center> |
+| :---: | :--: | :-------------------- |
+| `val` | `T`  | 检索到的模型实体。    |
+
+- 其中，`T`是某个`Model`的`TypeVar`。该`Model`可以是一个`sa.orm.DeclarativeBase`的子类。
+- 其中，`_EntityBindKey[T]`通常是`Type[T]`。
+- 其中，`_PKIdentityArgument`是`Any | tuple[Any]`的别名。
+
+---
+
+### <IconObjType type="method"/> `first_or_404` {#-first_or_404}
+
+```python
+val: T = db_proxy.first_or_404[T](
+    statement: sa.sql.Select[tuple[T]],
+    *,
+    description: str | None = None,
+)
+val: tuple[T, T2, ...] = db_proxy.first_or_404[T, T2, ...](
+    statement: sa.sql.Select[tuple[T, T2, ...]],
+    *,
+    description: str | None = None,
+)
+```
+
+与`Result.scalar()`相若，但不会返回`None`，而是会抛出`404 Not Found`错误、并拒绝请求。
+
+#### 输入 {#requires-7}
+
+|     参数      |              类型              |               必选                | <center>说明</center>              |
+| :-----------: | :----------------------------: | :-------------------------------: | ---------------------------------- |
+|  `statement`  | `sa.sql.Select[Tuple[T, ...]]` | <InlineIcon icon={vsiCheckIcon}/> | 要执行的`select`语句。             |
+| `description` |         `str \| None`          |                                   | 用来在抛出错误时、显示的定制信息。 |
+
+#### 输出 {#returns-3}
+
+| 参数  |   类型   | <center>说明</center>                       |
+| :---: | :------: | :------------------------------------------ |
+| `val` | `T, ...` | 当`statement`检索到时，所返回的第一个结果。 |
+
+- 其中，`T, T2, ...`是`sa.select`语句中指定的类型。
+
+---
+
+### <IconObjType type="method"/> `one_or_404` {#-one_or_404}
+
+```python
+val: T = db_proxy.one_or_404[T](
+    statement: sa.sql.Select[tuple[T]],
+    *,
+    description: str | None = None,
+)
+val: tuple[T, T2, ...] = db_proxy.one_or_404[T, T2, ...](
+    statement: sa.sql.Select[tuple[T, T2, ...]],
+    *,
+    description: str | None = None,
+)
+```
+
+与`Result.scalar_one()`相若，但不会抛出`NoResultFound`或`MultipleResultsFound`，而是会抛出`404 Not Found`错误、并拒绝请求。
+
+#### 输入 {#requires-8}
+
+|     参数      |              类型              |               必选                | <center>说明</center>              |
+| :-----------: | :----------------------------: | :-------------------------------: | ---------------------------------- |
+|  `statement`  | `sa.sql.Select[Tuple[T, ...]]` | <InlineIcon icon={vsiCheckIcon}/> | 要执行的`select`语句。             |
+| `description` |         `str \| None`          |                                   | 用来在抛出错误时、显示的定制信息。 |
+
+#### 输出 {#returns-4}
+
+| 参数  |   类型   | <center>说明</center>                                   |
+| :---: | :------: | :------------------------------------------------------ |
+| `val` | `T, ...` | 当`statement`检索到时，所返回的第一个、且唯一一个结果。 |
+
+- 其中，`T, T2, ...`是`sa.select`语句中指定的类型。
+
+---
+
+### <IconObjType type="method"/> `paginate` {#-paginate}
+
+```python
+db_proxy.paginate(*args: Any, **kwargs: Any)
+```
+
+:::danger
+
+该代理类并未实现该方法。
+
+:::
+
+### <IconObjType type="method"/> `relationship` {#-relationship}
+
+```python
+val: _RelationshipDeclared[Any] = db_proxy.relationship(
+    argument: _RelationshipArgumentType[Any] | None = None,
+    secondary: _RelationshipSecondaryArgument | None = None,
+    *,
+    uselist: bool | None = None,
+    collection_class: type[Collection[Any]] | Callable[[], Collection[Any]] = None,
+    primaryjoin: _RelationshipJoinConditionArgument | None = None,
+    secondaryjoin: _RelationshipJoinConditionArgument | None = None,
+    back_populates: str | None = None,
+    order_by: _ORMOrderByArgument = False,
+    backref: ORMBackrefArgument | None = None,
+    overlaps: str | None = None,
+    post_update: bool = False,
+    cascade: str = "save-update, merge",
+    viewonly: bool = False,
+    init: _NoArg | bool = _NoArg.NO_ARG,
+    repr: _NoArg | bool = _NoArg.NO_ARG,
+    default: _NoArg | _T = _NoArg.NO_ARG,
+    default_factory: _NoArg | Callable[[], _T] = _NoArg.NO_ARG,
+    compare: _NoArg | bool = _NoArg.NO_ARG,
+    kw_only: _NoArg | bool = _NoArg.NO_ARG,
+    hash: _NoArg | bool | None = _NoArg.NO_ARG,
+    lazy: _LazyLoadArgumentType = "select",
+    passive_deletes: Literal["all"] | bool = False,
+    passive_updates: bool = True,
+    active_history: bool = False,
+    enable_typechecks: bool = True,
+    foreign_keys: _ORMColCollectionArgument | None = None,
+    remote_side: _ORMColCollectionArgument | None = None,
+    join_depth: int | None = None,
+    comparator_factory: type[RelationshipProperty.Comparator[Any]] | None = None,
+    single_parent: bool = False,
+    innerjoin: bool = False,
+    distinct_target_key: bool | None = None,
+    load_on_pending: bool = False,
+    query_class: type[Query[Any]] | None = None,
+    info: _InfoType | None = None,
+    omit_join: Literal[None, False] = None,
+    sync_backref: bool | None = None,
+    **kw: Any,
+)
+```
+
+与`sa.orm.relationship`相同，用来提供两个映射类之间的关系。
+
+详情请参见[官方文档<IconExternalLink/>][link-sa-relationship]。
+
+## 属性 {#properties}
+
+### <IconObjType type="param"/> `db` {#-db}
+
+```python
+db: _SQLAlchemyLiteDB_co = db_proxy.db
+```
+
+Flask SQLAlchemy扩展所提供的`db`实例。
+
+---
+
+### <IconObjType type="param"/> `Model` {#-model}
+
+```python
+db: type[_ModelLite_co] = db_proxy.Model
+```
+
+`Model`类。定义SQLAlchemy模型时，充当基类。该值与初始化参数`model_class`是同一值，但是为了支持额外功能、经过了修改。
+
+---
+
+### <IconObjType type="param"/> `Table` {#-table}
+
+```python
+table_factory: Callable[[...], sa.Table] = db_proxy.Table
+```
+
+`sa.Table`的简化版。
+
+相比`sa.Table`，唯一的不同是，参数`metadata`可以隐式配置。用户使用该工厂函数构造数据表时，可以不设置该参数。
+
+---
+
+### <IconObjType type="param"/> `Query` {#-query}
+
+```python
+query_class: sa.orm.Query = db_proxy.Query
+```
+
+和`sa.orm.Query`相同。
+
+ORM层的SQL语句构造器。
+
+---
+
+### <IconObjType type="param"/> `session` {#-session}
+
+```python
+sess: sa.orm.scoped_session[sa.orm.Session] = db_proxy.session
+```
+
+和`self.db.session`用法相若。
+
+当前应用上下文的默认会话。在离开应用上下文时，会自动关闭。
+
+---
+
+### <IconObjType type="param"/> `metadatas` {#-metadatas}
+
+```python
+metadatas: dict[str | None, sa.MetaData] = db_proxy.metadatas
+```
+
+metadata的兼容接口。
+
+由于`flask_sqlalchemy_lite`并未支持`bind_key`，目前`metdatas`总是实现为仅含一个成员的字典，其形式如下：
+
+```python
+{None: self.metadata}
+```
+
+---
+
+### <IconObjType type="param"/> `metadata` {#-metadata}
+
+```python
+metadata: sa.MetaData = db_proxy.metadata
+```
+
+未配置bind key的情况下，`Model`和`Table`的默认metadata。
+
+---
+
+### <IconObjType type="param"/> `engines` {#-engines}
+
+```python
+engines: MutableMapping[str | None, sa.engine.Engine] = db_proxy.engines
+```
+
+配置在当前应用下的所有engine。
+
+为确保该值和`flask_sqlalchemy`用法兼容。所返回的值添加了一个额外项：`self.engines[None] is self.engines["default"]`。
+
+---
+
+### <IconObjType type="param"/> `engine` {#-engine}
+
+```python
+engine: sa.engine.Engine = db_proxy.engine
+```
+
+配置在当前应用下的默认engine。
+
+## 运算符 {#operators}
+
+### <IconObjType type="op"/> `__getattr__`
+
+```python
+obj: Any = getattr(
+    db_proxy,
+    any_attr: str
+)
+```
+
+当需要向`db_proxy`获取非显式定义的属性（方法）时调用。
+
+会依次向`sa.orm`和`sa`搜索属性。若所要的属性不存在于`sa.orm`，则在`sa`中搜索。
+
+特殊情况包含：
+
+|        属性         |          值           |
+| :-----------------: | :-------------------: |
+|  `db_proxy.event`   |      `sa.event`       |
+| `db_proxy.relation` | `sa.orm.relationship` |
+
+例如，
+
+```python
+db_proxy.select
+```
+
+即等同于调用`sa.select`。
+
+#### 输入 {#requires-9}
+
+|    参数    | 类型  |               必选                | <center>说明</center> |
+| :--------: | :---: | :-------------------------------: | --------------------- |
+| `any_attr` | `str` | <InlineIcon icon={vsiCheckIcon}/> | 要获取的属性名        |
+
+#### 输出 {#returns-5}
+
+| 参数  | 类型  | <center>说明</center>        |
+| :---: | :---: | :--------------------------- |
+| `obj` | `Any` | 在`sa.orm`或`sa`找到的属性。 |
+
+[link-sa-relationship]: https://docs.sqlalchemy.org/en/20/orm/relationship_api.html#sqlalchemy.orm.relationship
+[link-saorm-query]: https://docs.sqlalchemy.org/en/20/orm/queryguide/query.html#sqlalchemy.orm.Query
+[link-sa-table]: https://docs.sqlalchemy.org/en/20/core/metadata.html#sqlalchemy.schema.Table

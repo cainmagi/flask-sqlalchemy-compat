@@ -1,0 +1,38 @@
+---
+id: apply_to_engines
+title: apply_to_engines
+sidebar_label: apply_to_engines
+slug: /apis/utilities/apply_to_engines
+description: 向一个或多个engine调用一个函数。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.apply_to_engines" />
+
+```python
+apply_to_engines(
+    func: Callable[[sa.engine.Engine], None],
+    bind_key: str | None | Sequence[str | None],
+    engines: Mapping[str, sa.engine.Engine],
+    default_engine: sa.engine.Engine,
+)
+```
+
+向一个或多个engine调用一个函数。
+
+给定的`func`是作用于单个engine的函数。该方法定义了如何将`func`应用到多个engine的逻辑。
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+|       参数       |                  类型                  |               必选                | <center>说明</center>                                                         |
+| :--------------: | :------------------------------------: | :-------------------------------: | ----------------------------------------------------------------------------- |
+|      `func`      |      `(sa.engine.Engine) -> None`      | <InlineIcon icon={vsiCheckIcon}/> | 作用在单个engine上的函数。                                                      |
+|    `bind_key`    | `str \| None \| Sequence[str \| None]` | <InlineIcon icon={vsiCheckIcon}/> | `func`将要应用到的engine的名称。                                                |
+|    `engines`     |    `Mapping[str, sa.engine.Engine]`    | <InlineIcon icon={vsiCheckIcon}/> | 所有已注册engine的集合。若`bind_key`为`__all__`，则会向所有engine应用`func`。 |
+| `default_engine` |           `sa.engine.Engine`           | <InlineIcon icon={vsiCheckIcon}/> | 默认engine。其应与`engines["default"]`指向同一引用。                             |

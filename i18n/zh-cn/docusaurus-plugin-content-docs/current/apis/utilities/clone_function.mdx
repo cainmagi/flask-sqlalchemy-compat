@@ -1,0 +1,113 @@
+---
+id: clone_function
+title: clone_function
+sidebar_label: clone_function
+slug: /apis/utilities/clone_function
+description: 装饰器，透过克隆另一个函数的签名，来修改某函数的静态注解。
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar
+  type="func"
+  isPrivate={true}
+  isDecorator={true}
+  source="utilities.clone_function"
+/>
+
+```python
+decorator: Callable[
+  [Callable[P, T]],
+  Callable[P, T]
+] = clone_function[**P, T](
+    func_o: Callable[P, Any],
+)
+
+@clone_function(func_o)
+def func(val1, val2, ...): ...
+```
+
+装饰器，透过克隆另一个函数的签名，来修改某函数的静态注解。
+
+该装饰器应当用于克隆某个普通的函数。它不适用于方法。
+
+:::note
+
+须知，该装饰器不会修改被装饰函数签名中的返回值。
+
+:::
+
+:::note
+
+须知，该装饰器不会修改被装饰函数在运行时的行为。
+
+:::
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+|   参数   |      类型      |               必选                | <center>说明</center>                 |
+| :------: | :------------: | :-------------------------------: | ------------------------------------- |
+| `func_o` | `(**P) -> Any` | <InlineIcon icon={vsiCheckIcon}/> | <p>用来提供被克隆的签名的原函数。</p> |
+
+### 输出 {#returns}
+
+| 参数 | 类型 | <center>说明</center> |
+| :---------: | :----------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `decorator` | `((**P) -> T) -> ((**P) -> T)` | <p>一个包装函数。该函数直接返回被包装的函数。但所返回的被包装函数，其签名会与参数`func_o`一致。</p><p>签名的输入参数部分、拷贝自`func_o`，而输出值仍然由被包装的函数决定。</p> |
+
+
+## 范例 {#examples}
+
+### <IconObjType type="term"/> 将函数的签名拷贝到另一函数 {#-clone-the-signature-of-a-function-to-another-function}
+
+<Tabs
+  defaultValue="codes"
+  values={[
+    { label: '代码', value: 'codes', },
+    { label: '结果', value: 'results', },
+  ]
+}>
+
+<TabItem value="codes">
+
+```python title="clone_signature_to_function.py" showLineNumbers
+from typing import reveal_type
+import inspect
+import flask_sqlalchemy_compat as fsc
+
+
+def test_func(val1: int, val2: str) -> float: ...
+
+
+@fsc.utilities.clone_function(test_func)
+def modified_func(*args, **kwargs) -> str:
+    return "不是float！"
+
+
+if __name__ == "__main__":
+    reveal_type(modified_func)
+    print(inspect.signature(modified_func))
+    print(modified_func(1, "2"))
+```
+
+</TabItem>
+
+<TabItem value="results">
+
+```python
+Runtime type is 'function'
+(val1: int, val2: str) -> str
+不是float！
+```
+
+</TabItem>
+
+</Tabs>

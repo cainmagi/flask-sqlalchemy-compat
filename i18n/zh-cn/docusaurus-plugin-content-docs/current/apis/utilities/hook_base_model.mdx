@@ -1,0 +1,40 @@
+---
+id: hook_base_model
+title: hook_base_model
+sidebar_label: hook_base_model
+slug: /apis/utilities/hook_base_model
+description: 向某个给定的模型类添加钩子。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.hook_base_model" />
+
+```python
+hooked_model: type[_Model_contra] = hook_base_model[_Model_contra](
+    cls: type[_Model_contra],
+    db: SQLAlchemyProtocol | SQLAlchemyLiteProtocol,
+)
+```
+
+向某个给定的模型类添加钩子。所添加的钩子会在`__tablename__`，`query`，`query_cls`属性未定义的情况下、合成对应的属性。
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+| 参数  |                               类型                                |               必选                | <center>说明</center>          |
+| :---: | :---------------------------------------------------------------: | :-------------------------------: | ------------------------------ |
+| `cls` |                       `type[_Model_contra]`                       | <InlineIcon icon={vsiCheckIcon}/> | 要钩入的类。                   |
+| `db`  | `flask_sqlalchemy.SQLAlchemy \| flask_sqlalchemy_lite.SQLAlchemy` |                                   | 用来提供会话的数据库扩展实例。 |
+
+- 其中`_Model_contra`是`DeclarativeBase | DeclarativeBaseNoMeta`的`TypeVar`。
+
+### 输出 {#returns}
+
+|      参数      |         类型          | <center>说明</center>  |
+| :------------: | :-------------------: | :--------------------- |
+| `hooked_model` | `type[_Model_contra]` | 添加了钩子后基模型类。 |

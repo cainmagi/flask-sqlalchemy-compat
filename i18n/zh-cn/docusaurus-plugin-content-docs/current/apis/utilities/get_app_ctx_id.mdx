@@ -1,0 +1,28 @@
+---
+id: get_app_ctx_id
+title: get_app_ctx_id
+sidebar_label: get_app_ctx_id
+slug: /apis/utilities/get_app_ctx_id
+description: 获得当前Flask应用上下文对象的ID。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="utilities.get_app_ctx_id" />
+
+```python
+ctx_id: int = get_app_ctx_id()
+```
+
+获得当前Flask应用上下文对象的ID。
+
+## 参数 {#arguments}
+
+### 输出 {#returns}
+
+|   参数   | 类型  | <center>说明</center>        |
+| :------: | :---: | :---------------------------- |
+| `ctx_id` | `int` | 当前Flask应用上下文对象的ID。 |

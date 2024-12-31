@@ -1,0 +1,53 @@
+---
+id: as_flask_sqlalchemy_lite
+title: as_flask_sqlalchemy_lite
+sidebar_label: as_flask_sqlalchemy_lite
+slug: /apis/flask_sa_lite_api/as_flask_sqlalchemy_lite
+description: 令db按照flask_sqlalchemy_lite的方式工作。
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="func" source="flask_sa_lite_api.as_flask_sqlalchemy_lite" />
+
+```python
+db: _SQLAlchemyLiteDB = as_flask_sqlalchemy(db: _SQLAlchemyLiteDB)
+db: SQLAlchemyProxy[_SQLAlchemyDB_co] = as_flask_sqlalchemy_lite(db: _SQLAlchemyDB_co)
+```
+
+令`db`按照`flask_sqlalchemy_lite`的方式工作。
+
+## 别名 {#aliases}
+
+该函数可以按以下方式之一获取
+
+```python
+import flask_sqlalchemy_compat as fsc
+
+
+fsc.as_flask_sqlalchemy_lite
+fsc.flask_sa_lite_api.as_flask_sqlalchemy_lite
+```
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+| 参数 |                  类型                   |               必选                | <center>说明</center>      |
+| :--: | :-------------------------------------: | :-------------------------------: | -------------------------- |
+| `db` | `_SQLAlchemyLiteDB \| _SQLAlchemyDB_co` | <InlineIcon icon={vsiCheckIcon}/> | 需要封装的数据库扩展实例。 |
+
+- 其中，`_SQLAlchemyLiteDB`是[`fsc.protocols.SQLAlchemyLiteProtocol`](../protocols/SQLAlchemyLiteProtocol.mdx)的`TypeVar`。
+- 其中，`_SQLAlchemyDB_co`是[`fsc.protocols.SQLAlchemyProtocol`](../protocols/SQLAlchemyProtocol.mdx)的`TypeVar`。
+
+### 输出 {#returns}
+
+| 参数 |                                                     类型                                                      | <center>说明</center>                                                                                                                                                                                                          |
+| :--: | :-----------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `db` | <code>{`flask_sqlalchemy_lite.SQLAlchemy \| `}[SQLAlchemyLiteProxy](./SQLAlchemyLiteProxy.mdx){"(db)"}</code> | <p>若`db`来自`flask_sqlalchemy_lite`，直接原样返回。</p><p>若`db`来自`flask_sqlalchemy`，返回它的代理封装。该封装和`flask_sqlalchemy_lite.SQLAlchemy()`有着相同的API，但底层是藉由`flask_sqlalchemy.SQLAlchemy()`实现的。</p> |

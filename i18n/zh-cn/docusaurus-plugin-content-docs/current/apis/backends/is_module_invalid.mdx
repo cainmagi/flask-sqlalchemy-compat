@@ -1,0 +1,38 @@
+---
+id: is_module_invalid
+title: is_module_invalid
+sidebar_label: is_module_invalid
+slug: /apis/backends/is_module_invalid
+description: 检查所给定的模块是否无效（亦即为占位符）。
+---
+
+import vsiCheckIcon from "@iconify-icons/codicon/check";
+
+import InlineIcon from "@site/src/components/InlineIcon";
+import APITopBar from "@site/src/components/APITopBar";
+
+<APITopBar type="func" isPrivate={true} source="backends.is_module_invalid" />
+
+```python
+flag: bool = is_module_invalid(
+    module: ModuleType
+)
+```
+
+检查所给定的模块是否无效。
+
+一个无效模块不提供任何实际功能，只能充作占位符。
+
+## 参数 {#arguments}
+
+### 输入 {#requires}
+
+|   参数   |     类型     |               必选                | <center>说明</center> |
+| :------: | :----------: | :-------------------------------: | --------------------- |
+| `module` | `ModuleType` | <InlineIcon icon={vsiCheckIcon}/> | 要检查的模块。        |
+
+### 输出 {#returns}
+
+|  参数  |  类型  | <center>说明</center>                                                                                                                            |
+| :----: | :----: | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flag` | `bool` | 若该值为`True`，则所检查的模块会被注解为[`ModulePlaceholder`](./ModulePlaceholder.mdx)，亦即是说，模块会被标记为无效。否则，就表明模块是可用的。 |

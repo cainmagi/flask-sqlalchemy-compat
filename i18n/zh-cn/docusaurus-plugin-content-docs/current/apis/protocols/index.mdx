@@ -1,0 +1,22 @@
+---
+id: index
+title: protocols
+sidebar_label: protocols
+slug: /apis/protocols
+description: 该包定制的协议类型注解。
+---
+
+import APITopBar, {IconObjType} from "@site/src/components/APITopBar";
+
+<APITopBar type="module" source="protocols" />
+
+该包定制的协议类型注解。这些协议类型用以注解形如`flask_sqlalchemy.SQLAlchemy`的扩展类、或形如`flask_sqlalchemy.model.Model`的定制类，而不必实际地导入这些类所属的包。
+
+## 类型 {#typehints}
+
+|                                                    成员                                                     |    类型    | <center>说明</center>                                     |
+| :---------------------------------------------------------------------------------------------------------: | :--------: | :-------------------------------------------------------- |
+|            [<IconObjType type="type" hasText={true} text="ModelProtocol"/>](./ModelProtocol.mdx)            | `Protocol` | 和`flask_sqlalchemy.extensions._FSAModel`兼容的协议。     |
+| [<IconObjType type="type" hasText={true} text="SQLAlchemySharedProtocol"/>](./SQLAlchemySharedProtocol.mdx) | `Protocol` | 同时和Flask SQLAlchemy、Flask SQLAlchemy Lite兼容的协议。 |
+|   [<IconObjType type="type" hasText={true} text="SQLAlchemyLiteProtocol"/>](./SQLAlchemyLiteProtocol.mdx)   | `Protocol` | 和Flask SQLAlchemy Lite兼容的协议。                       |
+|       [<IconObjType type="type" hasText={true} text="SQLAlchemyProtocol"/>](./SQLAlchemyProtocol.mdx)       | `Protocol` | 和Flask SQLAlchemy兼容的协议。                            |

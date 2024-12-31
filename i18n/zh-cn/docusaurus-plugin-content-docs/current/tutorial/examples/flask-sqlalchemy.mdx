@@ -1,0 +1,63 @@
+---
+id: flask-sqlalchemy
+sidebar_label: 常规版
+title: "范例：基于Flask SQLAlchemy的应用"
+description: 以下范例，使用Flask SQLAlchemy查询数据，并构建数据库API。
+slug: /examples/flask-sqlalchemy
+---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IconExternalLink from "@theme/Icon/ExternalLink";
+import ThemedImage from "@theme/ThemedImage";
+
+import mdiLanguagePython from "@iconify-icons/mdi/language-python";
+
+import {demoURL} from "@site/src/envs/variables";
+import DarkButton from "@site/src/components/DarkButton";
+
+查看以下链接，以阅览一个完整的Flask应用范例。
+
+<p>
+  <DarkButton to={demoURL("app_fsqla.py")} icon={mdiLanguagePython}>
+    {"app_fsqla.py"}
+  </DarkButton>
+</p>
+
+该范例与[Lite范例](./flask-sqlalchemy-lite.mdx)的运行效果完全相同。换言之，它的API和功能都与Lite范例完全相同。只有以下区别：
+
+1. 默认的数据库后端是Flask SQLAlchemy。
+2. 在代码实现中，更倾向于使用Flask SQLAlchemy提供的旧式的数据库API。
+
+## 数据库结构 {#database-structure}
+
+数据库的实体关系图（entity-relationship diagram, ERD）还是与Lite范例一样：
+
+<div className="mb-default center w-60">
+  <ThemedImage
+    alt="常规版应用的ERD"
+    sources={{
+      light: useBaseUrl("/img/examples/erd-fsql-light.svg"),
+      dark: useBaseUrl("/img/examples/erd-fsql-dark.svg"),
+    }}
+  />
+</div>
+
+与Lite范例相比，该范例的数据库具有以下不同的特性：
+
+- 默认的数据库后端是Flask SQLAlchemy。如果常规版未安装，则退回到Flask SQLAlchemy Lite。
+- 针对每个对象关系映射（ORM）模型，受益于Flask SQLAlchemy的增强，不必手动定义`__tablename__`。
+- 以下API
+
+  - `db.session.execute(sa.select(...))`
+  - `db.session.query(...)`
+
+  会替换成形如`Model.query`的旧式API。这些用法都是Flask SQLAlchemy提供的。
+
+- 基于ID的实体定位是透过`db.get_or_404(...)`、而非`db.session.get(...)`实现的。该`get_or_404(...)`方法来自Flask SQLAlchemy。在数据项未找到时，该方法不会返回`None`，而是会抛出一个404中断。
+
+## 访问范例 {#access-the-demo}
+
+可以使用与[Lite范例](./flask-sqlalchemy-lite.mdx#access-the-demo)中相同的测试脚本，因为该范例实现的API和Lite范例的API完全一致。
