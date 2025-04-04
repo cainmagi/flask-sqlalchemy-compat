@@ -6,6 +6,10 @@
 
 ### 0.2.2 @ 04/04/2025
 
+#### :mega: New
+
+1. Configure DocSearch and GTag.
+
 #### :floppy_disk: Change
 
 1. Bump the `yarn` version from `4.6.0` to `4.8.1`.

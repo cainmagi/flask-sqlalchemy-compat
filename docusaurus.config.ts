@@ -67,6 +67,10 @@ const config: Config = {
           //   },
           // },
         },
+        gtag: {
+          trackingID: "G-3802252EHF",
+          anonymizeIP: true,
+        },
         theme: {
           customCss: "./src/css/custom.scss",
         },
@@ -182,6 +186,16 @@ const config: Config = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Flask SQLAlchemy Compat, Yuchen Jin. Built with Docusaurus.`,
+    },
+    algolia: {
+      apiKey: "b6ce0ee90b93543473de760cb8612a74",
+      indexName: "cainmagiio",
+      // APP id
+      appId: "U9A8UKBF0H",
+      // Optional: make the search sensitive to sub-routing.
+      contextualSearch: true,
+      // Optional: Algolia search parameters
+      searchParameters: {facetFilters: ["type:content"]},
     },
     prism: {
       theme: prismThemes.github,
