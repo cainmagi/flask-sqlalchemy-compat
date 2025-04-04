@@ -10,6 +10,7 @@
 
 1. Bump the `yarn` version from `4.6.0` to `4.8.1`.
 2. Bump the `docusaurus` version from `3.6.3` to `3.7.0`.
+3. Bump the `typescript` version from `5.7.2` to `5.8.2`.
 
 ### 0.2.2 @ 12/31/2024
 
